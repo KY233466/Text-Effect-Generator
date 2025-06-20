@@ -1,0 +1,22 @@
+{
+    "testId": "0cfabf08-9c0f-4c8c-8d0a-7d358c6c14b4",
+    "name": "My Addon",
+    "version": "1.0.0",
+    "manifestVersion": 2,
+    "requirements": {
+        "apps": [
+            {
+                "name": "Express",
+                "apiVersion": 1
+            }
+        ]
+    },
+    "entryPoints": [
+        {
+            "type": "panel",
+            "id": "panel1",
+            "main": "index.html",
+            "documentSandbox": "sandbox/code.js"
+        }
+    ]
+}
