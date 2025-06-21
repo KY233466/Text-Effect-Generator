@@ -28,8 +28,8 @@ function start() {
 
                 console.log('接收到 SVG 路径数据:', d.substring(0, 100) + '...');
                 
-                const pathObj = editor.createPath();
-                pathObj.pathData = d;
+                // 创建路径对象，直接传递路径字符串
+                const pathObj = editor.createPath(d);
                 
                 // 设置填充颜色（热粉色）
                 const fillColor = { red: 1, green: 0.1, blue: 0.5, alpha: 1 };

@@ -33,9 +33,9 @@ const warpTypes = {
 };
 
 const fonts = [
-  { name: "Old Standard", url: "fonts/OldStandardTT-Regular.ttf" },
-  { name: "Arial", url: "fonts/Arial.ttf" },
-  { name: "Helvetica", url: "fonts/Helvetica.ttf" }
+  { name: "Old Standard", url: "./fonts/OldStandardTT-Regular.ttf" },
+  { name: "Arial", url: "./fonts/Arial.ttf" },
+  { name: "Helvetica", url: "./fonts/Helvetica.ttf" }
 ];
 
 const TextWarpApp = ({ sandboxProxy }) => {
