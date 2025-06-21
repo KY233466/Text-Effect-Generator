@@ -1,10 +1,13 @@
 {
     "name": "my-addon",
     "version": "1.0.0",
-    "description": "Adobe Creative Cloud Web Add-on.",
+    "description": "Adobe Creative Cloud Web Add-on with Text Warp functionality.",
+    "type": "module",
     "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview",
         "clean": "ccweb-add-on-scripts clean",
-        "build": "ccweb-add-on-scripts build",
         "start": "ccweb-add-on-scripts start",
         "package": "ccweb-add-on-scripts package"
     },
@@ -14,8 +17,17 @@
         "Add-on",
         "panel"
     ],
+    "dependencies": {
+        "opentype.js": "^1.3.4",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0"
+    },
     "devDependencies": {
         "@adobe/ccweb-add-on-scripts": "^3.0.0",
-        "@types/adobe__ccweb-add-on-sdk": "^1.3.0"
+        "@types/adobe__ccweb-add-on-sdk": "^1.3.0",
+        "@types/react": "^18.2.0",
+        "@types/react-dom": "^18.2.0",
+        "@vitejs/plugin-react": "^4.0.0",
+        "vite": "^4.4.0"
     }
 }

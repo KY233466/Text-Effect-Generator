@@ -1,15 +1,104 @@
-## About
+# Adobe Express 文本变形插件
 
-This project has been created with _@adobe/create-ccweb-add-on_. As an example, this Add-on demonstrates how to get started with Add-on development using JavaScript with Document Sandbox Runtime.
+这是一个基于 opentype.js 的 Adobe Express 插件，可以实现高级文本变形效果。
 
-## Tools
+## 功能特性
 
--   HTML
--   CSS
--   JavaScript
+- **多种变形类型**：下弧形、波浪形、凸起、下凸
+- **实时预览**：在插件界面中实时预览变形效果
+- **强度调节**：0-100 的强度滑块控制变形程度
+- **字体支持**：支持自定义字体文件（需要将字体文件放在 `public/fonts/` 目录下）
+- **系统字体**：支持使用系统默认字体作为备选方案
 
-## Setup
+## 项目结构
 
-1. To install the dependencies, run `npm install`.
-2. To build the application, run `npm run build`.
-3. To start the application, run `npm run start`.
+```
+my-addon/
+├── src/
+│   ├── ui/
+│   │   └── index.jsx          # UI 界面（React + opentype.js）
+│   └── sandbox/
+│       └── code.js            # Adobe Express 沙盒逻辑
+├── public/
+│   └── fonts/                 # 字体文件目录
+├── dist/                      # 构建输出目录
+└── package.json
+```
+
+## 安装和运行
+
+1. **安装依赖**
+   ```bash
+   npm install
+   ```
+
+2. **添加字体文件**（可选）
+   - 将字体文件（.ttf 格式）放在 `public/fonts/` 目录下
+   - 支持的字体文件：
+     - `OldStandardTT-Regular.ttf`
+     - `Arial.ttf`
+     - `Helvetica.ttf`
+
+3. **构建项目**
+   ```bash
+   npm run build
+   ```
+
+4. **在 Adobe Express 中加载插件**
+   - 将构建后的 `dist/` 目录作为插件加载到 Adobe Express
+
+## 使用方法
+
+1. **输入文字**：在文本输入框中输入要变形的文字
+2. **选择字体**：从下拉菜单中选择字体（包括系统默认字体）
+3. **选择变形类型**：选择下弧形、波浪形、凸起或下凸
+4. **调整强度**：使用滑块调整变形强度（0-100）
+5. **预览效果**：在预览区域查看变形效果
+6. **插入画布**：点击"插入到画布"按钮将变形文本插入到 Adobe Express 画布
+
+## 技术实现
+
+### UI 端（React）
+- 使用 `opentype.js` 加载字体文件
+- 生成 SVG 路径数据
+- 实时预览变形效果
+- 通过 Adobe Express SDK 与沙盒通信
+
+### 沙盒端
+- 接收 SVG 路径数据
+- 使用 `editor.createPath()` 创建路径对象
+- 设置填充颜色和位置
+- 插入到 Adobe Express 画布
+
+## 变形算法
+
+- **下弧形**：使用二次函数创建向下弯曲的弧形效果
+- **波浪形**：使用正弦函数创建波浪效果
+- **凸起**：创建向上凸起的效果
+- **下凸**：创建向下凸起的效果
+
+## 注意事项
+
+1. **字体文件**：如果字体文件不存在，插件会自动使用系统默认字体
+2. **性能**：复杂的变形效果可能会影响性能，建议适当调整强度
+3. **兼容性**：确保 Adobe Express 版本支持 Path 对象创建
+
+## 开发调试
+
+- 使用 `npm run dev` 启动开发服务器
+- 在浏览器中打开插件进行本地调试
+- 查看控制台日志了解运行状态
+
+## 故障排除
+
+1. **字体加载失败**：检查字体文件路径和格式
+2. **插入失败**：检查 Adobe Express 环境是否正确
+3. **预览不显示**：检查 opentype.js 是否正确加载
+
+## 扩展功能
+
+- 支持更多变形类型
+- 添加颜色选择
+- 支持渐变填充
+- 添加描边效果
+- 支持图片输出

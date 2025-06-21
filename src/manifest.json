@@ -1,6 +1,6 @@
 {
     "testId": "0cfabf08-9c0f-4c8c-8d0a-7d358c6c14b4",
-    "name": "My Addon",
+    "name": "Text Warp Addon",
     "version": "1.0.0",
     "manifestVersion": 2,
     "requirements": {
@@ -15,7 +15,7 @@
         {
             "type": "panel",
             "id": "panel1",
-            "main": "index.html",
+            "main": "ui/index.html",
             "documentSandbox": "sandbox/code.js"
         }
     ]

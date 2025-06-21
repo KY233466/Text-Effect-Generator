@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文本变形测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .preview {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+            background: #fafafa;
+        }
+        input, select {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Adobe Express 文本变形插件 - 本地测试</h1>
+        <p>这是一个本地测试页面，用于验证 opentype.js 文本变形功能。</p>
+        
+        <div>
+            <label>文字：</label>
+            <input type="text" id="textInput" value="TYPE WARP" placeholder="输入文字">
+            
+            <label>变形类型：</label>
+            <select id="warpType">
+                <option value="arcLower">下弧形</option>
+                <option value="wave">波浪形</option>
+                <option value="bulge">凸起</option>
+                <option value="bulgeDown">下凸</option>
+            </select>
+            
+            <label>强度：</label>
+            <input type="range" id="intensity" min="0" max="100" value="30">
+            <span id="intensityValue">30</span>
+        </div>
+        
+        <div class="preview">
+            <h3>预览效果：</h3>
+            <div id="preview"></div>
+        </div>
+        
+        <button onclick="generatePath()">生成路径</button>
+        <button onclick="copyPath()">复制路径</button>
+        
+        <div>
+            <h3>生成的 SVG 路径：</h3>
+            <textarea id="pathOutput" rows="5" cols="80" readonly></textarea>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/opentype.js@1.3.4/dist/opentype.min.js"></script>
+    <script>
+        // 变形算法
+        function arcLowerWarp(x, y, totalWidth, centerX, arcHeight) {
+            const normX = (x - centerX) / (totalWidth / 2);
+            const arcY = arcHeight * (1 - normX * normX);
+            return { x, y: y + arcY };
+        }
+
+        function waveWarp(x, y, totalWidth, centerX, arcHeight) {
+            return { x, y: y + Math.sin(x / 40) * arcHeight };
+        }
+
+        function bulgeWarp(x, y, totalWidth, centerX, arcHeight) {
+            const normX = (x - centerX) / (totalWidth / 2);
+            const bulgeY = arcHeight * (1 - Math.abs(normX));
+            return { x, y: y - bulgeY };
+        }
+
+        function bulgeDownWarp(x, y, totalWidth, centerX, arcHeight) {
+            const normX = (x - centerX) / (totalWidth / 2);
+            const bulgeY = arcHeight * (1 - Math.abs(normX));
+            return { x, y: y + bulgeY };
+        }
+
+        const warpTypes = {
+            arcLower: { label: "下弧形", fn: arcLowerWarp },
+            wave: { label: "波浪形", fn: waveWarp },
+            bulge: { label: "凸起", fn: bulgeWarp },
+            bulgeDown: { label: "下凸", fn: bulgeDownWarp }
+        };
+
+        // 生成简单路径的函数
+        function generateSimplePath(text, warpType, intensity) {
+            const fontSize = 80;
+            const charWidth = 60;
+            const totalWidth = text.length * charWidth;
+            const centerX = totalWidth / 2;
+            const arcHeight = intensity;
+            const warpFn = warpTypes[warpType].fn;
+            
+            let path = '';
+            let x = 0;
+            
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                const charX = x + charWidth / 2;
+                const charY = fontSize;
+                
+                const { x: warpedX, y: warpedY } = warpFn(charX, charY, totalWidth, centerX, arcHeight);
+                
+                const rectWidth = charWidth * 0.8;
+                const rectHeight = fontSize * 0.8;
+                const startX = warpedX - rectWidth / 2;
+                const startY = warpedY - rectHeight / 2;
+                
+                path += `M ${startX} ${startY} L ${startX + rectWidth} ${startY} L ${startX + rectWidth} ${startY + rectHeight} L ${startX} ${startY + rectHeight} Z `;
+                
+                x += charWidth;
+            }
+            
+            return path;
+        }
+
+        function generatePath() {
+            const text = document.getElementById('textInput').value;
+            const warpType = document.getElementById('warpType').value;
+            const intensity = parseInt(document.getElementById('intensity').value);
+            
+            if (!text) {
+                alert('请输入文字');
+                return;
+            }
+            
+            // 使用简单路径生成（模拟系统字体）
+            const path = generateSimplePath(text, warpType, intensity);
+            
+            // 显示预览
+            document.getElementById('preview').innerHTML = `
+                <svg viewBox="0 0 800 300" width="100%" height="200" style="border: 1px solid #eee">
+                    <path d="${path}" fill="hotpink" stroke="none" />
+                </svg>
+            `;
+            
+            // 显示路径
+            document.getElementById('pathOutput').value = path;
+        }
+
+        function copyPath() {
+            const pathOutput = document.getElementById('pathOutput');
+            pathOutput.select();
+            document.execCommand('copy');
+            alert('路径已复制到剪贴板');
+        }
+
+        // 更新强度显示
+        document.getElementById('intensity').addEventListener('input', function() {
+            document.getElementById('intensityValue').textContent = this.value;
+        });
+
+        // 页面加载时生成一次
+        window.onload = function() {
+            generatePath();
+        };
+    </script>
+</body>
+</html> 
