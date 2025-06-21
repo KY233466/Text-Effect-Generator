@@ -12,23 +12,65 @@ function waveWarp(x, y, totalWidth, centerX, arcHeight) {
   return { x, y: y + Math.sin(x / 40) * arcHeight };
 }
 
-function bulgeWarp(x, y, totalWidth, centerX, arcHeight) {
+// 优化后的凸起变形算法 - 重命名为melt1
+function melt1Warp(x, y, totalWidth, centerX, arcHeight) {
   const normX = (x - centerX) / (totalWidth / 2);
-  const bulgeY = arcHeight * (1 - normX * normX);
+  // 水平方向的变形因子
+  const horizontalFactor = Math.cos(normX * Math.PI / 2);
+  const horizontalBulge = horizontalFactor * horizontalFactor;
+  
+  // 关键改进：根据字母的垂直位置决定是否变形
+  const baselineY = 80; // 字体基线位置
+  const letterTop = baselineY - 60; // 字母顶部大约位置
+  const letterBottom = baselineY + 15; // 字母底部大约位置
+  const letterMiddle = (letterTop + letterBottom) / 2; // 字母中间位置
+  
+  // 只有接近字母中间部分的点才进行变形
+  const distanceFromMiddle = Math.abs(y - letterMiddle);
+  const maxMiddleDistance = 25; // 中间区域的范围
+  
+  // 如果点在字母的顶部或底部边缘，几乎不变形
+  let verticalFactor = 0;
+  if (distanceFromMiddle < maxMiddleDistance) {
+    verticalFactor = 1 - (distanceFromMiddle / maxMiddleDistance);
+  }
+  
+  const bulgeY = arcHeight * horizontalBulge * verticalFactor;
   return { x, y: y - bulgeY };
 }
 
-function bulgeDownWarp(x, y, totalWidth, centerX, arcHeight) {
+// 优化后的下凸变形算法 - 重命名为melt2
+function melt2Warp(x, y, totalWidth, centerX, arcHeight) {
   const normX = (x - centerX) / (totalWidth / 2);
-  const bulgeY = arcHeight * (1 - normX * normX);
+  // 水平方向的变形因子
+  const horizontalFactor = Math.cos(normX * Math.PI / 2);
+  const horizontalBulge = horizontalFactor * horizontalFactor;
+  
+  // 关键改进：根据字母的垂直位置决定是否变形
+  const baselineY = 80; // 字体基线位置
+  const letterTop = baselineY - 60; // 字母顶部大约位置
+  const letterBottom = baselineY + 15; // 字母底部大约位置
+  const letterMiddle = (letterTop + letterBottom) / 2; // 字母中间位置
+  
+  // 只有接近字母中间部分的点才进行变形
+  const distanceFromMiddle = Math.abs(y - letterMiddle);
+  const maxMiddleDistance = 25; // 中间区域的范围
+  
+  // 如果点在字母的顶部或底部边缘，几乎不变形
+  let verticalFactor = 0;
+  if (distanceFromMiddle < maxMiddleDistance) {
+    verticalFactor = 1 - (distanceFromMiddle / maxMiddleDistance);
+  }
+  
+  const bulgeY = arcHeight * horizontalBulge * verticalFactor;
   return { x, y: y + bulgeY };
 }
 
 const warpTypes = {
   arcLower: { label: "下弧形", fn: arcLowerWarp },
   wave: { label: "波浪形", fn: waveWarp },
-  bulge: { label: "凸起", fn: bulgeWarp },
-  bulgeDown: { label: "下凸", fn: bulgeDownWarp }
+  melt1: { label: "Melt1 凸起", fn: melt1Warp },
+  melt2: { label: "Melt2 下凸", fn: melt2Warp }
 };
 
 const WarpText = ({ text, warpType, intensity, fontPostscriptName }) => {

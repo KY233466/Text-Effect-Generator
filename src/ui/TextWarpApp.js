@@ -13,23 +13,65 @@ function waveWarp(x, y, totalWidth, centerX, arcHeight) {
   return { x, y: y + Math.sin(x / 40) * arcHeight };
 }
 
-function bulgeWarp(x, y, totalWidth, centerX, arcHeight) {
+// 优化后的凸起变形算法 - 重命名为melt1
+function melt1Warp(x, y, totalWidth, centerX, arcHeight) {
   const normX = (x - centerX) / (totalWidth / 2);
-  const bulgeY = arcHeight * (1 - Math.abs(normX));
+  // 水平方向的变形因子
+  const horizontalFactor = Math.cos(normX * Math.PI / 2);
+  const horizontalBulge = horizontalFactor * horizontalFactor;
+  
+  // 关键改进：根据字母的垂直位置决定是否变形
+  const baselineY = 80; // 字体基线位置
+  const letterTop = baselineY - 60; // 字母顶部大约位置
+  const letterBottom = baselineY + 15; // 字母底部大约位置
+  const letterMiddle = (letterTop + letterBottom) / 2; // 字母中间位置
+  
+  // 只有接近字母中间部分的点才进行变形
+  const distanceFromMiddle = Math.abs(y - letterMiddle);
+  const maxMiddleDistance = 25; // 中间区域的范围
+  
+  // 如果点在字母的顶部或底部边缘，几乎不变形
+  let verticalFactor = 0;
+  if (distanceFromMiddle < maxMiddleDistance) {
+    verticalFactor = 1 - (distanceFromMiddle / maxMiddleDistance);
+  }
+  
+  const bulgeY = arcHeight * horizontalBulge * verticalFactor;
   return { x, y: y - bulgeY };
 }
 
-function bulgeDownWarp(x, y, totalWidth, centerX, arcHeight) {
+// 优化后的下凸变形算法 - 重命名为melt2
+function melt2Warp(x, y, totalWidth, centerX, arcHeight) {
   const normX = (x - centerX) / (totalWidth / 2);
-  const bulgeY = arcHeight * (1 - Math.abs(normX));
+  // 水平方向的变形因子
+  const horizontalFactor = Math.cos(normX * Math.PI / 2);
+  const horizontalBulge = horizontalFactor * horizontalFactor;
+  
+  // 关键改进：根据字母的垂直位置决定是否变形
+  const baselineY = 80; // 字体基线位置
+  const letterTop = baselineY - 60; // 字母顶部大约位置
+  const letterBottom = baselineY + 15; // 字母底部大约位置
+  const letterMiddle = (letterTop + letterBottom) / 2; // 字母中间位置
+  
+  // 只有接近字母中间部分的点才进行变形
+  const distanceFromMiddle = Math.abs(y - letterMiddle);
+  const maxMiddleDistance = 25; // 中间区域的范围
+  
+  // 如果点在字母的顶部或底部边缘，几乎不变形
+  let verticalFactor = 0;
+  if (distanceFromMiddle < maxMiddleDistance) {
+    verticalFactor = 1 - (distanceFromMiddle / maxMiddleDistance);
+  }
+  
+  const bulgeY = arcHeight * horizontalBulge * verticalFactor;
   return { x, y: y + bulgeY };
 }
 
 const warpTypes = {
   arcLower: { label: "下弧形", fn: arcLowerWarp },
   wave: { label: "波浪形", fn: waveWarp },
-  bulge: { label: "凸起", fn: bulgeWarp },
-  bulgeDown: { label: "下凸", fn: bulgeDownWarp }
+  melt1: { label: "Melt1 凸起", fn: melt1Warp },
+  melt2: { label: "Melt2 下凸", fn: melt2Warp }
 };
 
 const fonts = [
@@ -40,12 +82,41 @@ const fonts = [
 
 const TextWarpApp = ({ sandboxProxy }) => {
   const [text, setText] = useState("TYPE WARP");
-  const [warpType, setWarpType] = useState("arcLower");
+  const [warpType, setWarpType] = useState("melt1");
   const [fontUrl, setFontUrl] = useState(fonts[0].url);
-  const [intensity, setIntensity] = useState(30);
+  const [intensity, setIntensity] = useState(50);
   const [svgPath, setSvgPath] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [pathBounds, setPathBounds] = useState(null);
+
+  // 计算路径边界的辅助函数
+  const calculatePathBounds = (commands) => {
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    
+    commands.forEach(cmd => {
+      if ('x' in cmd && 'y' in cmd) {
+        minX = Math.min(minX, cmd.x);
+        maxX = Math.max(maxX, cmd.x);
+        minY = Math.min(minY, cmd.y);
+        maxY = Math.max(maxY, cmd.y);
+      }
+      if ('x1' in cmd && 'y1' in cmd) {
+        minX = Math.min(minX, cmd.x1);
+        maxX = Math.max(maxX, cmd.x1);
+        minY = Math.min(minY, cmd.y1);
+        maxY = Math.max(maxY, cmd.y1);
+      }
+      if ('x2' in cmd && 'y2' in cmd) {
+        minX = Math.min(minX, cmd.x2);
+        maxX = Math.max(maxX, cmd.x2);
+        minY = Math.min(minY, cmd.y2);
+        maxY = Math.max(maxY, cmd.y2);
+      }
+    });
+    
+    return { minX, maxX, minY, maxY, width: maxX - minX, height: maxY - minY };
+  };
 
   // 当参数变化时重新生成路径
   useEffect(() => {
@@ -71,7 +142,7 @@ const TextWarpApp = ({ sandboxProxy }) => {
       }
 
       setError("");
-      const fontSize = 80;
+      const fontSize = 120;
       const scale = fontSize / font.unitsPerEm;
       const arcHeight = intensity;
       const glyphs = font.stringToGlyphs(text);
@@ -81,9 +152,10 @@ const TextWarpApp = ({ sandboxProxy }) => {
       const totalWidth = glyphWidths.reduce((a, b) => a + b, 0);
       const centerX = totalWidth / 2;
       const warpFn = warpTypes[warpType].fn;
+      const baselineY = fontSize * 0.8;
 
       glyphs.forEach((g) => {
-        const path = g.getPath(x, fontSize, fontSize);
+        const path = g.getPath(x, baselineY, fontSize);
         path.commands.forEach((cmd) => {
           const warped = { ...cmd };
           if ('x' in warped && 'y' in warped) {
@@ -115,12 +187,18 @@ const TextWarpApp = ({ sandboxProxy }) => {
         return '';
       }).join(' ');
 
+      // 计算并保存路径边界信息
+      const bounds = calculatePathBounds(commands);
+      setPathBounds(bounds);
+
       setSvgPath(d);
     });
   }, [text, warpType, fontUrl, intensity]);
 
   const handleInsert = async () => {
     console.log("准备插入SVG路径:", svgPath.substring(0, 100));
+    console.log("路径边界信息:", pathBounds);
+    
     if (!svgPath || !sandboxProxy) {
       console.error('SVG路径或沙盒代理不可用');
       return;
@@ -128,7 +206,14 @@ const TextWarpApp = ({ sandboxProxy }) => {
 
     setIsLoading(true);
     try {
-      const result = await sandboxProxy.insertWarpedSVG({ d: svgPath });
+      // 传递更多信息到sandbox，包括边界信息
+      const result = await sandboxProxy.insertWarpedSVG({ 
+        d: svgPath, 
+        bounds: pathBounds,
+        originalText: text,
+        warpType: warpType,
+        intensity: intensity
+      });
       if (result.success) {
         console.log('SVG 路径插入成功');
       } else {
@@ -196,7 +281,9 @@ const TextWarpApp = ({ sandboxProxy }) => {
         error ? 
           h('div', { className: 'error-message' }, error) :
           h('svg', { 
-            viewBox: '0 0 800 300', 
+            viewBox: pathBounds ? 
+              `${pathBounds.minX - 20} ${pathBounds.minY - 20} ${pathBounds.width + 40} ${pathBounds.height + 40}` : 
+              '0 0 1000 300',
             width: '100%', 
             height: '200', 
             style: { border: '1px solid #eee' } 

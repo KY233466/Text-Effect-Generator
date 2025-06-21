@@ -16,10 +16,9 @@ function start() {
                 { postscriptName: "TimesNewRomanPSMT", familyName: "Times New Roman", styleName: "Regular" }
             ];
         },
-
         // 插入 SVG 路径
         insertWarpedSVG: async (options) => {
-            const { d } = options;
+            const { d, bounds, originalText, warpType, intensity } = options;
             
             try {
                 if (!d || d.trim() === '') {
@@ -27,21 +26,37 @@ function start() {
                 }
 
                 console.log('接收到 SVG 路径数据:', d.substring(0, 100) + '...');
+                console.log('路径边界信息:', bounds);
+                console.log('原始文本:', originalText, '变形类型:', warpType, '强度:', intensity);
                 
                 // 创建路径对象，直接传递路径字符串
                 const pathObj = editor.createPath(d);
                 
                 // 设置填充颜色（热粉色）
-                const fillColor = { red: 1, green: 0.1, blue: 0.5, alpha: 1 };
+                // hotpink的RGB值是: rgb(255, 105, 180) 即 #FF69B4
+                const fillColor = { red: 1.0, green: 0.412, blue: 0.706, alpha: 1 };
                 pathObj.fill = editor.makeColorFill(fillColor);
                 
-                pathObj.translation = { x: 100, y: 100 };
+                // 修复：明确移除描边，确保没有黑色边框
+                pathObj.stroke = undefined; // 使用undefined而不是null
+                
+                // 修复：根据边界信息计算更合适的位置
+                let offsetX = 100;
+                let offsetY = 100;
+                
+                if (bounds) {
+                    // 确保插入的内容位于画布的可见区域
+                    offsetX = Math.max(50, -bounds.minX + 50);
+                    offsetY = Math.max(50, -bounds.minY + 50);
+                }
+                
+                pathObj.translation = { x: offsetX, y: offsetY };
                 
                 const insertionParent = editor.context.insertionParent;
                 insertionParent.children.append(pathObj);
                 
-                console.log('SVG 路径插入成功');
-                return { success: true };
+                console.log(`SVG 路径插入成功，位置: (${offsetX}, ${offsetY})，无描边`);
+                return { success: true, position: { x: offsetX, y: offsetY } };
                 
             } catch (error) {
                 console.error('插入 SVG 路径失败:', error);

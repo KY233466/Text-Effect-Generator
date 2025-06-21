@@ -93,15 +93,44 @@
             return { x, y: y + Math.sin(x / 40) * arcHeight };
         }
 
+        // 优化后的凸起变形算法
         function bulgeWarp(x, y, totalWidth, centerX, arcHeight) {
             const normX = (x - centerX) / (totalWidth / 2);
-            const bulgeY = arcHeight * (1 - Math.abs(normX));
+            // 水平方向的变形因子
+            const horizontalFactor = Math.cos(normX * Math.PI / 2);
+            const horizontalBulge = horizontalFactor * horizontalFactor;
+            
+            // 垂直方向的变形因子：字母中间部分变形更多，上下边缘变形较少
+            // 假设字母高度在baselineY附近，根据距离基线的位置调整变形程度
+            const baselineY = 80; // 大约是字体基线位置
+            const letterHeight = 80; // 字母的大致高度
+            const distanceFromBaseline = Math.abs(y - baselineY);
+            const maxDistance = letterHeight * 0.6; // 字母高度的60%作为最大距离
+            
+            // 距离基线越近，变形越明显；距离越远（接近字母边缘），变形越小
+            const verticalFactor = Math.max(0, 1 - (distanceFromBaseline / maxDistance));
+            
+            const bulgeY = arcHeight * horizontalBulge * verticalFactor;
             return { x, y: y - bulgeY };
         }
 
+        // 优化后的下凸变形算法
         function bulgeDownWarp(x, y, totalWidth, centerX, arcHeight) {
             const normX = (x - centerX) / (totalWidth / 2);
-            const bulgeY = arcHeight * (1 - Math.abs(normX));
+            // 水平方向的变形因子
+            const horizontalFactor = Math.cos(normX * Math.PI / 2);
+            const horizontalBulge = horizontalFactor * horizontalFactor;
+            
+            // 垂直方向的变形因子：字母中间部分变形更多，上下边缘变形较少
+            const baselineY = 80; // 大约是字体基线位置
+            const letterHeight = 80; // 字母的大致高度
+            const distanceFromBaseline = Math.abs(y - baselineY);
+            const maxDistance = letterHeight * 0.6; // 字母高度的60%作为最大距离
+            
+            // 距离基线越近，变形越明显；距离越远（接近字母边缘），变形越小
+            const verticalFactor = Math.max(0, 1 - (distanceFromBaseline / maxDistance));
+            
+            const bulgeY = arcHeight * horizontalBulge * verticalFactor;
             return { x, y: y + bulgeY };
         }
 
