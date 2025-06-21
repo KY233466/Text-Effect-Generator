@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
-import { copyFile, mkdir } from 'fs/promises';
+import { copyFile, mkdir, readdir } from 'fs/promises';
 
 const projectRoot = __dirname;
 
@@ -22,11 +22,13 @@ export default defineConfig({
         const buildDir = resolve(projectRoot, 'dist');
         // Ensure the root dist directory exists
         await mkdir(buildDir, { recursive: true });
+        
         // Copy manifest.json
         await copyFile(
           resolve(projectRoot, 'src', 'manifest.json'), 
           resolve(buildDir, 'manifest.json')
         );
+        
         // Copy sandbox code
         const sandboxDir = resolve(buildDir, 'sandbox');
         await mkdir(sandboxDir, { recursive: true });
@@ -34,6 +36,27 @@ export default defineConfig({
           resolve(projectRoot, 'src', 'sandbox', 'code.js'), 
           resolve(sandboxDir, 'code.js')
         );
+        
+        // Copy fonts to UI directory
+        const fontsSourceDir = resolve(projectRoot, 'public', 'fonts');
+        const fontsDestDir = resolve(buildDir, 'ui', 'fonts');
+        await mkdir(fontsDestDir, { recursive: true });
+        
+        try {
+          const fontFiles = await readdir(fontsSourceDir);
+          for (const fontFile of fontFiles) {
+            if (fontFile.endsWith('.ttf') || fontFile.endsWith('.otf') || fontFile.endsWith('.woff') || fontFile.endsWith('.woff2')) {
+              await copyFile(
+                resolve(fontsSourceDir, fontFile),
+                resolve(fontsDestDir, fontFile)
+              );
+            }
+          }
+          console.log('✅ Fonts copied successfully.');
+        } catch (error) {
+          console.warn('⚠️ Could not copy fonts:', error.message);
+        }
+        
         console.log('✅ Manifest and Sandbox copied successfully.');
       }
     }
