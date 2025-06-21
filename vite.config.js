@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
-import { copyFile, mkdir, readdir } from 'fs/promises';
+import { copyFile, mkdir } from 'fs/promises';
 
 const projectRoot = __dirname;
 
@@ -10,12 +10,12 @@ export default defineConfig({
   // 1. Set the project root to the UI folder
   root: resolve(projectRoot, 'src/ui'),
   
-  // 2. Explicitly set the public directory to the project's public folder
+  // 2. 让 Vite 自动复制 public 目录到输出目录（包括字体文件）
   publicDir: resolve(projectRoot, 'public'),
 
   plugins: [
     react(),
-    // 3. Custom plugin to copy manifest and sandbox code
+    // 3. Custom plugin to copy manifest and sandbox code only
     {
       name: 'adobe-express-addon-build',
       async closeBundle() {
@@ -37,27 +37,9 @@ export default defineConfig({
           resolve(sandboxDir, 'code.js')
         );
         
-        // Copy fonts to UI directory
-        const fontsSourceDir = resolve(projectRoot, 'public', 'fonts');
-        const fontsDestDir = resolve(buildDir, 'ui', 'fonts');
-        await mkdir(fontsDestDir, { recursive: true });
-        
-        try {
-          const fontFiles = await readdir(fontsSourceDir);
-          for (const fontFile of fontFiles) {
-            if (fontFile.endsWith('.ttf') || fontFile.endsWith('.otf') || fontFile.endsWith('.woff') || fontFile.endsWith('.woff2')) {
-              await copyFile(
-                resolve(fontsSourceDir, fontFile),
-                resolve(fontsDestDir, fontFile)
-              );
-            }
-          }
-          console.log('✅ Fonts copied successfully.');
-        } catch (error) {
-          console.warn('⚠️ Could not copy fonts:', error.message);
-        }
-        
+        // 字体文件现在由 Vite 的 publicDir 自动处理，无需手动复制
         console.log('✅ Manifest and Sandbox copied successfully.');
+        console.log('✅ Fonts handled automatically by Vite publicDir.');
       }
     }
   ],

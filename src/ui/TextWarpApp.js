@@ -63,7 +63,7 @@ const TextWarpApp = ({ sandboxProxy }) => {
 
     opentype.load(fontUrl, (err, font) => {
       if (err || !font) {
-        const errorMessage = `字体加载失败: ${fontUrl}. 请确保字体文件存在于 'public/fonts' 目录下。`;
+        const errorMessage = `字体加载失败: ${fontUrl}. 请确保字体文件存在于 'src/ui/fonts' 目录下。`;
         console.error(errorMessage, err);
         setError(errorMessage);
         setSvgPath("");

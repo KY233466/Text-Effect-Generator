@@ -46,7 +46,7 @@ const WarpText = ({ text, warpType, intensity, fontPostscriptName }) => {
           // 这里应该使用 Adobe Express API 加载字体
           // 暂时使用默认字体
           font = await new Promise((resolve, reject) => {
-            opentype.load('/fonts/OldStandardTT-Regular.ttf', (err, font) => {
+            opentype.load('./fonts/OldStandardTT-Regular.ttf', (err, font) => {
               if (err) reject(err);
               else resolve(font);
             });
@@ -54,7 +54,7 @@ const WarpText = ({ text, warpType, intensity, fontPostscriptName }) => {
         } else {
           // 使用默认字体
           font = await new Promise((resolve, reject) => {
-            opentype.load('/fonts/OldStandardTT-Regular.ttf', (err, font) => {
+            opentype.load('./fonts/OldStandardTT-Regular.ttf', (err, font) => {
               if (err) reject(err);
               else resolve(font);
             });
