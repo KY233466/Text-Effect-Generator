@@ -51,14 +51,14 @@ export default defineConfig({
     // 5. Set the output directory relative to the project root
     outDir: resolve(projectRoot, 'dist/ui'),
     emptyOutDir: true,
-    // rollupOptions: {
-    //   input: resolve(__dirname, 'src/ui/index.html'),
-    //   output: {
-    //     entryFileNames: `assets/[name].js`,
-    //     chunkFileNames: `assets/[name].js`,
-    //     assetFileNames: `assets/[name].[ext]`
-    //   }
-    // }
+    rollupOptions: {
+      input: resolve(projectRoot, 'src/ui/index.html'),
+      output: {
+        entryFileNames: `assets/[name].js`,
+        chunkFileNames: `assets/[name].js`,
+        assetFileNames: `assets/[name].[ext]`
+      }
+    }
   },
 
   server: {
