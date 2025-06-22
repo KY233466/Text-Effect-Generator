@@ -1,7 +1,11 @@
 import React, { useRef, useState, useEffect } from 'react';
 import opentype from 'opentype.js';
+
+// import * as Warp from '../../../lib/warp.js';
+
 const SMUDGE_RADIUS = 100;
 const SMUDGE_STRENGTH = 0.33;
+const Warp = window.Warp;
 export default function Smudge() {
   const textInputRef = useRef();
   const svgRef = useRef();
@@ -16,9 +20,11 @@ export default function Smudge() {
   const [text, setText] = useState(null);
   const WarpRef = useRef(null);
   useEffect(() => {
-    import('../../../lib/warp.js').then(mod => {
-      WarpRef.current = mod.default;
-    });
+    if (typeof Warp !== 'undefined') {
+      // Initialize anything that depends on Warp
+    } else {
+      console.warn('Warp.js not loaded yet');
+    }
   }, []);
 
   // Generate SVG path from text
@@ -32,20 +38,7 @@ export default function Smudge() {
       }
       const pathData = font.getPath(text, 0, 100, 100).toSVG(3);
       svgRef.current.innerHTML = pathData;
-
-      // Initialize Warp.js after new SVG is created
-
-      if (!WarpRef.current) {
-        console.warn("Warp module not loaded yet");
-        return;
-      }
-      // const warp = new WarpRef.current(svgRef.current);
-
-      const warp = new WarpRef.current(svgRef.current);
-
-      // warp.interpolate(4);
-      // warpRef.current = warp;
-
+      const warp = new Warp(svgRef.current);
       warpRef.current = warp;
       warpRef.current.interpolate(10);
 
@@ -159,11 +152,21 @@ export default function Smudge() {
       window.removeEventListener('touchcancel', handleTouchEnd);
     };
   }, []);
-  return /*#__PURE__*/React.createElement("div", {
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", null, "Preview"), /*#__PURE__*/React.createElement("svg", {
+    ref: svgRef,
+    width: "100%",
+    height: "250",
     style: {
-      padding: '20px'
-    }
-  }, /*#__PURE__*/React.createElement("input", {
+      border: '1px solid #C7C7C7',
+      borderRadius: '10px',
+      backgroundColor: 'white',
+      cursor: isMouseDown ? 'grabbing' : 'grab'
+    },
+    onMouseDown: handleMouseDown,
+    onMouseMove: handleMouseMove,
+    onTouchStart: handleTouchStart,
+    onTouchMove: handleTouchMove
+  }), /*#__PURE__*/React.createElement("div", null, "Text"), /*#__PURE__*/React.createElement("input", {
     style: {
       color: 'black',
       border: '1px solid black'
@@ -176,22 +179,5 @@ export default function Smudge() {
     },
     id: "text-input",
     required: true
-  }), /*#__PURE__*/React.createElement("div", {
-    style: {
-      position: 'relative'
-    }
-  }, /*#__PURE__*/React.createElement("svg", {
-    ref: svgRef,
-    width: "600",
-    height: "300",
-    style: {
-      border: '1px solid #ccc',
-      backgroundColor: '#f9f9f9',
-      cursor: isMouseDown ? 'grabbing' : 'grab'
-    },
-    onMouseDown: handleMouseDown,
-    onMouseMove: handleMouseMove,
-    onTouchStart: handleTouchStart,
-    onTouchMove: handleTouchMove
-  })));
+  }));
 }

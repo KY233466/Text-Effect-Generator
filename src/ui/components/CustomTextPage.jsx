@@ -10,7 +10,6 @@ const CustomTextPage = ({ sandboxProxy }) => {
         padding: '60px 20px',
         color: '#666'
       }}> */}
-        <h3 style={{ margin: '0 0 16px 0', color: '#999' }}>Custom?</h3>
         {/* <Mesh /> */}
         <Smudge/>
       {/* </div> */}
