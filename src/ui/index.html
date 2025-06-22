@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Text Warp Add-on</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
         body {
             margin: 0;
             padding: 0;
@@ -20,15 +23,78 @@
         .text-warp-app {
           padding: 24px;
           background: #fff;
-          font-family: Arial, sans-serif;
-          max-width: 600px;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          max-width: 800px;
           margin: 0 auto;
+          min-height: 100vh;
+          box-sizing: border-box;
         }
 
-        .text-warp-app h2 {
-          color: #333;
-          margin-bottom: 24px;
-          text-align: center;
+        /* Tab 导航样式 */
+        .tab-navigation {
+          display: flex;
+          justify-content: center;
+          margin-bottom: 32px;
+          background: #f8f9fa;
+          border-radius: 12px;
+          padding: 6px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .tab-button {
+          flex: 1;
+          max-width: 200px;
+          padding: 14px 24px;
+          border: none;
+          background: transparent;
+          color: #6c757d;
+          cursor: pointer;
+          font-weight: 500;
+          font-size: 15px;
+          border-radius: 8px;
+          transition: all 0.3s ease;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .tab-button:hover {
+          background: rgba(0, 123, 255, 0.1);
+          color: #007bff;
+          transform: translateY(-1px);
+        }
+
+        .tab-button.active {
+          background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+          color: white;
+          font-weight: 600;
+          box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+          transform: translateY(-2px);
+        }
+
+        /* 页面内容容器 */
+        .page-content {
+          background: white;
+          border-radius: 16px;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+          padding: 32px;
+          min-height: 500px;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .page-content::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 4px;
+          background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        /* 文本变形页面样式 */
+        .text-warp-page {
+          padding: 20px 0;
         }
 
         .control-group {
@@ -44,7 +110,8 @@
 
         .text-input,
         .font-select,
-        .warp-select {
+        .warp-select,
+        .select-input {
           padding: 8px;
           border-radius: 4px;
           border: 1px solid #ccc;
@@ -55,13 +122,22 @@
 
         .text-input:focus,
         .font-select:focus,
-        .warp-select:focus {
+        .warp-select:focus,
+        .select-input:focus {
           outline: none;
           border-color: #007bff;
           box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
         }
 
-        .intensity-slider {
+        .content-textarea {
+          min-height: 120px;
+          resize: vertical;
+          font-family: inherit;
+          line-height: 1.6;
+        }
+
+        .intensity-slider,
+        .range-slider {
           width: 100%;
           max-width: 300px;
           margin-bottom: 4px;
@@ -96,58 +172,173 @@
           overflow: hidden;
         }
 
+        /* 自定义文本页面样式 */
+        .custom-text-page {
+          padding: 20px 0;
+        }
+
+        .page-header {
+          margin-bottom: 24px;
+          text-align: center;
+        }
+
+        .page-header h3 {
+          margin: 0 0 8px 0;
+          color: #333;
+          font-size: 24px;
+        }
+
+        .page-description {
+          margin: 0;
+          color: #666;
+          font-size: 14px;
+        }
+
+        .preset-section,
+        .content-section,
+        .style-section,
+        .preview-section,
+        .action-section {
+          margin-bottom: 32px;
+          padding: 20px;
+          background: white;
+          border-radius: 12px;
+          border: 1px solid #e9ecef;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .preset-section {
+          background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .preset-section h4,
+        .content-section h4,
+        .style-section h4,
+        .preview-section h4 {
+          margin: 0 0 16px 0;
+          color: #495057;
+          font-size: 16px;
+          border-bottom: 2px solid #e9ecef;
+          padding-bottom: 8px;
+        }
+
+        .preset-buttons {
+          display: flex;
+          gap: 12px;
+          flex-wrap: wrap;
+        }
+
+        .preset-button {
+          background: white;
+          color: #495057;
+          border: 2px solid #dee2e6;
+          padding: 12px 20px;
+          border-radius: 8px;
+          font-size: 14px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .preset-button:hover {
+          background: #007bff;
+          color: white;
+          border-color: #007bff;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 8px rgba(0,123,255,0.3);
+        }
+
+        .form-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 16px;
+          margin-bottom: 16px;
+        }
+
+        .color-input {
+          width: 60px;
+          height: 40px;
+          padding: 4px;
+          border: 2px solid #e9ecef;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .color-input:hover {
+          border-color: #007bff;
+        }
+
+        .text-preview {
+          min-height: 150px;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+          position: relative;
+          padding: 20px;
+          border-radius: 8px;
+          border: 1px solid #e0e0e0;
+        }
+
         .button-group {
           display: flex;
           gap: 12px;
           margin-top: 20px;
           flex-wrap: wrap;
+          justify-content: center;
         }
 
         .insert-button {
           padding: 12px 24px;
           border: none;
-          border-radius: 4px;
-          font-size: 16px;
-          font-weight: bold;
+          border-radius: 8px;
+          font-size: 14px;
+          font-weight: 600;
           cursor: pointer;
-          transition: background-color 0.2s;
-          flex: 1;
-          min-width: 150px;
+          transition: all 0.3s ease;
+          min-width: 120px;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .insert-button.primary {
-          background-color: #007bff;
+          background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
           color: white;
+          box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
         }
 
         .insert-button.primary:hover:not(:disabled) {
-          background-color: #0056b3;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
         }
 
         .insert-button.secondary {
-          background-color: #6c757d;
+          background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
           color: white;
+          box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
         }
 
         .insert-button.secondary:hover:not(:disabled) {
-          background-color: #545b62;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+        }
+
+        .insert-button.tertiary {
+          background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+          color: white;
+          box-shadow: 0 4px 15px rgba(23, 162, 184, 0.3);
+        }
+
+        .insert-button.tertiary:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(23, 162, 184, 0.4);
         }
 
         .insert-button:disabled {
           background-color: #ccc;
           color: #666;
           cursor: not-allowed;
-        }
-
-        .status-message {
-          margin-top: 16px;
-          padding: 8px 12px;
-          background-color: #d4edda;
-          color: #155724;
-          border: 1px solid #c3e6cb;
-          border-radius: 4px;
-          font-size: 12px;
-          text-align: center;
+          transform: none;
+          box-shadow: none;
         }
 
         .error-message {
@@ -160,15 +351,56 @@
         }
 
         /* 响应式设计 */
-        @media (max-width: 480px) {
+        @media (max-width: 768px) {
           .text-warp-app {
             padding: 16px;
+            max-width: 100%;
+          }
+          
+          .tab-navigation {
+            flex-direction: column;
+            gap: 8px;
+            padding: 12px;
+          }
+          
+          .tab-button {
+            max-width: none;
+            padding: 12px 20px;
+          }
+          
+          .page-content {
+            padding: 20px;
+            border-radius: 12px;
+          }
+
+          .form-row {
+            grid-template-columns: 1fr;
+            gap: 12px;
+          }
+          
+          .preset-buttons {
+            flex-direction: column;
           }
           
           .button-group {
             flex-direction: column;
           }
+        }
+
+        @media (max-width: 480px) {
+          .text-warp-app {
+            padding: 12px;
+          }
           
+          .tab-button {
+            font-size: 14px;
+            padding: 10px 16px;
+          }
+          
+          .page-content {
+            padding: 16px;
+          }
+
           .insert-button {
             min-width: auto;
           }
@@ -211,6 +443,22 @@
           background-size: 16px;
           padding-right: 32px;
         }
+
+        /* 加载动画 */
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .page-content {
+          animation: fadeIn 0.5s ease-out;
+        }
     </style>
     <script type="importmap">
       {
@@ -224,6 +472,6 @@
 </head>
 <body>
     <div id="root"></div>
-    <script type="module" src="./index.js"></script>
+    <script type="module" src="./index.jsx"></script>
 </body>
 </html> 
