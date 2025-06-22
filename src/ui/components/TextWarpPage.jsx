@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { effectsList, getWarpFunction } from '../shapes/index.js';
 import opentype from 'opentype.js';
 
-const { createElement: h, Fragment } = React;
-
 const fonts = [
   { name: "Old Standard", url: "./fonts/OldStandardTT-Regular.ttf" },
   { name: "Arial", url: "./fonts/Arial.ttf" },
@@ -195,81 +193,96 @@ const TextWarpPage = ({ sandboxProxy }) => {
     }
   };
 
-  return h('div', { className: 'text-warp-page' },
-    h('div', { className: 'control-group' },
-      h('label', null, '选择字体：'),
-      h('select', {
-        value: fontUrl,
-        onChange: e => setFontUrl(e.target.value),
-        className: 'font-select'
-      }, fonts.map(f => h('option', { key: f.url, value: f.url }, f.name)))
-    ),
+  return (
+    <div className="text-warp-page">
+      <div className="control-group">
+        <label>选择字体：</label>
+        <select
+          value={fontUrl}
+          onChange={e => setFontUrl(e.target.value)}
+          className="font-select"
+        >
+          {fonts.map(f => (
+            <option key={f.url} value={f.url}>{f.name}</option>
+          ))}
+        </select>
+      </div>
 
-    h('div', { className: 'control-group' },
-      h('label', null, '变形类型：'),
-      h('select', {
-        value: warpType,
-        onChange: e => setWarpType(e.target.value),
-        className: 'warp-select'
-      }, effectsList.map(effect => 
-        h('option', { key: effect.key, value: effect.key }, effect.label)
-      ))
-    ),
+      <div className="control-group">
+        <label>变形类型：</label>
+        <select
+          value={warpType}
+          onChange={e => setWarpType(e.target.value)}
+          className="warp-select"
+        >
+          {effectsList.map(effect => (
+            <option key={effect.key} value={effect.key}>{effect.label}</option>
+          ))}
+        </select>
+      </div>
 
-    h('div', { className: 'control-group' },
-      h('label', null, `变形强度：${intensity}`),
-      h('input', {
-        type: 'range',
-        min: '0',
-        max: '100',
-        value: intensity,
-        onChange: e => setIntensity(Number(e.target.value)),
-        className: 'intensity-slider'
-      }),
-      h('div', { className: 'intensity-hint' }, '0 (无变形) — 100 (最大变形)')
-    ),
+      <div className="control-group">
+        <label>变形强度：{intensity}</label>
+        <input
+          type="range"
+          min="0"
+          max="100"
+          value={intensity}
+          onChange={e => setIntensity(Number(e.target.value))}
+          className="intensity-slider"
+        />
+        <div className="intensity-hint">0 (无变形) — 100 (最大变形)</div>
+      </div>
 
-    h('div', { className: 'control-group' },
-      h('label', null, '输入文字：'),
-      h('input', {
-        type: 'text',
-        value: text,
-        onChange: e => setText(e.target.value),
-        placeholder: '输入要变形的文字',
-        className: 'text-input'
-      })
-    ),
+      <div className="control-group">
+        <label>输入文字：</label>
+        <input
+          type="text"
+          value={text}
+          onChange={e => setText(e.target.value)}
+          placeholder="输入要变形的文字"
+          className="text-input"
+        />
+      </div>
 
-    h('div', { className: 'preview-container' },
-      h('h3', null, '预览效果'),
-      h('div', { className: 'svg-preview' },
-        error ? 
-          h('div', { className: 'error-message' }, error) :
-          h('svg', { 
-            viewBox: pathBounds ? 
-              `${pathBounds.minX - 20} ${pathBounds.minY - 20} ${pathBounds.width + 40} ${pathBounds.height + 40}` : 
-              '0 0 1000 300',
-            width: '100%', 
-            height: '200', 
-            style: { border: '1px solid #eee' } 
-          },
-            h('path', { d: svgPath, fill: 'hotpink', stroke: 'none' })
-          )
-      )
-    ),
+      <div className="preview-container">
+        <h3>预览效果</h3>
+        <div className="svg-preview">
+          {error ? (
+            <div className="error-message">{error}</div>
+          ) : (
+            <svg
+              viewBox={pathBounds ? 
+                `${pathBounds.minX - 20} ${pathBounds.minY - 20} ${pathBounds.width + 40} ${pathBounds.height + 40}` : 
+                '0 0 1000 300'
+              }
+              width="100%"
+              height="200"
+              style={{ border: '1px solid #eee' }}
+            >
+              <path d={svgPath} fill="hotpink" stroke="none" />
+            </svg>
+          )}
+        </div>
+      </div>
 
-    h('div', { className: 'button-group' },
-      h('button', {
-        onClick: handleInsert,
-        disabled: isLoading || !svgPath,
-        className: 'insert-button primary'
-      }, isLoading ? '插入中...' : '插入变形文本'),
-      
-      h('button', {
-        onClick: handleTestRectangle,
-        className: 'insert-button secondary'
-      }, '测试API')
-    )
+      <div className="button-group">
+        <button
+          onClick={handleInsert}
+          disabled={isLoading || !svgPath}
+          className="insert-button primary"
+        >
+          {isLoading ? '插入中...' : '插入变形文本'}
+        </button>
+        
+        <button
+          onClick={handleTestRectangle}
+          className="insert-button secondary"
+        >
+          测试API
+        </button>
+      </div>
+    </div>
   );
 };
 

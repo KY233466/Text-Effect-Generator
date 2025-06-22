@@ -5,29 +5,24 @@ import CustomTextPage from './components/CustomTextPage.js';
 const { createElement: h } = React;
 
 const TextWarpApp = ({ sandboxProxy }) => {
-  // Tab 状态管理
-  const [activeTab, setActiveTab] = useState('warp'); // 'warp' 或 'custom'
+  const [activeTab, setActiveTab] = useState('warp');
 
-  return h('div', { className: 'text-warp-app' },
-    // Tab 导航
-    h('div', { className: 'tab-navigation' },
+  return h('div', { className: 'app' },
+    h('div', { className: 'tab-container' },
       h('button', {
-        onClick: () => setActiveTab('warp'),
-        className: `tab-button ${activeTab === 'warp' ? 'active' : ''}`
+        className: `tab ${activeTab === 'warp' ? 'active' : ''}`,
+        onClick: () => setActiveTab('warp')
       }, '🎨 文本变形'),
       
       h('button', {
-        onClick: () => setActiveTab('custom'),
-        className: `tab-button ${activeTab === 'custom' ? 'active' : ''}`
+        className: `tab ${activeTab === 'custom' ? 'active' : ''}`,
+        onClick: () => setActiveTab('custom')
       }, '✨ 自定义文本')
     ),
 
-    // 页面内容容器
     h('div', { className: 'page-content' },
-      // 条件渲染页面内容
-      activeTab === 'warp' ? 
-        h(TextWarpPage, { sandboxProxy }) :
-        h(CustomTextPage, { sandboxProxy })
+      activeTab === 'warp' && h(TextWarpPage, { sandboxProxy }),
+      activeTab === 'custom' && h(CustomTextPage, { sandboxProxy })
     )
   );
 };
