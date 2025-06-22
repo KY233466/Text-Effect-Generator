@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import TextWarpPage from './components/TextWarpPage.jsx';
-import CustomTextPage from './components/CustomTextPage.jsx';
+import TextWarpPage from './components/TextWarpPage.js';
+import CustomTextPage from './components/CustomTextPage.js';
 
 const TextWarpApp = ({ sandboxProxy }) => {
   const [activeTab, setActiveTab] = useState('warp');
