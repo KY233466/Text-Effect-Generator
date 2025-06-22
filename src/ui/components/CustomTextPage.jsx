@@ -11,7 +11,7 @@ const CustomTextPage = ({ sandboxProxy }) => {
         color: '#666'
       }}> */}
         {/* <Mesh /> */}
-        <Smudge/>
+      <Smudge sandboxProxy={sandboxProxy} />
       {/* </div> */}
     </div>
   );

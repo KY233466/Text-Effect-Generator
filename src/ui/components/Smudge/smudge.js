@@ -6,7 +6,9 @@ import opentype from 'opentype.js';
 const SMUDGE_RADIUS = 100;
 const SMUDGE_STRENGTH = 0.33;
 const Warp = window.Warp;
-export default function Smudge() {
+export default function Smudge({
+  sandboxProxy
+}) {
   const textInputRef = useRef();
   const svgRef = useRef();
   const warpRef = useRef();
@@ -26,6 +28,12 @@ export default function Smudge() {
       console.warn('Warp.js not loaded yet');
     }
   }, []);
+  useEffect(() => {
+    // Trigger text generation after SVG is rendered
+    if (svgRef.current && text) {
+      generateTextPath(text);
+    }
+  }, [svgRef.current]);
 
   // Generate SVG path from text
   const generateTextPath = text => {
@@ -36,8 +44,24 @@ export default function Smudge() {
         setIsGenerating(false);
         return;
       }
-      const pathData = font.getPath(text, 0, 100, 100).toSVG(3);
+
+      // Get SVG dimensions
+      const svgWidth = svgRef.current.clientWidth;
+      const svgHeight = svgRef.current.clientHeight;
+
+      // Calculate text width
+      const fontSize = 100;
+      const textWidth = font.getAdvanceWidth(text, fontSize);
+
+      // Calculate centered position
+      const x = (svgWidth - textWidth) / 2;
+      const y = svgHeight / 2 + fontSize / 3; // Adjust vertical position
+
+      // Generate path at calculated position
+      const pathData = font.getPath(text, x, y, fontSize).toSVG(3);
       svgRef.current.innerHTML = pathData;
+
+      // Initialize Warp with the new path
       const warp = new Warp(svgRef.current);
       warpRef.current = warp;
       warpRef.current.interpolate(10);
@@ -155,7 +179,9 @@ export default function Smudge() {
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", null, "Preview"), /*#__PURE__*/React.createElement("svg", {
     ref: svgRef,
     width: "100%",
-    height: "250",
+    height: "200",
+    viewBox: "0 0 600 200",
+    preserveAspectRatio: "xMidYMid meet",
     style: {
       border: '1px solid #C7C7C7',
       borderRadius: '10px',
