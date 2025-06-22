@@ -15,15 +15,16 @@ export default function Mesh() {
   const warpRef = useRef();
   const controlPointsRef = useRef([]);
   const [dragIndex, setDragIndex] = useState(null);
-  const handleSubmit = e => {
+  const [text, setText] = useState(null);
+  const handleSubmit = (e, targetText) => {
     e.preventDefault();
-    const text = textInputRef.current.value;
+    console.log("?" + targetText);
     opentype.load('https://s3-us-west-2.amazonaws.com/s.cdpn.io/135636/FiraSansExtraCondensed-Black.ttf', (err, font) => {
       if (err) {
         console.error('Font could not be loaded:', err);
         return;
       }
-      const pathData = font.getPath(text, 0, 100, 100).toSVG(3);
+      const pathData = font.getPath(targetText, 0, 100, 100).toSVG(3);
       svgRef.current.innerHTML = pathData;
       const path = svgRef.current.querySelector('path');
       const box = path.getBBox();
@@ -45,8 +46,6 @@ export default function Mesh() {
       const customControlPoints = [[20, -5], [5, 120], [100, 210], [350, 160], [520, 180], [450, 20], [250, 80]];
       controlPointsRef.current = customControlPoints;
       const warp = new Warp.Warp(svgRef.current);
-
-      // const warp = new Warp(svgRef.current);
       warp.interpolate(4);
       warpRef.current = warp;
 
@@ -130,30 +129,20 @@ export default function Mesh() {
     },
     onMouseMove: handleMouseMove,
     onMouseUp: handleMouseUp
-  }, /*#__PURE__*/React.createElement("form", {
-    id: "text-form",
-    onSubmit: handleSubmit,
-    style: {
-      paddingBottom: '0.5em'
-    }
   }, /*#__PURE__*/React.createElement("input", {
     style: {
       color: 'black',
       border: '1px solid black'
     },
     type: "text",
-    ref: textInputRef,
+    value: text,
+    onChange: e => {
+      setText(e.target.value);
+      handleSubmit(e, e.target.value);
+    },
     id: "text-input",
-    placeholder: "Lorem ipsum",
     required: true
-  }), /*#__PURE__*/React.createElement("input", {
-    type: "submit",
-    value: "WARP",
-    style: {
-      color: 'black',
-      border: '1px solid black'
-    }
-  })), /*#__PURE__*/React.createElement("svg", {
+  }), /*#__PURE__*/React.createElement("svg", {
     ref: svgControlRef,
     id: "svg-control",
     width: "500",

@@ -1,5 +1,6 @@
 import React from 'react';
 import Mesh from "./Mesh/mesh.js";
+import Smudge from "./Smudge/smudge.js";
 const CustomTextPage = ({
   sandboxProxy
 }) => {
@@ -8,6 +9,6 @@ const CustomTextPage = ({
       margin: '0 0 16px 0',
       color: '#999'
     }
-  }, "Custom?"), /*#__PURE__*/React.createElement(Mesh, null));
+  }, "Custom?"), /*#__PURE__*/React.createElement(Smudge, null));
 };
 export default CustomTextPage;

@@ -15,10 +15,12 @@ export default function Mesh() {
   const warpRef = useRef();
   const controlPointsRef = useRef([]);
   const [dragIndex, setDragIndex] = useState(null);
+  const [text, setText] = useState(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e, targetText) => {
     e.preventDefault();
-    const text = textInputRef.current.value;
+
+    console.log("?" + targetText);
 
     opentype.load(
       'https://s3-us-west-2.amazonaws.com/s.cdpn.io/135636/FiraSansExtraCondensed-Black.ttf',
@@ -28,7 +30,7 @@ export default function Mesh() {
           return;
         }
 
-        const pathData = font.getPath(text, 0, 100, 100).toSVG(3);
+        const pathData = font.getPath(targetText, 0, 100, 100).toSVG(3);
         svgRef.current.innerHTML = pathData;
 
         const path = svgRef.current.querySelector('path');
@@ -159,7 +161,24 @@ export default function Mesh() {
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
     >
-      <form id="text-form" onSubmit={handleSubmit} style={{ paddingBottom: '0.5em' }}>
+      <input
+          style={{ color: 'black', border: '1px solid black' }}
+          type="text"
+          value={text}
+          onChange={e => {setText(e.target.value); handleSubmit(e, e.target.value);}}
+          id="text-input"
+          required
+      />
+
+      {/* <button
+          onClick={handleSubmit}
+          // onClick={handleTestRectangle}
+          className="insert-button secondary"
+        >
+          WARP
+      </button> */}
+
+      {/* <form id="text-form" onSubmit={handleSubmit} style={{ paddingBottom: '0.5em' }}>
         <input
           style={{ color: 'black', border: '1px solid black' }}
           type="text"
@@ -169,7 +188,7 @@ export default function Mesh() {
           required
         />
         <input type="submit" value="WARP" style={{ color: 'black', border: '1px solid black' }} />
-      </form>
+      </form> */}
 
       <svg
         ref={svgControlRef}

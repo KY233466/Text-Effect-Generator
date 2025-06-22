@@ -1,5 +1,6 @@
 import React from 'react';
 import Mesh from "./Mesh/mesh.js";
+import Smudge from "./Smudge/smudge.js";
 
 const CustomTextPage = ({ sandboxProxy }) => {
   return (
@@ -10,7 +11,8 @@ const CustomTextPage = ({ sandboxProxy }) => {
         color: '#666'
       }}> */}
         <h3 style={{ margin: '0 0 16px 0', color: '#999' }}>Custom?</h3>
-        <Mesh />
+        {/* <Mesh /> */}
+        <Smudge/>
       {/* </div> */}
     </div>
   );
