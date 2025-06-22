@@ -1,78 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { effectsList, getWarpFunction } from './shapes/index.js';
 
 const { createElement: h, Fragment } = React;
-
-// 变形函数定义
-function arcLowerWarp(x, y, totalWidth, centerX, arcHeight) {
-  const normX = (x - centerX) / (totalWidth / 2);
-  const arcY = arcHeight * (1 - normX * normX);
-  return { x, y: y + arcY };
-}
-
-function waveWarp(x, y, totalWidth, centerX, arcHeight) {
-  return { x, y: y + Math.sin(x / 40) * arcHeight };
-}
-
-// 优化后的凸起变形算法 - 重命名为melt1
-function melt1Warp(x, y, totalWidth, centerX, arcHeight) {
-  const normX = (x - centerX) / (totalWidth / 2);
-  // 水平方向的变形因子
-  const horizontalFactor = Math.cos(normX * Math.PI / 2);
-  const horizontalBulge = horizontalFactor * horizontalFactor;
-  
-  // 关键改进：根据字母的垂直位置决定是否变形
-  const baselineY = 80; // 字体基线位置
-  const letterTop = baselineY - 60; // 字母顶部大约位置
-  const letterBottom = baselineY + 15; // 字母底部大约位置
-  const letterMiddle = (letterTop + letterBottom) / 2; // 字母中间位置
-  
-  // 只有接近字母中间部分的点才进行变形
-  const distanceFromMiddle = Math.abs(y - letterMiddle);
-  const maxMiddleDistance = 25; // 中间区域的范围
-  
-  // 如果点在字母的顶部或底部边缘，几乎不变形
-  let verticalFactor = 0;
-  if (distanceFromMiddle < maxMiddleDistance) {
-    verticalFactor = 1 - (distanceFromMiddle / maxMiddleDistance);
-  }
-  
-  const bulgeY = arcHeight * horizontalBulge * verticalFactor;
-  return { x, y: y - bulgeY };
-}
-
-// 优化后的下凸变形算法 - 重命名为melt2
-function melt2Warp(x, y, totalWidth, centerX, arcHeight) {
-  const normX = (x - centerX) / (totalWidth / 2);
-  // 水平方向的变形因子
-  const horizontalFactor = Math.cos(normX * Math.PI / 2);
-  const horizontalBulge = horizontalFactor * horizontalFactor;
-  
-  // 关键改进：根据字母的垂直位置决定是否变形
-  const baselineY = 80; // 字体基线位置
-  const letterTop = baselineY - 60; // 字母顶部大约位置
-  const letterBottom = baselineY + 15; // 字母底部大约位置
-  const letterMiddle = (letterTop + letterBottom) / 2; // 字母中间位置
-  
-  // 只有接近字母中间部分的点才进行变形
-  const distanceFromMiddle = Math.abs(y - letterMiddle);
-  const maxMiddleDistance = 25; // 中间区域的范围
-  
-  // 如果点在字母的顶部或底部边缘，几乎不变形
-  let verticalFactor = 0;
-  if (distanceFromMiddle < maxMiddleDistance) {
-    verticalFactor = 1 - (distanceFromMiddle / maxMiddleDistance);
-  }
-  
-  const bulgeY = arcHeight * horizontalBulge * verticalFactor;
-  return { x, y: y + bulgeY };
-}
-
-const warpTypes = {
-  arcLower: { label: "下弧形", fn: arcLowerWarp },
-  wave: { label: "波浪形", fn: waveWarp },
-  melt1: { label: "Melt1 凸起", fn: melt1Warp },
-  melt2: { label: "Melt2 下凸", fn: melt2Warp }
-};
 
 const fonts = [
   { name: "Old Standard", url: "./fonts/OldStandardTT-Regular.ttf" },
@@ -151,25 +80,41 @@ const TextWarpApp = ({ sandboxProxy }) => {
       const glyphWidths = glyphs.map(g => g.advanceWidth * scale);
       const totalWidth = glyphWidths.reduce((a, b) => a + b, 0);
       const centerX = totalWidth / 2;
-      const warpFn = warpTypes[warpType].fn;
+      
+      // 使用分离的变形函数
+      const warpFn = getWarpFunction(warpType);
+      if (!warpFn) {
+        setError(`未知的变形类型: ${warpType}`);
+        return;
+      }
+      
       const baselineY = fontSize * 0.8;
+      
+      // 计算文本度量信息，传递给变形函数
+      const textMetrics = {
+        baseline: baselineY,
+        ascender: baselineY - fontSize * 0.7,
+        descender: baselineY + fontSize * 0.2,
+        yMax: baselineY - fontSize * 0.7,
+        yMin: baselineY + fontSize * 0.2
+      };
 
       glyphs.forEach((g) => {
         const path = g.getPath(x, baselineY, fontSize);
         path.commands.forEach((cmd) => {
           const warped = { ...cmd };
           if ('x' in warped && 'y' in warped) {
-            const { x: newX, y: newY } = warpFn(warped.x, warped.y, totalWidth, centerX, arcHeight);
+            const { x: newX, y: newY } = warpFn(warped.x, warped.y, totalWidth, centerX, arcHeight, textMetrics);
             warped.x = newX;
             warped.y = newY;
           }
           if ('x1' in warped && 'y1' in warped) {
-            const { x: newX1, y: newY1 } = warpFn(warped.x1, warped.y1, totalWidth, centerX, arcHeight);
+            const { x: newX1, y: newY1 } = warpFn(warped.x1, warped.y1, totalWidth, centerX, arcHeight, textMetrics);
             warped.x1 = newX1;
             warped.y1 = newY1;
           }
           if ('x2' in warped && 'y2' in warped) {
-            const { x: newX2, y: newY2 } = warpFn(warped.x2, warped.y2, totalWidth, centerX, arcHeight);
+            const { x: newX2, y: newY2 } = warpFn(warped.x2, warped.y2, totalWidth, centerX, arcHeight, textMetrics);
             warped.x2 = newX2;
             warped.y2 = newY2;
           }
@@ -228,6 +173,27 @@ const TextWarpApp = ({ sandboxProxy }) => {
     }
   };
 
+  // 添加测试函数
+  const handleTestRectangle = async () => {
+    if (!sandboxProxy) {
+      console.error('沙盒代理不可用');
+      return;
+    }
+
+    try {
+      const result = await sandboxProxy.createRectangle();
+      if (result.success) {
+        console.log('测试矩形创建成功');
+      } else {
+        console.error('测试矩形创建失败:', result.error);
+        setError(`测试失败: ${result.error}`);
+      }
+    } catch (e) {
+      console.error('测试API调用失败:', e);
+      setError(`测试异常: ${e.message}`);
+    }
+  };
+
   return h('div', { className: 'text-warp-app' },
     h('h2', null, '文本变形插件'),
     
@@ -246,8 +212,8 @@ const TextWarpApp = ({ sandboxProxy }) => {
         value: warpType,
         onChange: e => setWarpType(e.target.value),
         className: 'warp-select'
-      }, Object.entries(warpTypes).map(([key, val]) => 
-        h('option', { key: key, value: key }, val.label)
+      }, effectsList.map(effect => 
+        h('option', { key: effect.key, value: effect.key }, effect.label)
       ))
     ),
 
@@ -298,7 +264,13 @@ const TextWarpApp = ({ sandboxProxy }) => {
         onClick: handleInsert,
         disabled: isLoading || !svgPath,
         className: 'insert-button primary'
-      }, isLoading ? '插入中...' : '插入变形文本')
+      }, isLoading ? '插入中...' : '插入变形文本'),
+      
+      h('button', {
+        onClick: handleTestRectangle,
+        className: 'test-button secondary',
+        style: { marginLeft: '10px' }
+      }, '测试API')
     )
   );
 };
