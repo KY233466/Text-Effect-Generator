@@ -3,13 +3,17 @@ import { arcLowerWarp, arcLowerConfig } from './arcLower.js';
 import { waveWarp, waveConfig } from './wave.js';
 import { melt1Warp, melt1Config } from './melt1.js';
 import { melt2Warp, melt2Config } from './melt2.js';
+import { triangleUpperWarp, triangleUpperConfig } from './triangleUpper.js';
+import { triangleLowerWarp, triangleLowerConfig } from './triangleLower.js';
 
 // 导出所有变形函数
 export const warpFunctions = {
   arcLower: arcLowerWarp,
   wave: waveWarp,
   melt1: melt1Warp,
-  melt2: melt2Warp
+  melt2: melt2Warp,
+  triangleUpper: triangleUpperWarp,
+  triangleLower: triangleLowerWarp
 };
 
 // 导出所有配置
@@ -17,7 +21,9 @@ export const warpConfigs = {
   arcLower: arcLowerConfig,
   wave: waveConfig,
   melt1: melt1Config,
-  melt2: melt2Config
+  melt2: melt2Config,
+  triangleUpper: triangleUpperConfig,
+  triangleLower: triangleLowerConfig
 };
 
 // 导出效果列表（用于UI渲染）
@@ -25,7 +31,9 @@ export const effectsList = [
   { key: 'arcLower', ...arcLowerConfig },
   { key: 'wave', ...waveConfig },
   { key: 'melt1', ...melt1Config },
-  { key: 'melt2', ...melt2Config }
+  { key: 'melt2', ...melt2Config },
+  { key: 'triangleUpper', ...triangleUpperConfig },
+  { key: 'triangleLower', ...triangleLowerConfig }
 ];
 
 // 辅助函数：获取变形函数
