@@ -4,6 +4,29 @@ import { editor } from "express-document-sdk";
 // Get the document sandbox runtime.
 const { runtime } = addOnSandboxSdk.instance;
 
+// 安全的属性设置函数
+function safeSetProperty(obj, property, value, description = '') {
+    try {
+        if (obj === null || obj === undefined) {
+            console.warn(`⚠️ 尝试在null/undefined对象上设置属性 ${property} ${description}`);
+            return false;
+        }
+        
+        if (!(property in obj) && typeof obj[property] === 'undefined') {
+            console.warn(`⚠️ 对象不支持属性 ${property} ${description}，对象类型:`, typeof obj);
+            console.log('可用属性:', Object.getOwnPropertyNames(obj));
+            return false;
+        }
+        
+        obj[property] = value;
+        console.log(`✅ 成功设置属性 ${property} = ${value} ${description}`);
+        return true;
+    } catch (error) {
+        console.error(`❌ 设置属性 ${property} 失败 ${description}:`, error);
+        return false;
+    }
+}
+
 function start() {
     // APIs to be exposed to the UI runtime
     // i.e., to the `index.html` file of this add-on.
@@ -70,13 +93,24 @@ function start() {
                 
                 console.log('路径对象创建成功:', pathObj);
                 
-                // 设置填充颜色（热粉色）
-                // hotpink的RGB值是: rgb(255, 105, 180) 即 #FF69B4
+                // 设置填充颜色（热粉色）- 使用安全的属性设置
                 const fillColor = { red: 1.0, green: 0.412, blue: 0.706, alpha: 1 };
-                pathObj.fill = editor.makeColorFill(fillColor);
                 
-                // 明确移除描边，确保没有黑色边框
-                pathObj.stroke = undefined;
+                // 检查 editor.makeColorFill 是否存在
+                if (typeof editor.makeColorFill === 'function') {
+                    const colorFill = editor.makeColorFill(fillColor);
+                    if (!safeSetProperty(pathObj, 'fill', colorFill, '(设置填充色)')) {
+                        console.warn('无法设置填充色，尝试其他方法');
+                        // 如果 fill 属性设置失败，尝试其他可能的属性名
+                        safeSetProperty(pathObj, 'fillColor', colorFill, '(尝试 fillColor 属性)') ||
+                        safeSetProperty(pathObj, 'color', colorFill, '(尝试 color 属性)');
+                    }
+                } else {
+                    console.warn('editor.makeColorFill 方法不存在');
+                }
+                
+                // 明确移除描边，确保没有黑色边框 - 使用安全的属性设置
+                safeSetProperty(pathObj, 'stroke', undefined, '(移除描边)');
                 
                 // 根据边界信息计算更合适的位置
                 let offsetX = 100;
@@ -88,7 +122,15 @@ function start() {
                     offsetY = Math.max(50, -bounds.minY + 50);
                 }
                 
-                pathObj.translation = { x: offsetX, y: offsetY };
+                // 设置位置 - 使用安全的属性设置
+                const translation = { x: offsetX, y: offsetY };
+                if (!safeSetProperty(pathObj, 'translation', translation, '(设置位置)')) {
+                    // 如果 translation 失败，尝试其他可能的属性名
+                    safeSetProperty(pathObj, 'position', translation, '(尝试 position 属性)') ||
+                    safeSetProperty(pathObj, 'transform', translation, '(尝试 transform 属性)') ||
+                    (safeSetProperty(pathObj, 'x', offsetX, '(尝试 x 属性)') && 
+                     safeSetProperty(pathObj, 'y', offsetY, '(尝试 y 属性)'));
+                }
                 
                 // 检查插入父节点
                 const insertionParent = editor.context.insertionParent;
