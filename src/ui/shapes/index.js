@@ -6,6 +6,7 @@ import { melt1Warp, melt1Config } from "./melt1.js";
 import { melt2Warp, melt2Config } from "./melt2.js";
 import { bulgeUpWarp, bulgeUpConfig } from "./bulgeUpWarp.js";
 import { bulgeDownWarp, bulgeDownConfig } from "./bulgeDownWarp.js";
+import { bulgeBothWarp, bulgeBothConfig } from "./bulgeBothWarp.js";
 import { triangleUpperWarp, triangleUpperConfig } from "./triangleUpper.js";
 import { triangleLowerWarp, triangleLowerConfig } from "./triangleLower.js";
 
@@ -17,6 +18,7 @@ export const warpFunctions = {
   melt2: melt2Warp,
   bulgeUp: bulgeUpWarp,
   bulgeDown: bulgeDownWarp,
+  bulgeBoth: bulgeBothWarp,
   triangleUpper: triangleUpperWarp,
   triangleLower: triangleLowerWarp,
 };
@@ -29,6 +31,7 @@ export const warpConfigs = {
   melt2: melt2Config,
   bulgeUp: bulgeUpConfig,
   bulgeDown: bulgeDownConfig,
+  bulgeBoth: bulgeBothConfig,
   triangleUpper: triangleUpperConfig,
   triangleLower: triangleLowerConfig,
 };
@@ -41,6 +44,7 @@ export const effectsList = [
   { key: "melt2", ...melt2Config },
   { key: "bulgeUp", ...bulgeUpConfig },
   { key: "bulgeDown", ...bulgeDownConfig },
+  { key: "bulgeBoth", ...bulgeBothConfig },
   { key: "triangleUpper", ...triangleUpperConfig },
   { key: "triangleLower", ...triangleLowerConfig },
 ];

@@ -24,8 +24,6 @@ const TextWarpPage = ({ sandboxProxy }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [pathBounds, setPathBounds] = useState(null);
-  const needsZeroBaseline =
-    warpType === "bulgeDown" || warpType === "triangleLower";
 
   // 计算路径边界的辅助函数
   const calculatePathBounds = (commands) => {
@@ -105,7 +103,7 @@ const TextWarpPage = ({ sandboxProxy }) => {
 
       // 计算文本度量信息，传递给变形函数
       const textMetrics = {
-        baseline: needsZeroBaseline ? 0 : baselineY,
+        baseline: baselineY,
         ascender: baselineY - fontSize * 0.7,
         descender: baselineY + fontSize * 0.2,
         yMax: baselineY - fontSize * 0.7,
