@@ -82,6 +82,8 @@ const TextWarpPage = ({
       }
       setError("");
       const fontSize = 120;
+
+      // 使用标准的路径变形渲染
       const scale = fontSize / font.unitsPerEm;
       const arcHeight = intensity;
       const glyphs = font.stringToGlyphs(text);
@@ -90,22 +92,24 @@ const TextWarpPage = ({
       const glyphWidths = glyphs.map(g => g.advanceWidth * scale);
       const totalWidth = glyphWidths.reduce((a, b) => a + b, 0);
       const centerX = totalWidth / 2;
-
-      // 使用分离的变形函数
       const warpFn = getWarpFunction(warpType);
       if (!warpFn) {
         setError(`未知的变形类型: ${warpType}`);
         return;
       }
       const baselineY = fontSize * 0.8;
-
-      // 计算文本度量信息，传递给变形函数
       const textMetrics = {
+        boundingBox: {
+          y: baselineY - fontSize,
+          height: fontSize
+        },
         baseline: baselineY,
-        ascender: baselineY - fontSize * 0.7,
-        descender: baselineY + fontSize * 0.2,
-        yMax: baselineY - fontSize * 0.7,
-        yMin: baselineY + fontSize * 0.2
+        ascender: font.ascender * scale,
+        // 正数
+        descender: font.descender * scale,
+        // 负数
+        yMax: font.ascender * scale,
+        yMin: font.descender * scale
       };
       glyphs.forEach(g => {
         const path = g.getPath(x, baselineY, fontSize);
@@ -149,23 +153,19 @@ const TextWarpPage = ({
         if (c.type === 'Z') return 'Z';
         return '';
       }).join(' ');
-
-      // 计算并保存路径边界信息
       const bounds = calculatePathBounds(commands);
       setPathBounds(bounds);
       setSvgPath(d);
     });
   }, [text, warpType, fontUrl, intensity]);
   const handleInsert = async () => {
-    console.log("准备插入SVG路径:", svgPath.substring(0, 100));
-    console.log("路径边界信息:", pathBounds);
     if (!svgPath || !sandboxProxy) {
-      console.error('SVG路径或沙盒代理不可用');
+      console.error('SVG内容或沙盒代理不可用');
       return;
     }
     setIsLoading(true);
     try {
-      // 传递更多信息到sandbox，包括边界信息
+      // 处理标准路径
       const result = await sandboxProxy.insertWarpedSVG({
         d: svgPath,
         bounds: pathBounds,
@@ -173,9 +173,7 @@ const TextWarpPage = ({
         warpType: warpType,
         intensity: intensity
       });
-      if (result.success) {
-        console.log('SVG 路径插入成功');
-      } else {
+      if (!result.success) {
         console.error('沙盒端插入失败:', result.error);
         setError(`插入失败: ${result.error}`);
       }
@@ -195,9 +193,7 @@ const TextWarpPage = ({
     }
     try {
       const result = await sandboxProxy.createRectangle();
-      if (result.success) {
-        console.log('测试矩形创建成功');
-      } else {
+      if (!result.success) {
         console.error('测试矩形创建失败:', result.error);
         setError(`测试失败: ${result.error}`);
       }
@@ -258,11 +254,37 @@ const TextWarpPage = ({
     style: {
       border: '1px solid #eee'
     }
-  }, /*#__PURE__*/React.createElement("path", {
+  }, svgPath && /*#__PURE__*/React.createElement("path", {
     d: svgPath,
     fill: "hotpink",
     stroke: "none"
-  })))), /*#__PURE__*/React.createElement("div", {
+  }), pathBounds && warpType.includes('arcClamp') && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("line", {
+    x1: pathBounds.minX - 10,
+    y1: pathBounds.minY,
+    x2: pathBounds.maxX + 10,
+    y2: pathBounds.minY,
+    stroke: "red",
+    strokeWidth: "1",
+    strokeDasharray: "2,2"
+  }), /*#__PURE__*/React.createElement("line", {
+    x1: pathBounds.minX - 10,
+    y1: pathBounds.maxY,
+    x2: pathBounds.maxX + 10,
+    y2: pathBounds.maxY,
+    stroke: "blue",
+    strokeWidth: "1",
+    strokeDasharray: "2,2"
+  }), /*#__PURE__*/React.createElement("text", {
+    x: pathBounds.maxX + 15,
+    y: pathBounds.minY + 5,
+    fontSize: "10",
+    fill: "red"
+  }, "\u9876\u90E8"), /*#__PURE__*/React.createElement("text", {
+    x: pathBounds.maxX + 15,
+    y: pathBounds.maxY + 5,
+    fontSize: "10",
+    fill: "blue"
+  }, "\u5E95\u90E8"))))), /*#__PURE__*/React.createElement("div", {
     className: "button-group"
   }, /*#__PURE__*/React.createElement("button", {
     onClick: handleInsert,
