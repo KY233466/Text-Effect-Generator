@@ -1,13 +1,23 @@
-// 下弧形变形效果
-export function arcLowerWarp(x, y, totalWidth, centerX, arcHeight) {
-  const normX = (x - centerX) / (totalWidth / 2);
-  const arcY = arcHeight * (1 - normX * normX);
-  return { x, y: y + arcY };
+export function arcLowerWarp(
+  x,
+  y,
+  totalWidth,
+  centerX,
+  intensity,
+  textMetrics = {}
+) {
+  const normX = (x - centerX) / (totalWidth / 2); // -1 ~ 1
+  const arcHeight = (intensity / 100) * (textMetrics.baseline || 100); // 控制弧形高度
+
+  return {
+    x,
+    y: y + arcHeight * (1 - normX * normX), // 越靠中间越低
+  };
 }
 
 export const arcLowerConfig = {
-  label: "下弧形",
-  description: "文字向下弯曲成平滑弧形",
+  label: "Arc Lower",
+  description: "Bend text downward into an arc",
   defaultIntensity: 50,
-  intensityRange: { min: 0, max: 100 }
-}; 
+  intensityRange: { min: 0, max: 100 },
+};

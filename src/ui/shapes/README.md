@@ -8,9 +8,8 @@
 shapes/
 ├── index.js          # 模块索引，统一导出所有效果
 ├── arcLower.js       # 下弧形变形效果
+├── arcUpper.js       # 上弧形变形效果
 ├── wave.js           # 波浪变形效果
-├── melt1.js          # 融化1效果（基于基线的渐进变形）
-├── melt2.js          # 融化2效果（中间区域重点变形）
 └── README.md         # 本说明文件
 ```
 
@@ -20,7 +19,7 @@ shapes/
 import { getWarpFunction, effectsList } from './shapes/index.js';
 
 // 获取特定的变形函数
-const warpFn = getWarpFunction('melt1');
+const warpFn = getWarpFunction('wave');
 
 // 应用变形
 const result = warpFn(x, y, totalWidth, centerX, intensity, textMetrics);
