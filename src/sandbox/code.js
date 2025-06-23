@@ -57,60 +57,152 @@ function start() {
                     throw new Error('Editor 对象不可用');
                 }
                 
-                console.log('Editor 对象可用方法:', Object.getOwnPropertyNames(editor));
+                // 详细检查 editor 对象的所有属性和方法
+                const allProps = Object.getOwnPropertyNames(editor);
+                const methods = allProps.filter(name => typeof editor[name] === 'function');
+                const properties = allProps.filter(name => typeof editor[name] !== 'function');
+                
+                console.log('Editor 可用方法:', methods);
+                console.log('Editor 可用属性:', properties);
                 
                 // 尝试不同的路径创建方法
                 let pathObj;
+                let creationMethod = '';
+                
                 try {
-                    // 方法1: 直接使用 createPath
+                    // 方法1: 检查各种可能的路径创建方法
                     if (typeof editor.createPath === 'function') {
-                        console.log('使用 editor.createPath 方法');
+                        console.log('尝试使用 editor.createPath 方法');
                         pathObj = editor.createPath(d);
-                    } else {
-                        throw new Error('createPath 方法不存在');
-                    }
-                } catch (pathError) {
-                    console.error('createPath 失败:', pathError);
-                    
-                    // 方法2: 尝试其他可能的方法名
-                    if (typeof editor.createPathNode === 'function') {
+                        creationMethod = 'createPath';
+                    } else if (typeof editor.createPathNode === 'function') {
                         console.log('尝试使用 editor.createPathNode 方法');
                         pathObj = editor.createPathNode(d);
+                        creationMethod = 'createPathNode';
                     } else if (typeof editor.addPath === 'function') {
                         console.log('尝试使用 editor.addPath 方法');
                         pathObj = editor.addPath(d);
+                        creationMethod = 'addPath';
+                    } else if (typeof editor.createShape === 'function') {
+                        console.log('尝试使用 editor.createShape 方法');
+                        pathObj = editor.createShape();
+                        if (pathObj && typeof pathObj.setPath === 'function') {
+                            pathObj.setPath(d);
+                            creationMethod = 'createShape + setPath';
+                        } else if (pathObj && 'path' in pathObj) {
+                            pathObj.path = d;
+                            creationMethod = 'createShape + path属性';
+                        }
+                    } else if (typeof editor.createPolygon === 'function') {
+                        console.log('尝试使用 editor.createPolygon 作为替代');
+                        // 作为最后的尝试，使用多边形
+                        pathObj = editor.createPolygon();
+                        creationMethod = 'createPolygon (fallback)';
                     } else {
-                        // 列出所有可用的方法
-                        const methods = Object.getOwnPropertyNames(editor).filter(name => typeof editor[name] === 'function');
-                        console.log('Editor 可用方法:', methods);
-                        throw new Error(`createPath 方法不存在。可用方法: ${methods.join(', ')}`);
+                        throw new Error(`没有找到合适的路径创建方法。可用方法: ${methods.join(', ')}`);
                     }
+                } catch (pathError) {
+                    console.error('路径创建失败:', pathError);
+                    throw new Error(`路径创建失败: ${pathError.message}。可用方法: ${methods.join(', ')}`);
                 }
                 
                 if (!pathObj) {
-                    throw new Error('路径对象创建失败');
+                    throw new Error('路径对象创建失败 - 返回值为空');
                 }
                 
-                console.log('路径对象创建成功:', pathObj);
+                console.log(`路径对象创建成功，使用方法: ${creationMethod}`, pathObj);
+                console.log('路径对象类型:', typeof pathObj);
+                console.log('路径对象属性:', Object.getOwnPropertyNames(pathObj));
                 
-                // 设置填充颜色（热粉色）- 使用安全的属性设置
+                // 🔥 首要任务：立即移除默认描边
+                console.log('🔥 PathNode默认带有描边，立即移除...');
+                console.log('创建时的默认stroke:', pathObj.stroke);
+                
+                // 尝试所有可能的描边移除方法
+                const strokeRemovalResults = [];
+                
+                // 方法1: 设置为 null (最直接的方法)
+                if (safeSetProperty(pathObj, 'stroke', null, '(设置stroke为null)')) {
+                    strokeRemovalResults.push('stroke=null 成功');
+                }
+                
+                // 方法2: 设置为 undefined
+                if (safeSetProperty(pathObj, 'stroke', undefined, '(设置stroke为undefined)')) {
+                    strokeRemovalResults.push('stroke=undefined 成功');
+                }
+                
+                // 方法3: 尝试其他可能的描边属性名
+                if (safeSetProperty(pathObj, 'strokeColor', null, '(移除strokeColor)')) {
+                    strokeRemovalResults.push('strokeColor=null 成功');
+                }
+                
+                if (safeSetProperty(pathObj, 'strokeWidth', 0, '(设置strokeWidth为0)')) {
+                    strokeRemovalResults.push('strokeWidth=0 成功');
+                }
+                
+                if (safeSetProperty(pathObj, 'border', null, '(移除border)')) {
+                    strokeRemovalResults.push('border=null 成功');
+                }
+                
+                if (safeSetProperty(pathObj, 'borderWidth', 0, '(设置borderWidth为0)')) {
+                    strokeRemovalResults.push('borderWidth=0 成功');
+                }
+                
+                // 方法4: 尝试使用editor.makeStroke创建透明描边
+                if (typeof editor.makeStroke === 'function') {
+                    try {
+                        // 创建完全透明且0宽度的描边
+                        const transparentStroke = editor.makeStroke({
+                            color: { red: 0, green: 0, blue: 0, alpha: 0 },
+                            width: 0
+                        });
+                        if (safeSetProperty(pathObj, 'stroke', transparentStroke, '(设置透明描边)')) {
+                            strokeRemovalResults.push('透明描边设置成功');
+                        }
+                    } catch (strokeError) {
+                        console.warn('创建透明描边失败:', strokeError);
+                    }
+                }
+                
+                console.log('✅ 描边移除结果:', strokeRemovalResults);
+                console.log('✅ 移除描边后的stroke值:', pathObj.stroke);
+                
+                // 现在设置填充颜色（热粉色）
+                console.log('🎨 开始设置填充色...');
                 const fillColor = { red: 1.0, green: 0.412, blue: 0.706, alpha: 1 };
                 
                 // 检查 editor.makeColorFill 是否存在
                 if (typeof editor.makeColorFill === 'function') {
-                    const colorFill = editor.makeColorFill(fillColor);
-                    if (!safeSetProperty(pathObj, 'fill', colorFill, '(设置填充色)')) {
-                        console.warn('无法设置填充色，尝试其他方法');
-                        // 如果 fill 属性设置失败，尝试其他可能的属性名
-                        safeSetProperty(pathObj, 'fillColor', colorFill, '(尝试 fillColor 属性)') ||
-                        safeSetProperty(pathObj, 'color', colorFill, '(尝试 color 属性)');
+                    try {
+                        const colorFill = editor.makeColorFill(fillColor);
+                        console.log('颜色填充对象创建成功:', colorFill);
+                        if (safeSetProperty(pathObj, 'fill', colorFill, '(设置填充色)')) {
+                            console.log('✅ 填充色设置成功');
+                        } else {
+                            console.warn('无法设置填充色，尝试其他方法');
+                            // 如果 fill 属性设置失败，尝试其他可能的属性名
+                            safeSetProperty(pathObj, 'fillColor', colorFill, '(尝试 fillColor 属性)') ||
+                            safeSetProperty(pathObj, 'color', colorFill, '(尝试 color 属性)');
+                        }
+                    } catch (colorError) {
+                        console.error('创建颜色填充失败:', colorError);
                     }
                 } else {
-                    console.warn('editor.makeColorFill 方法不存在');
+                    console.warn('editor.makeColorFill 方法不存在，尝试直接设置颜色');
+                    safeSetProperty(pathObj, 'fill', fillColor, '(直接设置填充色)') ||
+                    safeSetProperty(pathObj, 'fillColor', fillColor, '(直接设置 fillColor)') ||
+                    safeSetProperty(pathObj, 'color', fillColor, '(直接设置 color)');
                 }
                 
-                // 明确移除描边，确保没有黑色边框 - 使用安全的属性设置
-                safeSetProperty(pathObj, 'stroke', undefined, '(移除描边)');
+                // 最终验证：确保没有描边，有填充
+                console.log('🔍 最终样式验证:', {
+                    stroke: pathObj.stroke,
+                    fill: pathObj.fill,
+                    strokeColor: pathObj.strokeColor,
+                    fillColor: pathObj.fillColor,
+                    strokeWidth: pathObj.strokeWidth,
+                    borderWidth: pathObj.borderWidth
+                });
                 
                 // 根据边界信息计算更合适的位置
                 let offsetX = 100;
@@ -139,11 +231,18 @@ function start() {
                 }
                 
                 console.log('插入父节点:', insertionParent);
+                console.log('插入父节点类型:', typeof insertionParent);
+                console.log('插入父节点属性:', Object.getOwnPropertyNames(insertionParent));
                 
-                insertionParent.children.append(pathObj);
+                try {
+                    insertionParent.children.append(pathObj);
+                    console.log(`SVG 路径插入成功，使用方法: ${creationMethod}，位置: (${offsetX}, ${offsetY})`);
+                } catch (appendError) {
+                    console.error('追加到父节点失败:', appendError);
+                    throw new Error(`追加到父节点失败: ${appendError.message}`);
+                }
                 
-                console.log(`SVG 路径插入成功，位置: (${offsetX}, ${offsetY})，无描边`);
-                return { success: true, position: { x: offsetX, y: offsetY } };
+                return { success: true, position: { x: offsetX, y: offsetY }, method: creationMethod };
                 
             } catch (error) {
                 console.error('插入 SVG 路径失败:', error);
