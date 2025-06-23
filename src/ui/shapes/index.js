@@ -9,6 +9,9 @@ import { bulgeBothWarp, bulgeBothConfig } from "./bulgeBothWarp.js";
 import { triangleUpperWarp, triangleUpperConfig } from "./triangleUpper.js";
 import { triangleLowerWarp, triangleLowerConfig } from "./triangleLower.js";
 import { flagWarp, flagConfig } from "./flag.js";
+import { envelopeWaveWarp, envelopeWaveConfig } from './envelopeWave.js';
+import { arcClampTopWarp, arcClampTopConfig } from './arcClampTopWarp.js';
+import { arcClampBottomWarp, arcClampBottomConfig } from './arcClampBottomWarp.js';
 
 // 导出所有变形函数
 export const warpFunctions = {
@@ -21,19 +24,9 @@ export const warpFunctions = {
   triangleUpper: triangleUpperWarp,
   triangleLower: triangleLowerWarp,
   flag: flagWarp,
-};
-
-// 导出所有配置
-export const warpConfigs = {
-  arcLower: arcLowerConfig,
-  arcUpper: arcUpperConfig,
-  wave: waveConfig,
-  bulgeUp: bulgeUpConfig,
-  bulgeDown: bulgeDownConfig,
-  bulgeBoth: bulgeBothConfig,
-  triangleUpper: triangleUpperConfig,
-  triangleLower: triangleLowerConfig,
-  flag: flagConfig,
+  envelopeWave: envelopeWaveWarp,
+  arcClampTop: arcClampTopWarp,
+  arcClampBottom: arcClampBottomWarp,
 };
 
 // 导出效果列表（用于UI渲染）
@@ -47,14 +40,27 @@ export const effectsList = [
   { key: "triangleUpper", ...triangleUpperConfig },
   { key: "triangleLower", ...triangleLowerConfig },
   { key: "flag", ...flagConfig },
+  { key: "envelopeWave", label: envelopeWaveConfig.label, description: envelopeWaveConfig.description },
+  { key: "arcClampTop", label: arcClampTopConfig.label, description: arcClampTopConfig.description },
+  { key: "arcClampBottom", label: arcClampBottomConfig.label, description: arcClampBottomConfig.description },
 ];
 
 // 辅助函数：获取变形函数
-export function getWarpFunction(effectType) {
-  return warpFunctions[effectType];
-}
-
-// 辅助函数：获取配置
-export function getWarpConfig(effectType) {
-  return warpConfigs[effectType];
+export function getWarpFunction(type) {
+  const functions = {
+    arcLower: arcLowerWarp,
+    arcUpper: arcUpperWarp,
+    wave: waveWarp,
+    bulgeUp: bulgeUpWarp,
+    bulgeDown: bulgeDownWarp,
+    bulgeBoth: bulgeBothWarp,
+    triangleUpper: triangleUpperWarp,
+    triangleLower: triangleLowerWarp,
+    flag: flagWarp,
+    envelopeWave: envelopeWaveWarp,
+    arcClampTop: arcClampTopWarp,
+    arcClampBottom: arcClampBottomWarp,
+  };
+  
+  return functions[type];
 }
