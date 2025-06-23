@@ -8,6 +8,7 @@ import { bulgeDownWarp, bulgeDownConfig } from "./bulgeDownWarp.js";
 import { bulgeBothWarp, bulgeBothConfig } from "./bulgeBothWarp.js";
 import { triangleUpperWarp, triangleUpperConfig } from "./triangleUpper.js";
 import { triangleLowerWarp, triangleLowerConfig } from "./triangleLower.js";
+import { flagWarp, flagConfig } from "./flag.js";
 
 // 导出所有变形函数
 export const warpFunctions = {
@@ -19,6 +20,7 @@ export const warpFunctions = {
   bulgeBoth: bulgeBothWarp,
   triangleUpper: triangleUpperWarp,
   triangleLower: triangleLowerWarp,
+  flag: flagWarp,
 };
 
 // 导出所有配置
@@ -31,6 +33,7 @@ export const warpConfigs = {
   bulgeBoth: bulgeBothConfig,
   triangleUpper: triangleUpperConfig,
   triangleLower: triangleLowerConfig,
+  flag: flagConfig,
 };
 
 // 导出效果列表（用于UI渲染）
@@ -43,6 +46,7 @@ export const effectsList = [
   { key: "bulgeBoth", ...bulgeBothConfig },
   { key: "triangleUpper", ...triangleUpperConfig },
   { key: "triangleLower", ...triangleLowerConfig },
+  { key: "flag", ...flagConfig },
 ];
 
 // 辅助函数：获取变形函数

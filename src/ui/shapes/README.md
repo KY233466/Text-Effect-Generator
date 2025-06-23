@@ -10,8 +10,26 @@ shapes/
 ├── arcLower.js       # 下弧形变形效果
 ├── arcUpper.js       # 上弧形变形效果
 ├── wave.js           # 波浪变形效果
+├── bulgeUpWarp.js    # 上凸变形效果
+├── bulgeDownWarp.js  # 下凸变形效果
+├── bulgeBothWarp.js  # 双向凸起变形效果
+├── triangleUpper.js  # 上三角变形效果
+├── triangleLower.js  # 下三角变形效果
+├── flag.js           # 旗帜飘动变形效果
 └── README.md         # 本说明文件
 ```
+
+## 可用效果
+
+- **Arc Lower**: 下弧形变形效果
+- **Arc Upper**: 上弧形变形效果  
+- **Wave**: 波浪变形效果
+- **Bulge Up**: 上凸变形效果
+- **Bulge Down**: 下凸变形效果
+- **Bulge Both**: 双向凸起变形效果
+- **Triangle Upper**: 上三角变形效果
+- **Triangle Lower**: 下三角变形效果
+- **Flag**: 旗帜飘动变形效果
 
 ## 使用方法
 
