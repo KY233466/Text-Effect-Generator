@@ -13,6 +13,7 @@ import { concaveTopWarp, concaveTopConfig } from "./concaveTop.js";
 import { concaveBottomWarp, concaveBottomConfig } from "./concaveBottom.js";
 import { slantDownRightWarp, slantDownRightConfig } from "./slantDownRight.js";
 import { slantDownLeftWarp, slantDownLeftConfig } from "./slantDownLeft.js";
+import { bouquetWarp, bouquetConfig } from "./bouquet.js";
 
 // 导出所有变形函数
 export const warpFunctions = {
@@ -29,6 +30,7 @@ export const warpFunctions = {
   concaveBottom: concaveBottomWarp,
   slantDownRight: slantDownRightWarp,
   slantDownLeft: slantDownLeftWarp,
+  bouquet: bouquetWarp,
 };
 
 // 导出所有配置
@@ -46,6 +48,7 @@ export const warpConfigs = {
   concaveBottom: concaveBottomConfig,
   slantDownRight: slantDownRightConfig,
   slantDownLeft: slantDownLeftConfig,
+  bouquet: bouquetConfig,
 };
 
 // 导出效果列表（用于UI渲染）
@@ -63,6 +66,7 @@ export const effectsList = [
   { key: "concaveBottom", ...concaveBottomConfig },
   { key: "slantDownRight", ...slantDownRightConfig },
   { key: "slantDownLeft", ...slantDownLeftConfig },
+  { key: "bouquet", ...bouquetConfig },
 ];
 
 // 辅助函数：获取变形函数
