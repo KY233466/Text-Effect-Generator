@@ -36,11 +36,9 @@ export default function Smudge({
     }
   }, [text]);
   const generateTextPath = () => {
-    setIsGenerating(true);
     opentype.load('https://s3-us-west-2.amazonaws.com/s.cdpn.io/135636/FiraSansExtraCondensed-Black.ttf', (err, font) => {
       if (err) {
         console.error('Font could not be loaded:', err);
-        setIsGenerating(false);
         return;
       }
       const svgWidth = svgRef.current.clientWidth;
@@ -78,7 +76,6 @@ export default function Smudge({
       warpRef.current.interpolate(10);
       lastMouseX.current = null;
       lastMouseY.current = null;
-      setIsGenerating(false);
     });
   };
   const calculatePathBounds = commands => {

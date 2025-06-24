@@ -40,13 +40,11 @@ export default function Smudge({ sandboxProxy }) {
     }, [text]);
 
     const generateTextPath = () => {
-        setIsGenerating(true);
         opentype.load(
             'https://s3-us-west-2.amazonaws.com/s.cdpn.io/135636/FiraSansExtraCondensed-Black.ttf',
             (err, font) => {
                 if (err) {
                     console.error('Font could not be loaded:', err);
-                    setIsGenerating(false);
                     return;
                 }
 
@@ -89,7 +87,6 @@ export default function Smudge({ sandboxProxy }) {
 
                 lastMouseX.current = null;
                 lastMouseY.current = null;
-                setIsGenerating(false);
             }
         );
     };

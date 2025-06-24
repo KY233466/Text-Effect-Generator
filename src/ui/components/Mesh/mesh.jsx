@@ -262,6 +262,7 @@ export default function Mesh({ sandboxProxy }) {
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
     >
+      <div>Preview</div>
       <div style={{ display: 'flex', width: '100%' }}>
         <svg
           ref={svgControlRef}

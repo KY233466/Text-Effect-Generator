@@ -235,7 +235,7 @@ export default function Mesh({
     },
     onMouseMove: handleMouseMove,
     onMouseUp: handleMouseUp
-  }, /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("div", null, "Preview"), /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
       width: '100%'
