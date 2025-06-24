@@ -2,16 +2,13 @@ import React, { useRef, useState, useEffect } from 'react';
 import opentype from 'opentype.js';
 const Warp = window.Warp;
 export default function Mesh({
-  sandboxProxy,
-  pathBounds,
   setPathBounds,
   text,
-  svgPath,
   setSvgPath,
-  isLoading,
-  setIsLoading,
-  error,
-  setError
+  fontUrl,
+  lineHeight,
+  letterSpacing,
+  alignment
 }) {
   const svgRef = useRef();
   const pathRef = useRef();
@@ -31,9 +28,9 @@ export default function Mesh({
       return;
     }
     generateTextPath();
-  }, [text]);
+  }, [text, fontUrl, lineHeight, letterSpacing, alignment]);
   const generateTextPath = () => {
-    opentype.load('https://s3-us-west-2.amazonaws.com/s.cdpn.io/135636/FiraSansExtraCondensed-Black.ttf', (err, font) => {
+    opentype.load(fontUrl, (err, font) => {
       if (err) {
         console.error('Font could not be loaded:', err);
         return;
@@ -42,14 +39,13 @@ export default function Mesh({
       const fontSize = 100;
       const scale = fontSize / font.unitsPerEm;
       const baselineY = fontSize * 0.8;
-      const lineHeight = 1.2; // Or make this configurable
       const actualLineHeight = fontSize * lineHeight;
       let commands = [];
       let maxLineWidth = 0;
       const lineInfos = lines.map((line, lineIndex) => {
         const glyphs = font.stringToGlyphs(line);
         const glyphWidths = glyphs.map(g => g.advanceWidth * scale);
-        const lineWidth = glyphWidths.reduce((a, b) => a + b, 0);
+        const lineWidth = glyphWidths.reduce((a, b) => a + b, 0) + (glyphs.length - 1) * letterSpacing;
         maxLineWidth = Math.max(maxLineWidth, lineWidth);
         return {
           line,
@@ -59,19 +55,17 @@ export default function Mesh({
           y: baselineY + lineIndex * actualLineHeight
         };
       });
-
-      // Align horizontally center
       lineInfos.forEach(({
         glyphs,
         glyphWidths,
         lineWidth,
         y
       }) => {
-        let x = (maxLineWidth - lineWidth) / 2;
+        let x = alignment === 'left' ? 0 : alignment === 'right' ? maxLineWidth - lineWidth : (maxLineWidth - lineWidth) / 2;
         glyphs.forEach((g, i) => {
           const glyphPath = g.getPath(x, y, fontSize);
           commands.push(...glyphPath.commands);
-          x += glyphWidths[i];
+          x += glyphWidths[i] + letterSpacing;
         });
       });
       const d = commands.map(c => {
@@ -85,8 +79,6 @@ export default function Mesh({
       setSvgPath(d);
       const bounds = calculatePathBounds(commands);
       setPathBounds(bounds);
-
-      // Create <path> manually
       svgRef.current.innerHTML = '';
       const pathEl = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       pathEl.setAttribute('d', d);
@@ -105,25 +97,17 @@ export default function Mesh({
       const rect = svgControlRef.current.getBoundingClientRect();
       const width = rect.width;
       const height = rect.height;
-
-      // 1. FIRST CREATE RECTANGULAR CONTROL POINTS (BOUNDING BOX)
       let initialControlPoints = [[x, y], [x, y + h], [(x + w) * 0.25, y + h], [(x + w) * 0.75, y + h], [x + w, y + h], [x + w, y], [x + w * 0.4, y]];
-
-      // Apply buffer to avoid zero distances
       const buffer = 0.1;
       initialControlPoints = initialControlPoints.map(([cx, cy]) => [cx === x ? cx - buffer : cx === x + w ? cx + buffer : cx, cy === y ? cy - buffer : cy === y + h ? cy + buffer : cy]);
       const c = (width - 40) / 520;
       const xShift = 20;
       const yShift = 50;
-
-      // 2. SET CUSTOM CONTROL POINTS (THE ONES YOU WANT TO SHOW/DRAG)
       const customControlPoints = [[20 * c + xShift, 5 * c + yShift], [5 * c + xShift, 120 * c + yShift], [80 * c + xShift, 210 * c + yShift], [350 * c + xShift, 160 * c + yShift], [520 * c + xShift, 180 * c + yShift], [450 * c + xShift, 20 * c + yShift], [200 * c + xShift, 80 * c + yShift]];
       controlPointsRef.current = customControlPoints;
       const warp = new Warp(svgRef.current);
       warp.interpolate(4);
       warpRef.current = warp;
-
-      // 3. CALCULATE WEIGHTS USING RECTANGULAR POINTS
       warp.transform((v0, V = initialControlPoints) => {
         const A = [],
           W = [],
@@ -150,13 +134,9 @@ export default function Mesh({
         for (let i = 0; i < V.length; i++) L[i] = W[i] / sum;
         return [...v0, ...L];
       });
-
-      // 4. APPLY CUSTOM SHAPE USING THE WEIGHTS
       warp.transform(reposition);
       const newD = pathRef.current?.getAttribute('d');
       if (newD) setSvgPath(newD);
-
-      // 5. DRAW THE CUSTOM CONTROL SHAPE
       drawControlShape();
     });
   };
@@ -231,13 +211,9 @@ export default function Mesh({
     warpRef.current.transform(reposition);
   };
   const handleMouseUp = () => {
-    // if (dragIndex !== null) {
-    //   console.log('Updated control points:', controlPointsRef.current);
-    // }
     if (pathRef.current) {
       const updatedD = svgRef.current.querySelector('path')?.getAttribute('d');
       if (updatedD) {
-        // console.log('Updated path D:', updatedD);
         setSvgPath(updatedD);
       }
     }
@@ -260,10 +236,7 @@ export default function Mesh({
     ref: svgControlRef,
     id: "svg-control",
     width: "100%",
-    height: "200"
-    // viewBox={`0 0 350 200`}
-    // preserveAspectRatio="xMidYMid meet"
-    ,
+    height: "200",
     style: {
       border: '1px solid #C7C7C7',
       borderRadius: '10px',
@@ -295,10 +268,7 @@ export default function Mesh({
     ref: svgRef,
     id: "svg-element",
     width: "100%",
-    height: "200"
-    // viewBox={`0 0 350 200`}
-    // preserveAspectRatio="xMidYMid meet"
-    ,
+    height: "200",
     style: {
       border: '1px solid #C7C7C7',
       borderRadius: '10px',

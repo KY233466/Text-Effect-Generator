@@ -3,19 +3,18 @@ import { effectsList, getWarpFunction } from '../shapes/index.js';
 import opentype from 'opentype.js';
 const TextWarpPage = ({
   sandboxProxy,
-  pathBounds,
-  setPathBounds,
   text,
-  svgPath,
-  setSvgPath
+  fontUrl,
+  lineHeight,
+  letterSpacing,
+  alignment
 }) => {
   const [warpType, setWarpType] = useState("wave");
-  const [fontUrl, setFontUrl] = useState("./fonts/Arial.ttf");
   const [intensity, setIntensity] = useState(50);
-  const [lineHeight, setLineHeight] = useState(1.2);
-  const [letterSpacing, setLetterSpacing] = useState(0);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [svgPath, setSvgPath] = useState("");
+  const [pathBounds, setPathBounds] = useState(null);
 
   // 计算路径边界
   const calculatePathBounds = commands => {

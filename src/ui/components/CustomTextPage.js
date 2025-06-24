@@ -3,16 +3,18 @@ import Mesh from "./Mesh/mesh.js";
 import Smudge from "./Smudge/smudge.js";
 const CustomTextPage = ({
   sandboxProxy,
-  pathBounds,
-  setPathBounds,
   text,
-  svgPath,
-  setSvgPath
+  fontUrl,
+  lineHeight,
+  letterSpacing,
+  alignment
 }) => {
   const Shape = ["mesh", "smudge"];
   const [selected, setSelected] = useState("mesh");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [svgPath, setSvgPath] = useState("");
+  const [pathBounds, setPathBounds] = useState(null);
   const handleInsert = async () => {
     if (!sandboxProxy || !svgPath || !pathBounds) {
       console.error('缺少必要数据');
@@ -37,27 +39,22 @@ const CustomTextPage = ({
     }
   };
   return /*#__PURE__*/React.createElement("div", null, selected == "mesh" ? /*#__PURE__*/React.createElement(Mesh, {
-    sandboxProxy: sandboxProxy,
-    pathBounds: pathBounds,
     setPathBounds: setPathBounds,
     text: text,
-    svgPath: svgPath,
     setSvgPath: setSvgPath,
-    isLoading: isLoading,
-    setIsLoading: setIsLoading,
-    error: error,
-    setError: setError
+    fontUrl: fontUrl,
+    lineHeight: lineHeight,
+    letterSpacing: letterSpacing,
+    alignment: alignment
   }) : /*#__PURE__*/React.createElement(Smudge, {
-    sandboxProxy: sandboxProxy,
     pathBounds: pathBounds,
     setPathBounds: setPathBounds,
     text: text,
-    svgPath: svgPath,
     setSvgPath: setSvgPath,
-    isLoading: isLoading,
-    setIsLoading: setIsLoading,
-    error: error,
-    setError: setError
+    fontUrl: fontUrl,
+    lineHeight: lineHeight,
+    letterSpacing: letterSpacing,
+    alignment: alignment
   }), /*#__PURE__*/React.createElement("div", null, "Shape"), /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',

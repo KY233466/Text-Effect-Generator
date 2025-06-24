@@ -7,8 +7,10 @@ const TextWarpApp = ({
 }) => {
   const [activeTab, setActiveTab] = useState('text');
   const [text, setText] = useState("TEXT WARP\nMULTI LINE");
-  const [svgPath, setSvgPath] = useState("");
-  const [pathBounds, setPathBounds] = useState(null);
+  const [fontUrl, setFontUrl] = useState("./fonts/Arial.ttf");
+  const [lineHeight, setLineHeight] = useState(1.2);
+  const [letterSpacing, setLetterSpacing] = useState(0);
+  const [alignment, setAlignment] = useState("center");
   return /*#__PURE__*/React.createElement("div", {
     className: "app",
     style: {
@@ -40,26 +42,30 @@ const TextWarpApp = ({
     },
     onClick: () => setActiveTab('custom')
   }, "\u2728 Custom")), activeTab === 'text' && /*#__PURE__*/React.createElement(SelectText, {
-    pathBounds: pathBounds,
-    setPathBounds: setPathBounds,
     text: text,
     setText: setText,
-    svgPath: svgPath,
-    setSvgPath: setSvgPath,
+    fontUrl: fontUrl,
+    setFontUrl: setFontUrl,
+    lineHeight: lineHeight,
+    setLineHeight: setLineHeight,
+    letterSpacing: letterSpacing,
+    setLetterSpacing: setLetterSpacing,
+    alignment: alignment,
+    setAlignment: setAlignment,
     sandboxProxy: sandboxProxy
   }), activeTab === 'warp' && /*#__PURE__*/React.createElement(TextWarpPage, {
-    pathBounds: pathBounds,
-    setPathBounds: setPathBounds,
     text: text,
-    svgPath: svgPath,
-    setSvgPath: setSvgPath,
+    fontUrl: fontUrl,
+    lineHeight: lineHeight,
+    letterSpacing: letterSpacing,
+    alignment: alignment,
     sandboxProxy: sandboxProxy
   }), activeTab === 'custom' && /*#__PURE__*/React.createElement(CustomTextPage, {
-    pathBounds: pathBounds,
-    setPathBounds: setPathBounds,
     text: text,
-    svgPath: svgPath,
-    setSvgPath: setSvgPath,
+    fontUrl: fontUrl,
+    lineHeight: lineHeight,
+    letterSpacing: letterSpacing,
+    alignment: alignment,
     sandboxProxy: sandboxProxy
   }));
 };

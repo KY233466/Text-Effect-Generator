@@ -6,15 +6,17 @@ import SelectText from './components/SelectText.js';
 const TextWarpApp = ({ sandboxProxy }) => {
   const [activeTab, setActiveTab] = useState('text');
   const [text, setText] = useState("TEXT WARP\nMULTI LINE");
-  const [svgPath, setSvgPath] = useState("");
-  const [pathBounds, setPathBounds] = useState(null);
+  const [fontUrl, setFontUrl] = useState("./fonts/Arial.ttf");
+  const [lineHeight, setLineHeight] = useState(1.2);
+  const [letterSpacing, setLetterSpacing] = useState(0);
+  const [alignment, setAlignment] = useState("center");
 
   return (
-    <div className="app" style={{margin: '15px'}}>
+    <div className="app" style={{ margin: '15px' }}>
       <div className="tab-container">
         <button
           className={`tab ${activeTab === 'text' ? 'active' : ''}`}
-          style={{ marginRight: '10px', padding: '5px 10px', borderRadius: '30px'}}
+          style={{ marginRight: '10px', padding: '5px 10px', borderRadius: '30px' }}
           onClick={() => setActiveTab('text')}
         >
           Text
@@ -35,33 +37,35 @@ const TextWarpApp = ({ sandboxProxy }) => {
         </button>
       </div>
 
-      {/* <div className="page-content"> */}
-        {activeTab === 'text' && 
-          <SelectText 
-            pathBounds={pathBounds} 
-            setPathBounds={setPathBounds} 
-            text={text} 
-            setText={setText}
-            svgPath={svgPath} 
-            setSvgPath={setSvgPath} 
-            sandboxProxy={sandboxProxy} />}
-        {activeTab === 'warp' && 
-          <TextWarpPage
-            pathBounds={pathBounds} 
-            setPathBounds={setPathBounds} 
-            text={text} 
-            svgPath={svgPath} 
-            setSvgPath={setSvgPath} 
-            sandboxProxy={sandboxProxy} />}
-        {activeTab === 'custom' && 
-          <CustomTextPage
-            pathBounds={pathBounds}
-            setPathBounds={setPathBounds}
-            text={text}
-            svgPath={svgPath}
-            setSvgPath={setSvgPath}
-            sandboxProxy={sandboxProxy} />}
-      {/* </div> */}
+      {activeTab === 'text' &&
+        <SelectText
+          text={text}
+          setText={setText}
+          fontUrl={fontUrl}
+          setFontUrl={setFontUrl}
+          lineHeight={lineHeight}
+          setLineHeight={setLineHeight}
+          letterSpacing={letterSpacing}
+          setLetterSpacing={setLetterSpacing}
+          alignment={alignment}
+          setAlignment={setAlignment}
+          sandboxProxy={sandboxProxy} />}
+      {activeTab === 'warp' &&
+        <TextWarpPage
+          text={text}
+          fontUrl={fontUrl}
+          lineHeight={lineHeight}
+          letterSpacing={letterSpacing}
+          alignment={alignment}
+          sandboxProxy={sandboxProxy} />}
+      {activeTab === 'custom' &&
+        <CustomTextPage
+          text={text}
+          fontUrl={fontUrl}
+          lineHeight={lineHeight}
+          letterSpacing={letterSpacing}
+          alignment={alignment}
+          sandboxProxy={sandboxProxy} />}
     </div>
   );
 };

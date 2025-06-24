@@ -4,16 +4,19 @@ import Smudge from "./Smudge/smudge.js";
 
 const CustomTextPage = ({
   sandboxProxy,
-  pathBounds,
-  setPathBounds,
   text,
-  svgPath,
-  setSvgPath }) => {
+  fontUrl,
+  lineHeight,
+  letterSpacing,
+  alignment }) => {
 
   const Shape = ["mesh", "smudge"];
   const [selected, setSelected] = useState("mesh");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const [svgPath, setSvgPath] = useState("");
+  const [pathBounds, setPathBounds] = useState(null);
 
   const handleInsert = async () => {
     if (!sandboxProxy || !svgPath || !pathBounds) {
@@ -42,25 +45,22 @@ const CustomTextPage = ({
   return (
     <div>
       {selected == "mesh" ? <Mesh
-        sandboxProxy={sandboxProxy} pathBounds={pathBounds}
         setPathBounds={setPathBounds}
         text={text}
-        svgPath={svgPath}
         setSvgPath={setSvgPath}
-        isLoading={isLoading}
-        setIsLoading={setIsLoading}
-        error={error}
-        setError={setError}
+        fontUrl={fontUrl}
+        lineHeight={lineHeight}
+        letterSpacing={letterSpacing}
+        alignment={alignment}
       /> : <Smudge
-        sandboxProxy={sandboxProxy} pathBounds={pathBounds}
+        pathBounds={pathBounds}
         setPathBounds={setPathBounds}
         text={text}
-        svgPath={svgPath}
         setSvgPath={setSvgPath}
-        isLoading={isLoading}
-        setIsLoading={setIsLoading}
-        error={error}
-        setError={setError}
+        fontUrl={fontUrl}
+        lineHeight={lineHeight}
+        letterSpacing={letterSpacing}
+        alignment={alignment}
       />}
       <div>Shape</div>
       <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>

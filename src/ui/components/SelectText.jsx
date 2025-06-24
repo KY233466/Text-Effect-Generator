@@ -8,18 +8,21 @@ const fonts = [
 ];
 
 export default function SelectText({ sandboxProxy,
-  pathBounds,
-  setPathBounds,
   text,
   setText,
-  svgPath,
-  setSvgPath }) {
-  const [fontUrl, setFontUrl] = useState("./fonts/Arial.ttf");
-  const [lineHeight, setLineHeight] = useState(1.2);
-  const [letterSpacing, setLetterSpacing] = useState(0);
-  const [alignment, setAlignment] = useState("center");
+  fontUrl,
+  setFontUrl,
+  lineHeight,
+  setLineHeight,
+  letterSpacing,
+  setLetterSpacing,
+  alignment,
+  setAlignment }) {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const [svgPath, setSvgPath] = useState("");
+  const [pathBounds, setPathBounds] = useState(null);
 
   const calculatePathBounds = (commands) => {
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;

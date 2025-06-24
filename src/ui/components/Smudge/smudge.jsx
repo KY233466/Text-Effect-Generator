@@ -6,16 +6,16 @@ const SMUDGE_STRENGTH = 0.33;
 
 const Warp = window.Warp;
 
-export default function Smudge({ sandboxProxy,
+export default function Smudge({
     pathBounds,
     setPathBounds,
     text,
-    svgPath,
     setSvgPath,
-    isLoading,
-    setIsLoading,
-    error,
-    setError }) {
+    fontUrl,
+    lineHeight,
+    letterSpacing,
+    alignment
+}) {
     const svgRef = useRef();
     const pathRef = useRef();
     const warpRef = useRef();
@@ -41,58 +41,86 @@ export default function Smudge({ sandboxProxy,
         if (svgRef.current && text) {
             generateTextPath();
         }
-    }, [text]);
+    }, [text, fontUrl, lineHeight, letterSpacing, alignment]);
 
     const generateTextPath = () => {
-        opentype.load(
-            'https://s3-us-west-2.amazonaws.com/s.cdpn.io/135636/FiraSansExtraCondensed-Black.ttf',
-            (err, font) => {
-                if (err) {
-                    console.error('Font could not be loaded:', err);
-                    return;
+        opentype.load(fontUrl, (err, font) => {
+            if (err) {
+                console.error('Font could not be loaded:', err);
+                return;
+            }
+
+            const fontSize = 100;
+            const scale = fontSize / font.unitsPerEm;
+            const baselineY = fontSize * 0.8;
+            const actualLineHeight = fontSize * lineHeight;
+
+            const lines = text.split('\n');
+            const allCommands = [];
+            let maxLineWidth = 0;
+
+            const lineInfos = lines.map((line, i) => {
+                const glyphs = font.stringToGlyphs(line);
+                const glyphWidths = glyphs.map(g => g.advanceWidth * scale);
+                const lineWidth = glyphWidths.reduce((a, b) => a + b, 0) + (glyphs.length - 1) * letterSpacing;
+                maxLineWidth = Math.max(maxLineWidth, lineWidth);
+
+                return {
+                    glyphs,
+                    glyphWidths,
+                    lineWidth,
+                    y: baselineY + i * actualLineHeight
+                };
+            });
+
+            lineInfos.forEach(lineInfo => {
+                let x;
+                if (alignment === 'left') {
+                    x = 0;
+                } else if (alignment === 'center') {
+                    x = (maxLineWidth - lineInfo.lineWidth) / 2;
+                } else if (alignment === 'right') {
+                    x = maxLineWidth - lineInfo.lineWidth;
+                } else {
+                    x = 0;
                 }
 
-                const svgWidth = svgRef.current.clientWidth;
-                const svgHeight = svgRef.current.clientHeight;
-                const fontSize = 100;
-                const textWidth = font.getAdvanceWidth(text, fontSize);
-                const x = (svgWidth - textWidth) / 2;
-                const y = svgHeight / 2 + fontSize / 3;
+                lineInfo.glyphs.forEach((glyph, j) => {
+                    const path = glyph.getPath(x, lineInfo.y, fontSize);
+                    allCommands.push(...path.commands);
+                    x += lineInfo.glyphWidths[j] + letterSpacing;
+                });
+            });
 
-                const path = font.getPath(text, x, y, fontSize);
-                const commands = path.commands;
+            const d = allCommands.map(c => {
+                if (c.type === 'M') return `M ${c.x} ${c.y}`;
+                if (c.type === 'L') return `L ${c.x} ${c.y}`;
+                if (c.type === 'C') return `C ${c.x1} ${c.y1}, ${c.x2} ${c.y2}, ${c.x} ${c.y}`;
+                if (c.type === 'Q') return `Q ${c.x1} ${c.y1}, ${c.x} ${c.y}`;
+                if (c.type === 'Z') return 'Z';
+                return '';
+            }).join(' ');
 
-                const d = commands.map(c => {
-                    if (c.type === 'M') return `M ${c.x} ${c.y}`;
-                    if (c.type === 'L') return `L ${c.x} ${c.y}`;
-                    if (c.type === 'C') return `C ${c.x1} ${c.y1}, ${c.x2} ${c.y2}, ${c.x} ${c.y}`;
-                    if (c.type === 'Q') return `Q ${c.x1} ${c.y1}, ${c.x} ${c.y}`;
-                    if (c.type === 'Z') return 'Z';
-                    return '';
-                }).join(' ');
-                setSvgPath(d);
+            setSvgPath(d);
 
-                const bounds = calculatePathBounds(commands);
-                setPathBounds(bounds);
+            const bounds = calculatePathBounds(allCommands);
+            setPathBounds(bounds);
 
-                // Create <path> manually
-                svgRef.current.innerHTML = '';
-                const pathEl = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                pathEl.setAttribute('d', d);
-                pathEl.setAttribute('fill', 'hotpink');
-                pathEl.setAttribute('stroke', 'none');
-                svgRef.current.appendChild(pathEl);
-                pathRef.current = pathEl;
+            svgRef.current.innerHTML = '';
+            const pathEl = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            pathEl.setAttribute('d', d);
+            pathEl.setAttribute('fill', 'hotpink');
+            pathEl.setAttribute('stroke', 'none');
+            svgRef.current.appendChild(pathEl);
+            pathRef.current = pathEl;
 
-                // Initialize Warp
-                const warp = new Warp(svgRef.current);
-                warpRef.current = warp;
-                warpRef.current.interpolate(10);
+            const warp = new Warp(svgRef.current);
+            warpRef.current = warp;
+            warpRef.current.interpolate(10);
 
-                lastMouseX.current = null;
-                lastMouseY.current = null;
-            }
-        );
+            lastMouseX.current = null;
+            lastMouseY.current = null;
+        });
     };
 
     const calculatePathBounds = (commands) => {
@@ -138,7 +166,6 @@ export default function Smudge({ sandboxProxy,
     const handleMouseDown = (e) => {
         if (!svgRef.current) return;
         setIsMouseDown(true);
-        const rect = svgRef.current.getBoundingClientRect();
         mouseX.current = e.clientX;
         mouseY.current = e.clientY;
         lastMouseX.current = e.clientX;
@@ -199,34 +226,33 @@ export default function Smudge({ sandboxProxy,
         }
     };
 
+    const getSVGCoordinates = (clientX, clientY) => {
+        const pt = svgRef.current.createSVGPoint();
+        pt.x = clientX;
+        pt.y = clientY;
+        return pt.matrixTransform(svgRef.current.getScreenCTM().inverse());
+    };
+
     const applySmudge = () => {
         if (!svgRef.current || !warpRef.current) return;
-        const rect = svgRef.current.getBoundingClientRect();
+
+        const start = getSVGCoordinates(lastMouseX.current, lastMouseY.current);
+        const end = getSVGCoordinates(mouseX.current, mouseY.current);
+
         warpRef.current.transform(
-            smudgeFactory(
-                lastMouseX.current - rect.left,
-                lastMouseY.current - rect.top,
-                mouseX.current - rect.left,
-                mouseY.current - rect.top,
-                SMUDGE_RADIUS,
-                SMUDGE_STRENGTH
-            )
+            smudgeFactory(start.x, start.y, end.x, end.y, SMUDGE_RADIUS, SMUDGE_STRENGTH)
         );
     };
 
     const applyTouchSmudge = () => {
         if (!svgRef.current || !warpRef.current) return;
-        const rect = svgRef.current.getBoundingClientRect();
+
         Object.values(touchPoints.current).forEach(point => {
+            const start = getSVGCoordinates(point.lastX, point.lastY);
+            const end = getSVGCoordinates(point.x, point.y);
+
             warpRef.current.transform(
-                smudgeFactory(
-                    point.lastX - rect.left,
-                    point.lastY - rect.top,
-                    point.x - rect.left,
-                    point.y - rect.top,
-                    SMUDGE_RADIUS,
-                    SMUDGE_STRENGTH
-                )
+                smudgeFactory(start.x, start.y, end.x, end.y, SMUDGE_RADIUS, SMUDGE_STRENGTH)
             );
         });
     };
@@ -238,7 +264,7 @@ export default function Smudge({ sandboxProxy,
                 ref={svgRef}
                 width="100%"
                 height="200"
-                viewBox="0 0 600 200"
+                viewBox={pathBounds ? `${pathBounds.minX - 20} ${pathBounds.minY - 20} ${pathBounds.width + 40} ${pathBounds.height + 40}` : '0 0 600 200'}
                 preserveAspectRatio="xMidYMid meet"
                 style={{
                     border: '1px solid #C7C7C7',
