@@ -2,15 +2,31 @@ import React, { useState } from 'react';
 import Mesh from "./Mesh/mesh.js";
 import Smudge from "./Smudge/smudge.js";
 
-const CustomTextPage = ({ sandboxProxy }) => {
+const CustomTextPage = ({ sandboxProxy,
+  pathBounds,
+  setPathBounds,
+  text,
+  svgPath,
+  setSvgPath }) => {
 
   const Shape = ["mesh", "smudge"];
   const [selected, setSelected] = useState("mesh");
 
-
   return (
     <div>
-      {selected == "mesh" ? <Mesh sandboxProxy={sandboxProxy} /> : <Smudge sandboxProxy={sandboxProxy} />}
+      {selected == "mesh" ? <Mesh 
+        sandboxProxy={sandboxProxy} pathBounds={pathBounds}
+        setPathBounds={setPathBounds}
+        text={text}
+        svgPath={svgPath}
+        setSvgPath={setSvgPath}
+        /> : <Smudge
+          sandboxProxy={sandboxProxy} pathBounds={pathBounds}
+          setPathBounds={setPathBounds}
+          text={text}
+          svgPath={svgPath}
+          setSvgPath={setSvgPath}
+          />}
       <div>Shape</div>
       <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
         {Shape.map((s) => <button style={{

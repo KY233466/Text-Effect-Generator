@@ -2,14 +2,29 @@ import React, { useState } from 'react';
 import Mesh from "./Mesh/mesh.js";
 import Smudge from "./Smudge/smudge.js";
 const CustomTextPage = ({
-  sandboxProxy
+  sandboxProxy,
+  pathBounds,
+  setPathBounds,
+  text,
+  svgPath,
+  setSvgPath
 }) => {
   const Shape = ["mesh", "smudge"];
   const [selected, setSelected] = useState("mesh");
   return /*#__PURE__*/React.createElement("div", null, selected == "mesh" ? /*#__PURE__*/React.createElement(Mesh, {
-    sandboxProxy: sandboxProxy
+    sandboxProxy: sandboxProxy,
+    pathBounds: pathBounds,
+    setPathBounds: setPathBounds,
+    text: text,
+    svgPath: svgPath,
+    setSvgPath: setSvgPath
   }) : /*#__PURE__*/React.createElement(Smudge, {
-    sandboxProxy: sandboxProxy
+    sandboxProxy: sandboxProxy,
+    pathBounds: pathBounds,
+    setPathBounds: setPathBounds,
+    text: text,
+    svgPath: svgPath,
+    setSvgPath: setSvgPath
   }), /*#__PURE__*/React.createElement("div", null, "Shape"), /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
