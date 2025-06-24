@@ -18,7 +18,7 @@ const TextWarpApp = ({ sandboxProxy }) => {
           className={`tab ${activeTab === 'custom' ? 'active' : ''}`}
           onClick={() => setActiveTab('custom')}
         >
-          ✨ 自定义文本
+          ✨ Custom
         </button>
       </div>
 
