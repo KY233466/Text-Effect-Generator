@@ -7,7 +7,7 @@ export function triangleLowerWarp(
   intensity,
   textMetrics
 ) {
-  const baselineY = 0;
+  const baselineY = 10;
   const ascenderHeight = textMetrics.ascender || textMetrics.yMax || 100;
   const descenderHeight = textMetrics.descender || textMetrics.yMin || -20;
 

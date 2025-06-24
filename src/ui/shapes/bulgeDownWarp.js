@@ -9,7 +9,7 @@ export function bulgeDownWarp(
   const normX = (x - centerX) / (totalWidth / 2);
   const strength = intensity / 50;
   const scaleY = 1 + strength * (1 - normX * normX);
-  const baseline = 0;
+  const baseline = 10;
 
   // 上半部分保持原样，下半部分向下膨胀
   if (y < baseline) {
