@@ -9,19 +9,22 @@ export function concaveBottomWarp(
   textMetrics
 ) {
   const normX = (x - centerX) / (totalWidth / 2); // -1 ~ 1
-  const strength = intensity / 100;
 
-  // 从中间向两边 scaleY 从 min 到 1（反向 bulge）
-  const scaleY = 1 - strength * (1 - normX * normX);
+  const baseline = textMetrics.yMax;
 
-  const baseline = 0;
+  const horizontalFactor = 1 - normX * normX;
+  const bottom = textMetrics.yMin;
+  const normY = (y - baseline) / (bottom - baseline);
+  const verticalFactor = Math.max(0, Math.min(1, normY));
 
-  if (y <= baseline) {
+  const offsetY = (intensity / 50) * 50 * horizontalFactor * verticalFactor;
+  
+  if (y <= baseline * 0.85) {
     return { x, y }; // baseline 以上不变
   } else {
     return {
       x,
-      y: baseline + (y - baseline) * scaleY, // baseline 以下按 scaleY 缩放
+      y: y-offsetY, // baseline 以下缩放
     };
   }
 }
