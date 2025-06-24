@@ -2,7 +2,12 @@ import React, { useRef, useState, useEffect } from 'react';
 import opentype from 'opentype.js';
 const Warp = window.Warp;
 export default function Mesh({
-  sandboxProxy
+  sandboxProxy,
+  pathBounds,
+  setPathBounds,
+  text,
+  svgPath,
+  setSvgPath
 }) {
   const svgRef = useRef();
   const pathRef = useRef();
@@ -12,9 +17,6 @@ export default function Mesh({
   const warpRef = useRef();
   const controlPointsRef = useRef([]);
   const [dragIndex, setDragIndex] = useState(null);
-  const [text, setText] = useState("");
-  const [dPath, setDPath] = useState('');
-  const [pathBounds, setPathBounds] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   useEffect(() => {
@@ -22,7 +24,7 @@ export default function Mesh({
     if (text === "") {
       svgRef.current.innerHTML = "";
       if (controlPathRef.current) controlPathRef.current.setAttribute("d", "");
-      setDPath("");
+      setSvgPath("");
       setPathBounds(null);
       return;
     }
@@ -54,7 +56,7 @@ export default function Mesh({
         if (c.type === 'Z') return 'Z';
         return '';
       }).join(' ');
-      setDPath(d);
+      setSvgPath(d);
       const bounds = calculatePathBounds(commands);
       setPathBounds(bounds);
 
@@ -126,7 +128,7 @@ export default function Mesh({
       // 4. APPLY CUSTOM SHAPE USING THE WEIGHTS
       warp.transform(reposition);
       const newD = pathRef.current?.getAttribute('d');
-      if (newD) setDPath(newD);
+      if (newD) setSvgPath(newD);
 
       // 5. DRAW THE CUSTOM CONTROL SHAPE
       drawControlShape();
@@ -210,20 +212,20 @@ export default function Mesh({
       const updatedD = svgRef.current.querySelector('path')?.getAttribute('d');
       if (updatedD) {
         // console.log('Updated path D:', updatedD);
-        setDPath(updatedD);
+        setSvgPath(updatedD);
       }
     }
     setDragIndex(null);
   };
   const handleInsert = async () => {
-    if (!sandboxProxy || !dPath || !pathBounds) {
+    if (!sandboxProxy || !svgPath || !pathBounds) {
       console.error('缺少必要数据');
       return;
     }
     setIsLoading(true);
     try {
       const result = await sandboxProxy.insertWarpedSVG({
-        d: dPath,
+        d: svgPath,
         bounds: pathBounds,
         originalText: text,
         warpType: 'mesh',
@@ -311,6 +313,6 @@ export default function Mesh({
     required: true
   }), /*#__PURE__*/React.createElement("button", {
     onClick: handleInsert,
-    disabled: isLoading || !dPath
+    disabled: isLoading || !svgPath
   }, isLoading ? '插入中...' : '插入变形文本'));
 }

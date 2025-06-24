@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { effectsList, getWarpFunction } from '../shapes/index.js';
 import opentype from 'opentype.js';
 const fonts = [{
   name: "Old Standard",
@@ -11,23 +10,20 @@ const fonts = [{
   name: "Helvetica",
   url: "./fonts/Helvetica.ttf"
 }];
-const TextWarpPage = ({
+export default function SelectText({
   sandboxProxy,
   pathBounds,
   setPathBounds,
   text,
+  setText,
   svgPath,
   setSvgPath
-}) => {
-  const [warpType, setWarpType] = useState("wave");
+}) {
   const [fontUrl, setFontUrl] = useState("./fonts/Arial.ttf");
-  const [intensity, setIntensity] = useState(50);
   const [lineHeight, setLineHeight] = useState(1.2);
   const [letterSpacing, setLetterSpacing] = useState(0);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
-  // 计算路径边界
   const calculatePathBounds = commands => {
     let minX = Infinity,
       minY = Infinity,
@@ -63,18 +59,12 @@ const TextWarpPage = ({
       height: maxY === -Infinity || minY === Infinity ? 0 : maxY - minY
     };
   };
-  console.log("text is", text);
-
-  // 当参数变化时重新生成路径 - 修改为支持多行
   useEffect(() => {
-    console.log("text is", text);
     if (!text) {
       setSvgPath("");
       setError("");
       return;
     }
-
-    // 直接使用导入的opentype对象
     if (!opentype) {
       setError("OpenType.js 未加载完成，请刷新页面重试");
       return;
@@ -89,8 +79,7 @@ const TextWarpPage = ({
       }
       setError("");
       try {
-        // 处理多行文本
-        const lines = text.split('\n').filter(line => line.trim()); // 过滤空行
+        const lines = text.split('\n').filter(line => line.trim());
         if (lines.length === 0) {
           setSvgPath("");
           return;
@@ -101,12 +90,9 @@ const TextWarpPage = ({
         const actualLineHeight = fontSize * lineHeight;
         let allCommands = [];
         let maxLineWidth = 0;
-
-        // 预先计算所有行的宽度，用于整体居中
         const lineInfos = lines.map((line, lineIndex) => {
           const glyphs = font.stringToGlyphs(line);
           const glyphWidths = glyphs.map(g => g.advanceWidth * scale);
-          // 计算行宽度时包含字符间距
           const lineWidth = glyphWidths.reduce((a, b) => a + b, 0) + (glyphs.length - 1) * letterSpacing;
           maxLineWidth = Math.max(maxLineWidth, lineWidth);
           return {
@@ -117,80 +103,16 @@ const TextWarpPage = ({
             y: baselineY + lineIndex * actualLineHeight
           };
         });
-
-        // 获取变形函数
-        const warpFn = getWarpFunction(warpType);
-        if (!warpFn) {
-          setError(`未知的变形类型: ${warpType}`);
-          return;
-        }
-
-        // 计算整体文本的度量信息 - 关键改进！
-        const totalHeight = (lines.length - 1) * actualLineHeight + fontSize;
-        const overallTopY = baselineY - fontSize * 0.7; // 第一行顶部
-        const overallBottomY = baselineY + (lines.length - 1) * actualLineHeight + fontSize * 0.2; // 最后一行底部
-        const overallCenterY = (overallTopY + overallBottomY) / 2; // 整体垂直中心
-
-        // 统一的文本度量信息 - 所有字符都使用这个
-        const unifiedTextMetrics = {
-          baseline: overallCenterY,
-          // 使用整体的垂直中心作为基线
-          ascender: overallTopY,
-          descender: overallBottomY,
-          yMax: overallTopY,
-          yMin: overallBottomY
-        };
-
-        // 整体变形参数
-        const totalWidth = maxLineWidth;
-        const centerX = maxLineWidth / 2;
-        const arcHeight = intensity;
-
-        // 处理每一行
         lineInfos.forEach((lineInfo, lineIndex) => {
           const {
             glyphs,
             lineWidth,
             y
           } = lineInfo;
-
-          // 水平居中对齐
           let x = (maxLineWidth - lineWidth) / 2;
-
-          // 处理当前行的每个字符 - 全部使用统一的文本度量！
           glyphs.forEach(g => {
             const path = g.getPath(x, y, fontSize);
-            path.commands.forEach(cmd => {
-              const warped = {
-                ...cmd
-              };
-              if ('x' in warped && 'y' in warped) {
-                const {
-                  x: newX,
-                  y: newY
-                } = warpFn(warped.x, warped.y, totalWidth, centerX, arcHeight, unifiedTextMetrics);
-                warped.x = newX;
-                warped.y = newY;
-              }
-              if ('x1' in warped && 'y1' in warped) {
-                const {
-                  x: newX1,
-                  y: newY1
-                } = warpFn(warped.x1, warped.y1, totalWidth, centerX, arcHeight, unifiedTextMetrics);
-                warped.x1 = newX1;
-                warped.y1 = newY1;
-              }
-              if ('x2' in warped && 'y2' in warped) {
-                const {
-                  x: newX2,
-                  y: newY2
-                } = warpFn(warped.x2, warped.y2, totalWidth, centerX, arcHeight, unifiedTextMetrics);
-                warped.x2 = newX2;
-                warped.y2 = newY2;
-              }
-              allCommands.push(warped);
-            });
-            // 应用字符间距到x坐标
+            allCommands.push(...path.commands);
             x += g.advanceWidth * scale + letterSpacing;
           });
         });
@@ -202,38 +124,30 @@ const TextWarpPage = ({
           if (c.type === 'Z') return 'Z';
           return '';
         }).join(' ');
-
-        // 计算并保存路径边界信息
         const bounds = calculatePathBounds(allCommands);
         setPathBounds(bounds);
         setSvgPath(d);
       } catch (error) {
-        console.error('生成多行文本变形时出错:', error);
-        setError('生成文本变形时出现错误，请检查输入内容');
+        console.error('生成文本路径时出错:', error);
+        setError('生成文本路径时出现错误，请检查输入内容');
       }
     });
-  }, [text, warpType, fontUrl, intensity, lineHeight, letterSpacing]); // 添加lineHeight和letterSpacing依赖
-
+  }, [text, fontUrl, lineHeight, letterSpacing]);
   const handleInsert = async () => {
-    console.log("准备插入SVG路径:", svgPath.substring(0, 100));
-    console.log("路径边界信息:", pathBounds);
     if (!svgPath || !sandboxProxy) {
       console.error('SVG路径或沙盒代理不可用');
       return;
     }
     setIsLoading(true);
     try {
-      // 传递更多信息到sandbox，包括边界信息
       const result = await sandboxProxy.insertWarpedSVG({
         d: svgPath,
         bounds: pathBounds,
         originalText: text,
-        warpType: warpType,
-        intensity: intensity
+        warpType: "none",
+        intensity: 0
       });
-      if (result.success) {
-        console.log('SVG 路径插入成功');
-      } else {
+      if (!result.success) {
         console.error('沙盒端插入失败:', result.error);
         setError(`插入失败: ${result.error}`);
       }
@@ -244,31 +158,9 @@ const TextWarpPage = ({
       setIsLoading(false);
     }
   };
-
-  // 添加测试函数
-  const handleTestRectangle = async () => {
-    if (!sandboxProxy) {
-      console.error('沙盒代理不可用');
-      return;
-    }
-    try {
-      const result = await sandboxProxy.createRectangle();
-      if (result.success) {
-        console.log('测试矩形创建成功');
-      } else {
-        console.error('测试矩形创建失败:', result.error);
-        setError(`测试失败: ${result.error}`);
-      }
-    } catch (e) {
-      console.error('测试API调用失败:', e);
-      setError(`测试异常: ${e.message}`);
-    }
-  };
   return /*#__PURE__*/React.createElement("div", {
     className: "text-warp-page"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "preview-container"
-  }, /*#__PURE__*/React.createElement("h3", null, "\u9884\u89C8\u6548\u679C"), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("div", null, "Preview"), /*#__PURE__*/React.createElement("div", {
     className: "svg-preview"
   }, error ? /*#__PURE__*/React.createElement("div", {
     className: "error-message"
@@ -277,7 +169,8 @@ const TextWarpPage = ({
     width: "100%",
     height: "auto",
     style: {
-      border: '1px solid #eee',
+      border: '1px solid #C7C7C7',
+      borderRadius: '10px',
       minHeight: '200px',
       maxHeight: '500px'
     }
@@ -285,35 +178,56 @@ const TextWarpPage = ({
     d: svgPath,
     fill: "hotpink",
     stroke: "none"
-  })))), /*#__PURE__*/React.createElement("div", {
+  }))), /*#__PURE__*/React.createElement("div", {
     className: "control-group"
-  }, /*#__PURE__*/React.createElement("label", null, "\u53D8\u5F62\u7C7B\u578B\uFF1A"), /*#__PURE__*/React.createElement("select", {
-    value: warpType,
-    onChange: e => setWarpType(e.target.value),
-    className: "warp-select"
-  }, effectsList.map(effect => /*#__PURE__*/React.createElement("option", {
-    key: effect.key,
-    value: effect.key
-  }, effect.label)))), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("label", null, "Text"), /*#__PURE__*/React.createElement("textarea", {
+    style: {
+      border: '1px solid #C7C7C7',
+      borderRadius: '10px'
+    },
+    value: text,
+    onChange: e => setText(e.target.value),
+    placeholder: "Enter text to render\\nMulti-line supported\\nEach line renders separately",
+    className: "text-input content-textarea",
+    rows: 3
+  })), /*#__PURE__*/React.createElement("div", {
     className: "control-group"
-  }, /*#__PURE__*/React.createElement("label", null, "\u53D8\u5F62\u5F3A\u5EA6\uFF1A", intensity), /*#__PURE__*/React.createElement("input", {
+  }, /*#__PURE__*/React.createElement("div", null, "Typography"), /*#__PURE__*/React.createElement("select", {
+    value: fontUrl,
+    onChange: e => setFontUrl(e.target.value),
+    className: "font-select"
+  }, fonts.map(f => /*#__PURE__*/React.createElement("option", {
+    key: f.url,
+    value: f.url
+  }, f.name)))), /*#__PURE__*/React.createElement("div", {
+    className: "control-group"
+  }, /*#__PURE__*/React.createElement("label", null, "\u884C\u9AD8\u500D\u6570\uFF1A", lineHeight), /*#__PURE__*/React.createElement("input", {
     type: "range",
-    min: "0",
-    max: "100",
-    value: intensity,
-    onChange: e => setIntensity(Number(e.target.value)),
+    min: "0.8",
+    max: "2.5",
+    step: "0.1",
+    value: lineHeight,
+    onChange: e => setLineHeight(Number(e.target.value)),
     className: "intensity-slider"
   }), /*#__PURE__*/React.createElement("div", {
     className: "intensity-hint"
-  }, "0 (\u65E0\u53D8\u5F62) \u2014 100 (\u6700\u5927\u53D8\u5F62)")), /*#__PURE__*/React.createElement("div", {
+  }, "0.8 (\u7D27\u5BC6) \u2014 2.5 (\u5BBD\u677E)")), /*#__PURE__*/React.createElement("div", {
+    className: "control-group"
+  }, /*#__PURE__*/React.createElement("label", null, "\u5B57\u7B26\u95F4\u8DDD\uFF1A", letterSpacing), /*#__PURE__*/React.createElement("input", {
+    type: "range",
+    min: "0",
+    max: "20",
+    value: letterSpacing,
+    onChange: e => setLetterSpacing(Number(e.target.value)),
+    className: "intensity-slider"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "intensity-hint"
+  }, "0 (\u65E0\u95F4\u8DDD) \u2014 20 (\u6700\u5927\u95F4\u8DDD)")), /*#__PURE__*/React.createElement("div", {
     className: "button-group"
   }, /*#__PURE__*/React.createElement("button", {
     onClick: handleInsert,
     disabled: isLoading || !svgPath,
     className: "insert-button primary"
-  }, isLoading ? '插入中...' : '插入变形文本'), /*#__PURE__*/React.createElement("button", {
-    onClick: handleTestRectangle,
-    className: "insert-button secondary"
-  }, "\u6D4B\u8BD5API")));
-};
-export default TextWarpPage;
+  }, isLoading ? '插入中...' : '插入未变形文本')));
+}
+;

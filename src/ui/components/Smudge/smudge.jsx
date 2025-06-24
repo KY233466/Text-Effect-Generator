@@ -6,7 +6,12 @@ const SMUDGE_STRENGTH = 0.33;
 
 const Warp = window.Warp;
 
-export default function Smudge({ sandboxProxy }) {
+export default function Smudge({ sandboxProxy,
+    pathBounds,
+    setPathBounds,
+    text,
+    svgPath,
+    setSvgPath }) {
     const svgRef = useRef();
     const pathRef = useRef();
     const warpRef = useRef();
@@ -16,9 +21,6 @@ export default function Smudge({ sandboxProxy }) {
     const lastMouseY = useRef(null);
     const touchPoints = useRef({});
     const [isMouseDown, setIsMouseDown] = useState(false);
-    const [text, setText] = useState('');
-    const [dPath, setDPath] = useState('');
-    const [pathBounds, setPathBounds] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -66,7 +68,7 @@ export default function Smudge({ sandboxProxy }) {
                     if (c.type === 'Z') return 'Z';
                     return '';
                 }).join(' ');
-                setDPath(d);
+                setSvgPath(d);
 
                 const bounds = calculatePathBounds(commands);
                 setPathBounds(bounds);
@@ -154,7 +156,7 @@ export default function Smudge({ sandboxProxy }) {
         setIsMouseDown(false);
         if (pathRef.current) {
             const updatedD = pathRef.current.getAttribute('d');
-            if (updatedD) setDPath(updatedD);
+            if (updatedD) setSvgPath(updatedD);
         }
     };
 
@@ -191,7 +193,7 @@ export default function Smudge({ sandboxProxy }) {
         });
         if (pathRef.current) {
             const updatedD = pathRef.current.getAttribute('d');
-            if (updatedD) setDPath(updatedD);
+            if (updatedD) setSvgPath(updatedD);
         }
     };
 
@@ -228,14 +230,14 @@ export default function Smudge({ sandboxProxy }) {
     };
 
     const handleInsert = async () => {
-        if (!sandboxProxy || !dPath || !pathBounds) {
+        if (!sandboxProxy || !svgPath || !pathBounds) {
             console.error('缺少必要数据');
             return;
         }
         setIsLoading(true);
         try {
             const result = await sandboxProxy.insertWarpedSVG({
-                d: dPath,
+                d: svgPath,
                 bounds: pathBounds,
                 originalText: text,
                 warpType: 'smudge',
@@ -272,19 +274,9 @@ export default function Smudge({ sandboxProxy }) {
                 onTouchMove={handleTouchMove}
             />
 
-            <div>Text</div>
-            <input
-                style={{ color: 'black', border: '1px solid black' }}
-                type="text"
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                id="text-input"
-                required
-            />
-
             <button
                 onClick={handleInsert}
-                disabled={isLoading || !dPath}
+                disabled={isLoading || !svgPath}
             >
                 {isLoading ? '插入中...' : '插入变形文本'}
             </button>
