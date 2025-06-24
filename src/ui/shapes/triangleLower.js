@@ -1,43 +1,28 @@
-// 三角形下变形效果
-export function triangleLowerWarp(
-  x,
-  y,
-  totalWidth,
-  centerX,
-  intensity,
-  textMetrics
-) {
-  const baselineY = textMetrics.yMax;
-  const ascenderHeight = textMetrics.ascender || textMetrics.yMax || 100;
-  const descenderHeight = textMetrics.descender || textMetrics.yMin || -20;
-
-  // 计算相对于基线的位置
-  const relativeY = y - baselineY;
-
+// 三角形下变形效果 - 统一版本
+export function triangleLowerWarp(x, y, totalWidth, centerX, intensity, textMetrics) {
+  const fixedLine = textMetrics.yMax;    // 顶部作为固定线（顶部对齐）
+  const variableLine = textMetrics.yMin; // 底部作为变形边界
+  
+  // 只有在固定线以下的部分才变形
+  if (y <= fixedLine) {
+    return { x, y }; // 顶部区域完全不变形
+  }
+  
   // 计算水平位置的归一化值 (-1 到 1)
   const normX = (x - centerX) / (totalWidth / 2);
-
-  // 倒三角形线性变形：中心最低，向两边线性上升
-  // 使用绝对值创建对称的倒三角形形状
+  
+  // 三角形线性变形：中心最强，向两边线性下降
   const triangleFactor = 1 - Math.abs(normX);
-
-  // 垂直影响因子：主要影响基线以下的部分，并扩展影响范围
-  let verticalFactor = 0;
-  if (relativeY >= 0) {
-    // 基线及以下的部分
-    // 扩展影响范围，不仅限于字体的descender部分
-    const descenderRange = Math.abs(descenderHeight - baselineY);
-    const effectiveRange = Math.max(descenderRange, 40); // 至少40像素的影响范围
-
-    // 计算变形强度，距离基线越远效果越强
-    verticalFactor = (relativeY + effectiveRange * 0.2) / effectiveRange;
-    verticalFactor = Math.min(verticalFactor, 1.2); // 允许稍微超过1以增强效果
-  }
-  // 基线以上的部分保持不变形
-
-  // 计算最终的Y偏移量（向下变形为正值）
-  const triangleY = intensity * triangleFactor * verticalFactor;
-
+  
+  // 垂直影响因子：距离固定线越远，变形越强
+  const textHeight = Math.abs(variableLine - fixedLine);
+  const normY = Math.abs(y - fixedLine) / textHeight;
+  const verticalFactor = Math.min(normY, 1);
+  
+  // 标准化强度计算
+  const standardIntensity = (intensity / 50) * (textHeight / 4);
+  const triangleY = standardIntensity * triangleFactor * verticalFactor;
+  
   return { x, y: y + triangleY };
 }
 
