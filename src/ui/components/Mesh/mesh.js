@@ -12,15 +12,21 @@ export default function Mesh({
   const warpRef = useRef();
   const controlPointsRef = useRef([]);
   const [dragIndex, setDragIndex] = useState(null);
-  const [text, setText] = useState(null);
+  const [text, setText] = useState("");
   const [dPath, setDPath] = useState('');
   const [pathBounds, setPathBounds] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   useEffect(() => {
-    if (svgRef.current && text) {
-      generateTextPath();
+    if (!svgRef.current) return;
+    if (text === "") {
+      svgRef.current.innerHTML = "";
+      if (controlPathRef.current) controlPathRef.current.setAttribute("d", "");
+      setDPath("");
+      setPathBounds(null);
+      return;
     }
+    generateTextPath();
   }, [text]);
   const generateTextPath = () => {
     opentype.load('https://s3-us-west-2.amazonaws.com/s.cdpn.io/135636/FiraSansExtraCondensed-Black.ttf', (err, font) => {
@@ -36,6 +42,8 @@ export default function Mesh({
       const ySvg = svgHeight / 2 + fontSize / 3;
 
       // const path = font.getPath(text, xSvg, ySvg, fontSize);
+
+      console.log("curr Text", text);
       const path = font.getPath(text, 0, 100, fontSize);
       const commands = path.commands;
       const d = commands.map(c => {
@@ -66,6 +74,9 @@ export default function Mesh({
         width: w,
         height: h
       } = box;
+      const rect = svgControlRef.current.getBoundingClientRect();
+      const width = rect.width;
+      const height = rect.height;
 
       // 1. FIRST CREATE RECTANGULAR CONTROL POINTS (BOUNDING BOX)
       let initialControlPoints = [[x, y], [x, y + h], [(x + w) * 0.25, y + h], [(x + w) * 0.75, y + h], [x + w, y + h], [x + w, y], [x + w * 0.4, y]];
@@ -73,12 +84,13 @@ export default function Mesh({
       // Apply buffer to avoid zero distances
       const buffer = 0.1;
       initialControlPoints = initialControlPoints.map(([cx, cy]) => [cx === x ? cx - buffer : cx === x + w ? cx + buffer : cx, cy === y ? cy - buffer : cy === y + h ? cy + buffer : cy]);
+      const c = (width - 40) / 520;
+      const xShift = 20;
+      const yShift = 50;
 
       // 2. SET CUSTOM CONTROL POINTS (THE ONES YOU WANT TO SHOW/DRAG)
-      const customControlPoints = [[20, 5], [5, 120], [100, 210], [350, 160], [520, 180], [450, 20], [250, 80]];
+      const customControlPoints = [[20 * c + xShift, 5 * c + yShift], [5 * c + xShift, 120 * c + yShift], [80 * c + xShift, 210 * c + yShift], [350 * c + xShift, 160 * c + yShift], [520 * c + xShift, 180 * c + yShift], [450 * c + xShift, 20 * c + yShift], [200 * c + xShift, 80 * c + yShift]];
       controlPointsRef.current = customControlPoints;
-      // controlPointsRef.current = initialControlPoints;
-
       const warp = new Warp(svgRef.current);
       warp.interpolate(4);
       warpRef.current = warp;
@@ -191,13 +203,13 @@ export default function Mesh({
     warpRef.current.transform(reposition);
   };
   const handleMouseUp = () => {
-    if (dragIndex !== null) {
-      console.log('Updated control points:', controlPointsRef.current);
-    }
+    // if (dragIndex !== null) {
+    //   console.log('Updated control points:', controlPointsRef.current);
+    // }
     if (pathRef.current) {
       const updatedD = svgRef.current.querySelector('path')?.getAttribute('d');
       if (updatedD) {
-        console.log('Updated path D:', updatedD);
+        // console.log('Updated path D:', updatedD);
         setDPath(updatedD);
       }
     }
@@ -229,7 +241,6 @@ export default function Mesh({
   return /*#__PURE__*/React.createElement("div", {
     style: {
       width: '100%',
-      maxWidth: '350px',
       position: 'relative',
       overflow: 'hidden'
     },
@@ -261,7 +272,7 @@ export default function Mesh({
     fill: "none",
     stroke: "red",
     strokeWidth: "1px"
-  }), text && Array.from({
+  }), text != "" && Array.from({
     length: 7
   }).map((_, i) => /*#__PURE__*/React.createElement("circle", {
     key: i,
