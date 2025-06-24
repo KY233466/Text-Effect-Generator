@@ -7,8 +7,8 @@ export function envelopeWaveWarp(
     textMetrics = {}
   ) {
     const freq = 2; // 波数
-    const amp = (intensity / 100) * (textMetrics.baseline || 50);
-    const centerY = textMetrics.baseline || 0;
+    const amp = (intensity / 500) * (textMetrics.baseline);
+    const centerY = textMetrics.baseline;
   
     const normX = (x - centerX) / (totalWidth / 2); // -1 ~ 1
   
