@@ -1,16 +1,13 @@
 import React, { useRef, useState, useEffect } from 'react';
 import opentype from 'opentype.js';
-
-// import * as Warp from '../../../lib/warp.js';
-
 const SMUDGE_RADIUS = 100;
 const SMUDGE_STRENGTH = 0.33;
 const Warp = window.Warp;
 export default function Smudge({
   sandboxProxy
 }) {
-  const textInputRef = useRef();
   const svgRef = useRef();
+  const pathRef = useRef();
   const warpRef = useRef();
   const mouseX = useRef(0);
   const mouseY = useRef(0);
@@ -19,24 +16,27 @@ export default function Smudge({
   const touchPoints = useRef({});
   const [isMouseDown, setIsMouseDown] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [text, setText] = useState(null);
-  const WarpRef = useRef(null);
+  const [text, setText] = useState('');
+  const [dPath, setDPath] = useState('');
+  const [pathBounds, setPathBounds] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   useEffect(() => {
-    if (typeof Warp !== 'undefined') {
-      // Initialize anything that depends on Warp
-    } else {
-      console.warn('Warp.js not loaded yet');
-    }
+    window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('touchend', handleTouchEnd);
+    window.addEventListener('touchcancel', handleTouchEnd);
+    return () => {
+      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('touchend', handleTouchEnd);
+      window.removeEventListener('touchcancel', handleTouchEnd);
+    };
   }, []);
   useEffect(() => {
-    // Trigger text generation after SVG is rendered
     if (svgRef.current && text) {
       generateTextPath(text);
     }
-  }, [svgRef.current]);
-
-  // Generate SVG path from text
-  const generateTextPath = text => {
+  }, [text]);
+  const generateTextPath = inputText => {
     setIsGenerating(true);
     opentype.load('https://s3-us-west-2.amazonaws.com/s.cdpn.io/135636/FiraSansExtraCondensed-Black.ttf', (err, font) => {
       if (err) {
@@ -44,40 +44,78 @@ export default function Smudge({
         setIsGenerating(false);
         return;
       }
-
-      // Get SVG dimensions
       const svgWidth = svgRef.current.clientWidth;
       const svgHeight = svgRef.current.clientHeight;
-
-      // Calculate text width
       const fontSize = 100;
-      const textWidth = font.getAdvanceWidth(text, fontSize);
-
-      // Calculate centered position
+      const textWidth = font.getAdvanceWidth(inputText, fontSize);
       const x = (svgWidth - textWidth) / 2;
-      const y = svgHeight / 2 + fontSize / 3; // Adjust vertical position
+      const y = svgHeight / 2 + fontSize / 3;
+      const path = font.getPath(inputText, x, y, fontSize);
+      const commands = path.commands;
+      const d = commands.map(c => {
+        if (c.type === 'M') return `M ${c.x} ${c.y}`;
+        if (c.type === 'L') return `L ${c.x} ${c.y}`;
+        if (c.type === 'C') return `C ${c.x1} ${c.y1}, ${c.x2} ${c.y2}, ${c.x} ${c.y}`;
+        if (c.type === 'Q') return `Q ${c.x1} ${c.y1}, ${c.x} ${c.y}`;
+        if (c.type === 'Z') return 'Z';
+        return '';
+      }).join(' ');
+      setDPath(d);
+      const bounds = calculatePathBounds(commands);
+      setPathBounds(bounds);
 
-      // Generate path at calculated position
-      const pathData = font.getPath(text, x, y, fontSize).toSVG(3);
-      svgRef.current.innerHTML = pathData;
+      // Create <path> manually
+      svgRef.current.innerHTML = '';
+      const pathEl = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      pathEl.setAttribute('d', d);
+      pathEl.setAttribute('fill', 'hotpink');
+      pathEl.setAttribute('stroke', 'none');
+      svgRef.current.appendChild(pathEl);
+      pathRef.current = pathEl;
 
-      // Initialize Warp with the new path
+      // Initialize Warp
       const warp = new Warp(svgRef.current);
       warpRef.current = warp;
       warpRef.current.interpolate(10);
-
-      // Reset mouse tracking
       lastMouseX.current = null;
       lastMouseY.current = null;
       setIsGenerating(false);
     });
   };
-  const handleSubmit = e => {
-    e.preventDefault();
-    generateTextPath(e.target.value);
+  const calculatePathBounds = commands => {
+    let minX = Infinity,
+      maxX = -Infinity,
+      minY = Infinity,
+      maxY = -Infinity;
+    commands.forEach(cmd => {
+      if ('x' in cmd && 'y' in cmd) {
+        minX = Math.min(minX, cmd.x);
+        maxX = Math.max(maxX, cmd.x);
+        minY = Math.min(minY, cmd.y);
+        maxY = Math.max(maxY, cmd.y);
+      }
+      if ('x1' in cmd && 'y1' in cmd) {
+        minX = Math.min(minX, cmd.x1);
+        maxX = Math.max(maxX, cmd.x1);
+        minY = Math.min(minY, cmd.y1);
+        maxY = Math.max(maxY, cmd.y1);
+      }
+      if ('x2' in cmd && 'y2' in cmd) {
+        minX = Math.min(minX, cmd.x2);
+        maxX = Math.max(maxX, cmd.x2);
+        minY = Math.min(minY, cmd.y2);
+        maxY = Math.max(maxY, cmd.y2);
+      }
+    });
+    return {
+      minX,
+      maxX,
+      minY,
+      maxY,
+      width: maxX - minX,
+      height: maxY - minY
+    };
   };
-
-  // Smudge effect factory
   const smudgeFactory = (startX, startY, endX, endY, radius, strength) => {
     const deltaX = endX - startX;
     const deltaY = endY - startY;
@@ -92,13 +130,9 @@ export default function Smudge({
       return [x, y];
     };
   };
-
-  // Mouse handlers
   const handleMouseDown = e => {
     if (!svgRef.current) return;
     setIsMouseDown(true);
-
-    // Initialize positions
     const rect = svgRef.current.getBoundingClientRect();
     mouseX.current = e.clientX;
     mouseY.current = e.clientY;
@@ -107,8 +141,6 @@ export default function Smudge({
   };
   const handleMouseMove = e => {
     if (!isMouseDown || !warpRef.current) return;
-
-    // Update positions
     lastMouseX.current = mouseX.current;
     lastMouseY.current = mouseY.current;
     mouseX.current = e.clientX;
@@ -117,9 +149,11 @@ export default function Smudge({
   };
   const handleMouseUp = () => {
     setIsMouseDown(false);
+    if (pathRef.current) {
+      const updatedD = pathRef.current.getAttribute('d');
+      if (updatedD) setDPath(updatedD);
+    }
   };
-
-  // Touch handlers
   const handleTouchStart = e => {
     setIsMouseDown(true);
     Array.from(e.changedTouches).forEach(touch => {
@@ -144,6 +178,16 @@ export default function Smudge({
     });
     requestAnimationFrame(applyTouchSmudge);
   };
+  const handleTouchEnd = e => {
+    setIsMouseDown(false);
+    Array.from(e.changedTouches).forEach(touch => {
+      delete touchPoints.current[touch.identifier];
+    });
+    if (pathRef.current) {
+      const updatedD = pathRef.current.getAttribute('d');
+      if (updatedD) setDPath(updatedD);
+    }
+  };
   const applySmudge = () => {
     if (!svgRef.current || !warpRef.current) return;
     const rect = svgRef.current.getBoundingClientRect();
@@ -156,26 +200,29 @@ export default function Smudge({
       warpRef.current.transform(smudgeFactory(point.lastX - rect.left, point.lastY - rect.top, point.x - rect.left, point.y - rect.top, SMUDGE_RADIUS, SMUDGE_STRENGTH));
     });
   };
-
-  // Cleanup touch points
-  const handleTouchEnd = e => {
-    setIsMouseDown(false);
-    Array.from(e.changedTouches).forEach(touch => {
-      delete touchPoints.current[touch.identifier];
-    });
+  const handleInsert = async () => {
+    if (!sandboxProxy || !dPath || !pathBounds) {
+      console.error('缺少必要数据');
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const result = await sandboxProxy.insertWarpedSVG({
+        d: dPath,
+        bounds: pathBounds,
+        originalText: text,
+        warpType: 'smudge',
+        intensity: 1
+      });
+      if (!result.success) {
+        setError(result.error);
+      }
+    } catch (e) {
+      setError(`插入异常: ${e.message}`);
+    } finally {
+      setIsLoading(false);
+    }
   };
-
-  // Set up event listeners
-  useEffect(() => {
-    window.addEventListener('mouseup', handleMouseUp);
-    window.addEventListener('touchend', handleTouchEnd);
-    window.addEventListener('touchcancel', handleTouchEnd);
-    return () => {
-      window.removeEventListener('mouseup', handleMouseUp);
-      window.removeEventListener('touchend', handleTouchEnd);
-      window.removeEventListener('touchcancel', handleTouchEnd);
-    };
-  }, []);
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", null, "Preview"), /*#__PURE__*/React.createElement("svg", {
     ref: svgRef,
     width: "100%",
@@ -199,11 +246,11 @@ export default function Smudge({
     },
     type: "text",
     value: text,
-    onChange: e => {
-      setText(e.target.value);
-      handleSubmit(e);
-    },
+    onChange: e => setText(e.target.value),
     id: "text-input",
     required: true
-  }));
+  }), /*#__PURE__*/React.createElement("button", {
+    onClick: handleInsert,
+    disabled: isLoading || !dPath
+  }, isLoading ? '插入中...' : '插入变形文本'));
 }
