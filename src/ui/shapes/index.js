@@ -10,6 +10,7 @@ import { triangleUpperWarp, triangleUpperConfig } from "./triangleUpper.js";
 import { triangleLowerWarp, triangleLowerConfig } from "./triangleLower.js";
 import { flagWarp, flagConfig } from "./flag.js";
 import { concaveTopWarp, concaveTopConfig } from "./concaveTop.js";
+import { concaveBottomWarp, concaveBottomConfig } from "./concaveBottom.js";
 
 // 导出所有变形函数
 export const warpFunctions = {
@@ -23,6 +24,7 @@ export const warpFunctions = {
   triangleLower: triangleLowerWarp,
   flag: flagWarp,
   concaveTop: concaveTopWarp,
+  concaveBottom: concaveBottomWarp,
 };
 
 // 导出所有配置
@@ -37,6 +39,7 @@ export const warpConfigs = {
   triangleLower: triangleLowerConfig,
   flag: flagConfig,
   concaveTop: concaveTopConfig,
+  concaveBottom: concaveBottomConfig,
 };
 
 // 导出效果列表（用于UI渲染）
@@ -51,6 +54,7 @@ export const effectsList = [
   { key: "triangleLower", ...triangleLowerConfig },
   { key: "flag", ...flagConfig },
   { key: "concaveTop", ...concaveTopConfig },
+  { key: "concaveBottom", ...concaveBottomConfig },
 ];
 
 // 辅助函数：获取变形函数
