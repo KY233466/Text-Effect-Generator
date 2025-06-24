@@ -38,6 +38,7 @@ const TextWarpApp = ({ sandboxProxy }) => {
             pathBounds={pathBounds} 
             setPathBounds={setPathBounds} 
             text={text} 
+            setText={setText}
             svgPath={svgPath} 
             setSvgPath={setSvgPath} 
             sandboxProxy={sandboxProxy} />}
