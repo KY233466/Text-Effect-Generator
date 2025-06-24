@@ -334,16 +334,6 @@ export default function Mesh({
 
       </div>
 
-      <div>Text</div>
-      <input
-        style={{ color: 'black', border: '1px solid black' }}
-        type="text"
-        value={text}
-        onChange={e => setText(e.target.value)}
-        id="text-input"
-        required
-      />
-
       <button
         onClick={handleInsert}
         disabled={isLoading || !svgPath}

@@ -301,17 +301,7 @@ export default function Mesh({
       borderRadius: '10px',
       overflow: 'visible'
     }
-  })), /*#__PURE__*/React.createElement("div", null, "Text"), /*#__PURE__*/React.createElement("input", {
-    style: {
-      color: 'black',
-      border: '1px solid black'
-    },
-    type: "text",
-    value: text,
-    onChange: e => setText(e.target.value),
-    id: "text-input",
-    required: true
-  }), /*#__PURE__*/React.createElement("button", {
+  })), /*#__PURE__*/React.createElement("button", {
     onClick: handleInsert,
     disabled: isLoading || !svgPath
   }, isLoading ? '插入中...' : '插入变形文本'));

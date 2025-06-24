@@ -10,29 +10,32 @@ const TextWarpApp = ({ sandboxProxy }) => {
   const [pathBounds, setPathBounds] = useState(null);
 
   return (
-    <div className="app">
+    <div className="app" style={{margin: '15px'}}>
       <div className="tab-container">
         <button
           className={`tab ${activeTab === 'text' ? 'active' : ''}`}
+          style={{ marginRight: '10px', padding: '5px 10px', borderRadius: '30px'}}
           onClick={() => setActiveTab('text')}
         >
           Text
         </button>
         <button
           className={`tab ${activeTab === 'warp' ? 'active' : ''}`}
+          style={{ marginRight: '10px', padding: '5px 10px', borderRadius: '30px' }}
           onClick={() => setActiveTab('warp')}
         >
-          🎨 文本变形
+          Shape
         </button>
         <button
           className={`tab ${activeTab === 'custom' ? 'active' : ''}`}
+          style={{ padding: '5px 10px', borderRadius: '30px' }}
           onClick={() => setActiveTab('custom')}
         >
           ✨ Custom
         </button>
       </div>
 
-      <div className="page-content">
+      {/* <div className="page-content"> */}
         {activeTab === 'text' && 
           <SelectText 
             pathBounds={pathBounds} 
@@ -58,7 +61,7 @@ const TextWarpApp = ({ sandboxProxy }) => {
             svgPath={svgPath}
             setSvgPath={setSvgPath}
             sandboxProxy={sandboxProxy} />}
-      </div>
+      {/* </div> */}
     </div>
   );
 };
