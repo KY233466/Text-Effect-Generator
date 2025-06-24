@@ -9,44 +9,46 @@ const fonts = [
 ];
 
 const TextWarpPage = ({ sandboxProxy }) => {
-  const [text, setText] = useState("TYPE WARP");
+  const [text, setText] = useState("TEXT WARP\nMULTI LINE");
   const [warpType, setWarpType] = useState("wave");
-  const [fontUrl, setFontUrl] = useState(fonts[2].url);
+  const [fontUrl, setFontUrl] = useState("./fonts/Arial.ttf");
   const [intensity, setIntensity] = useState(50);
+  const [lineHeight, setLineHeight] = useState(1.2);
+  const [letterSpacing, setLetterSpacing] = useState(0);
   const [svgPath, setSvgPath] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
   const [pathBounds, setPathBounds] = useState(null);
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  // 计算路径边界的辅助函数
+  // 计算路径边界
   const calculatePathBounds = (commands) => {
-    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
     
     commands.forEach(cmd => {
-      if ('x' in cmd && 'y' in cmd) {
-        minX = Math.min(minX, cmd.x);
-        maxX = Math.max(maxX, cmd.x);
-        minY = Math.min(minY, cmd.y);
-        maxY = Math.max(maxY, cmd.y);
-      }
-      if ('x1' in cmd && 'y1' in cmd) {
-        minX = Math.min(minX, cmd.x1);
-        maxX = Math.max(maxX, cmd.x1);
-        minY = Math.min(minY, cmd.y1);
-        maxY = Math.max(maxY, cmd.y1);
-      }
-      if ('x2' in cmd && 'y2' in cmd) {
-        minX = Math.min(minX, cmd.x2);
-        maxX = Math.max(maxX, cmd.x2);
-        minY = Math.min(minY, cmd.y2);
-        maxY = Math.max(maxY, cmd.y2);
-      }
+      const points = [];
+      if ('x' in cmd && 'y' in cmd) points.push({ x: cmd.x, y: cmd.y });
+      if ('x1' in cmd && 'y1' in cmd) points.push({ x: cmd.x1, y: cmd.y1 });
+      if ('x2' in cmd && 'y2' in cmd) points.push({ x: cmd.x2, y: cmd.y2 });
+      
+      points.forEach(p => {
+        minX = Math.min(minX, p.x);
+        maxX = Math.max(maxX, p.x);
+        minY = Math.min(minY, p.y);
+        maxY = Math.max(maxY, p.y);
+      });
     });
     
-    return { minX, maxX, minY, maxY, width: maxX - minX, height: maxY - minY };
+    return {
+      minX: minX === Infinity ? 0 : minX,
+      minY: minY === Infinity ? 0 : minY,
+      maxX: maxX === -Infinity ? 0 : maxX,
+      maxY: maxY === -Infinity ? 0 : maxY,
+      width: (maxX === -Infinity || minX === Infinity) ? 0 : maxX - minX,
+      height: (maxY === -Infinity || minY === Infinity) ? 0 : maxY - minY
+    };
   };
 
-  // 当参数变化时重新生成路径
+  // 当参数变化时重新生成路径 - 修改为支持多行
   useEffect(() => {
     if (!text) {
       setSvgPath("");
@@ -59,7 +61,7 @@ const TextWarpPage = ({ sandboxProxy }) => {
       setError("OpenType.js 未加载完成，请刷新页面重试");
       return;
     }
-
+    
     opentype.load(fontUrl, (err, font) => {
       if (err || !font) {
         const errorMessage = `字体加载失败: ${fontUrl}. 请确保字体文件存在于 'src/ui/fonts' 目录下。`;
@@ -68,76 +70,123 @@ const TextWarpPage = ({ sandboxProxy }) => {
         setSvgPath("");
         return;
       }
-
+      
       setError("");
-      const fontSize = 120;
-      const scale = fontSize / font.unitsPerEm;
-      const arcHeight = intensity;
-      const glyphs = font.stringToGlyphs(text);
-      let x = 0;
-      const commands = [];
-      const glyphWidths = glyphs.map(g => g.advanceWidth * scale);
-      const totalWidth = glyphWidths.reduce((a, b) => a + b, 0);
-      const centerX = totalWidth / 2;
       
-      // 使用分离的变形函数
-      const warpFn = getWarpFunction(warpType);
-      if (!warpFn) {
-        setError(`未知的变形类型: ${warpType}`);
-        return;
-      }
-      
-      const baselineY = fontSize * 0.8;
-      
-      // 计算文本度量信息，传递给变形函数
-      const textMetrics = {
-        baseline: baselineY,
-        ascender: baselineY - fontSize * 0.7,
-        descender: baselineY + fontSize * 0.2,
-        yMax: baselineY - fontSize * 0.7,
-        yMin: baselineY + fontSize * 0.2
-      };
+      try {
+        // 处理多行文本
+        const lines = text.split('\n').filter(line => line.trim()); // 过滤空行
+        if (lines.length === 0) {
+          setSvgPath("");
+          return;
+        }
 
-      glyphs.forEach((g) => {
-        const path = g.getPath(x, baselineY, fontSize);
-        path.commands.forEach((cmd) => {
-          const warped = { ...cmd };
-          if ('x' in warped && 'y' in warped) {
-            const { x: newX, y: newY } = warpFn(warped.x, warped.y, totalWidth, centerX, arcHeight, textMetrics);
-            warped.x = newX;
-            warped.y = newY;
-          }
-          if ('x1' in warped && 'y1' in warped) {
-            const { x: newX1, y: newY1 } = warpFn(warped.x1, warped.y1, totalWidth, centerX, arcHeight, textMetrics);
-            warped.x1 = newX1;
-            warped.y1 = newY1;
-          }
-          if ('x2' in warped && 'y2' in warped) {
-            const { x: newX2, y: newY2 } = warpFn(warped.x2, warped.y2, totalWidth, centerX, arcHeight, textMetrics);
-            warped.x2 = newX2;
-            warped.y2 = newY2;
-          }
-          commands.push(warped);
+        const fontSize = 120;
+        const scale = fontSize / font.unitsPerEm;
+        const baselineY = fontSize * 0.8;
+        const actualLineHeight = fontSize * lineHeight;
+        
+        let allCommands = [];
+        let maxLineWidth = 0;
+        
+        // 预先计算所有行的宽度，用于整体居中
+        const lineInfos = lines.map((line, lineIndex) => {
+          const glyphs = font.stringToGlyphs(line);
+          const glyphWidths = glyphs.map(g => g.advanceWidth * scale);
+          // 计算行宽度时包含字符间距
+          const lineWidth = glyphWidths.reduce((a, b) => a + b, 0) + (glyphs.length - 1) * letterSpacing;
+          maxLineWidth = Math.max(maxLineWidth, lineWidth);
+          
+          return {
+            line,
+            glyphs,
+            glyphWidths,
+            lineWidth,
+            y: baselineY + lineIndex * actualLineHeight
+          };
         });
-        x += g.advanceWidth * scale;
-      });
+        
+        // 获取变形函数
+        const warpFn = getWarpFunction(warpType);
+        if (!warpFn) {
+          setError(`未知的变形类型: ${warpType}`);
+          return;
+        }
+        
+        // 计算整体文本的度量信息 - 关键改进！
+        const totalHeight = (lines.length - 1) * actualLineHeight + fontSize;
+        const overallTopY = baselineY - fontSize * 0.7; // 第一行顶部
+        const overallBottomY = baselineY + (lines.length - 1) * actualLineHeight + fontSize * 0.2; // 最后一行底部
+        const overallCenterY = (overallTopY + overallBottomY) / 2; // 整体垂直中心
+        
+        // 统一的文本度量信息 - 所有字符都使用这个
+        const unifiedTextMetrics = {
+          baseline: overallCenterY, // 使用整体的垂直中心作为基线
+          ascender: overallTopY,
+          descender: overallBottomY,
+          yMax: overallTopY,
+          yMin: overallBottomY
+        };
+        
+        // 整体变形参数
+        const totalWidth = maxLineWidth;
+        const centerX = maxLineWidth / 2;
+        const arcHeight = intensity;
+        
+        // 处理每一行
+        lineInfos.forEach((lineInfo, lineIndex) => {
+          const { glyphs, lineWidth, y } = lineInfo;
+          
+          // 水平居中对齐
+          let x = (maxLineWidth - lineWidth) / 2;
+          
+          // 处理当前行的每个字符 - 全部使用统一的文本度量！
+          glyphs.forEach((g) => {
+            const path = g.getPath(x, y, fontSize);
+            path.commands.forEach((cmd) => {
+              const warped = { ...cmd };
+              if ('x' in warped && 'y' in warped) {
+                const { x: newX, y: newY } = warpFn(warped.x, warped.y, totalWidth, centerX, arcHeight, unifiedTextMetrics);
+                warped.x = newX;
+                warped.y = newY;
+              }
+              if ('x1' in warped && 'y1' in warped) {
+                const { x: newX1, y: newY1 } = warpFn(warped.x1, warped.y1, totalWidth, centerX, arcHeight, unifiedTextMetrics);
+                warped.x1 = newX1;
+                warped.y1 = newY1;
+              }
+              if ('x2' in warped && 'y2' in warped) {
+                const { x: newX2, y: newY2 } = warpFn(warped.x2, warped.y2, totalWidth, centerX, arcHeight, unifiedTextMetrics);
+                warped.x2 = newX2;
+                warped.y2 = newY2;
+              }
+              allCommands.push(warped);
+            });
+            // 应用字符间距到x坐标
+            x += g.advanceWidth * scale + letterSpacing;
+          });
+        });
 
-      const d = commands.map(c => {
-        if (c.type === 'M') return `M ${c.x} ${c.y}`;
-        if (c.type === 'L') return `L ${c.x} ${c.y}`;
-        if (c.type === 'C') return `C ${c.x1} ${c.y1}, ${c.x2} ${c.y2}, ${c.x} ${c.y}`;
-        if (c.type === 'Q') return `Q ${c.x1} ${c.y1}, ${c.x} ${c.y}`;
-        if (c.type === 'Z') return 'Z';
-        return '';
-      }).join(' ');
+        const d = allCommands.map(c => {
+          if (c.type === 'M') return `M ${c.x} ${c.y}`;
+          if (c.type === 'L') return `L ${c.x} ${c.y}`;
+          if (c.type === 'C') return `C ${c.x1} ${c.y1}, ${c.x2} ${c.y2}, ${c.x} ${c.y}`;
+          if (c.type === 'Q') return `Q ${c.x1} ${c.y1}, ${c.x} ${c.y}`;
+          if (c.type === 'Z') return 'Z';
+          return '';
+        }).join(' ');
 
-      // 计算并保存路径边界信息
-      const bounds = calculatePathBounds(commands);
-      setPathBounds(bounds);
-
-      setSvgPath(d);
+        // 计算并保存路径边界信息
+        const bounds = calculatePathBounds(allCommands);
+        setPathBounds(bounds);
+        setSvgPath(d);
+        
+      } catch (error) {
+        console.error('生成多行文本变形时出错:', error);
+        setError('生成文本变形时出现错误，请检查输入内容');
+      }
     });
-  }, [text, warpType, fontUrl, intensity]);
+  }, [text, warpType, fontUrl, intensity, lineHeight, letterSpacing]); // 添加lineHeight和letterSpacing依赖
 
   const handleInsert = async () => {
     console.log("准备插入SVG路径:", svgPath.substring(0, 100));
@@ -235,13 +284,40 @@ const TextWarpPage = ({ sandboxProxy }) => {
       </div>
 
       <div className="control-group">
-        <label>输入文字：</label>
+        <label>行高倍数：{lineHeight}</label>
         <input
-          type="text"
+          type="range"
+          min="0.8"
+          max="2.5"
+          step="0.1"
+          value={lineHeight}
+          onChange={e => setLineHeight(Number(e.target.value))}
+          className="intensity-slider"
+        />
+        <div className="intensity-hint">0.8 (紧密) — 2.5 (宽松)</div>
+      </div>
+
+      <div className="control-group">
+        <label>字符间距：{letterSpacing}</label>
+        <input
+          type="range"
+          min="0"
+          max="20"
+          value={letterSpacing}
+          onChange={e => setLetterSpacing(Number(e.target.value))}
+          className="intensity-slider"
+        />
+        <div className="intensity-hint">0 (无间距) — 20 (最大间距)</div>
+      </div>
+
+      <div className="control-group">
+        <label>输入文字（支持多行）：</label>
+        <textarea
           value={text}
           onChange={e => setText(e.target.value)}
-          placeholder="输入要变形的文字"
-          className="text-input"
+          placeholder="Enter text to warp&#10;Multi-line supported&#10;Each line renders separately"
+          className="text-input content-textarea"
+          rows={3}
         />
       </div>
 
@@ -257,8 +333,12 @@ const TextWarpPage = ({ sandboxProxy }) => {
                 '0 0 1000 300'
               }
               width="100%"
-              height="200"
-              style={{ border: '1px solid #eee' }}
+              height="auto"
+              style={{ 
+                border: '1px solid #eee',
+                minHeight: '200px',
+                maxHeight: '500px'
+              }}
             >
               <path d={svgPath} fill="hotpink" stroke="none" />
             </svg>
