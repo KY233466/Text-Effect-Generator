@@ -38,18 +38,42 @@ export default function Mesh({
         console.error('Font could not be loaded:', err);
         return;
       }
-      const svgWidth = svgRef.current.clientWidth;
-      const svgHeight = svgRef.current.clientHeight;
+      const lines = text.split('\n').filter(line => line.trim());
       const fontSize = 100;
-      const textWidth = font.getAdvanceWidth(text, fontSize);
-      const xSvg = (svgWidth - textWidth) / 2;
-      const ySvg = svgHeight / 2 + fontSize / 3;
+      const scale = fontSize / font.unitsPerEm;
+      const baselineY = fontSize * 0.8;
+      const lineHeight = 1.2; // Or make this configurable
+      const actualLineHeight = fontSize * lineHeight;
+      let commands = [];
+      let maxLineWidth = 0;
+      const lineInfos = lines.map((line, lineIndex) => {
+        const glyphs = font.stringToGlyphs(line);
+        const glyphWidths = glyphs.map(g => g.advanceWidth * scale);
+        const lineWidth = glyphWidths.reduce((a, b) => a + b, 0);
+        maxLineWidth = Math.max(maxLineWidth, lineWidth);
+        return {
+          line,
+          glyphs,
+          glyphWidths,
+          lineWidth,
+          y: baselineY + lineIndex * actualLineHeight
+        };
+      });
 
-      // const path = font.getPath(text, xSvg, ySvg, fontSize);
-
-      console.log("curr Text", text);
-      const path = font.getPath(text, 0, 100, fontSize);
-      const commands = path.commands;
+      // Align horizontally center
+      lineInfos.forEach(({
+        glyphs,
+        glyphWidths,
+        lineWidth,
+        y
+      }) => {
+        let x = (maxLineWidth - lineWidth) / 2;
+        glyphs.forEach((g, i) => {
+          const glyphPath = g.getPath(x, y, fontSize);
+          commands.push(...glyphPath.commands);
+          x += glyphWidths[i];
+        });
+      });
       const d = commands.map(c => {
         if (c.type === 'M') return `M ${c.x} ${c.y}`;
         if (c.type === 'L') return `L ${c.x} ${c.y}`;

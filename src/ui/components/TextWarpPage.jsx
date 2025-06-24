@@ -256,7 +256,7 @@ const TextWarpPage = ({ sandboxProxy,
                 '0 0 1000 300'
               }
               width="100%"
-              height="auto"
+              height="200"
               style={{
                 border: '1px solid #eee',
                 minHeight: '200px',

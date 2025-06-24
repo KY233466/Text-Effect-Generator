@@ -173,7 +173,7 @@ export default function SelectText({ sandboxProxy,
                 '0 0 1000 300'
               }
               width="100%"
-              height="auto"
+              height="200"
               style={{
                 border: '1px solid #1178FF',
                 borderRadius: '10px',
@@ -270,7 +270,7 @@ export default function SelectText({ sandboxProxy,
             style={{ marginTop: '5px', width: '80%', '--progress': `${(letterSpacing / 20) * 100}%` }}
           />
         </div>
-        
+
         <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
           <button
             onClick={() => setAlignment('left')}

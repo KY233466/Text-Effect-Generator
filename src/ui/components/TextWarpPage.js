@@ -265,7 +265,7 @@ const TextWarpPage = ({
   }, error) : /*#__PURE__*/React.createElement("svg", {
     viewBox: pathBounds ? `${pathBounds.minX - 20} ${pathBounds.minY - 20} ${pathBounds.width + 40} ${pathBounds.height + 40}` : '0 0 1000 300',
     width: "100%",
-    height: "auto",
+    height: "200",
     style: {
       border: '1px solid #eee',
       minHeight: '200px',
