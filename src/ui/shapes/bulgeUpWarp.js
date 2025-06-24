@@ -1,8 +1,11 @@
 export function bulgeUpWarp(x, y, totalWidth, centerX, intensity, textMetrics) {
   const normX = (x - centerX) / (totalWidth / 2); // [-1, 1]
-  const strength = intensity / 50; // scale 0-100 to ~0-2
+  const strength = intensity / 100; // scale 0-100 to ~0-2
   const scaleY = 1 + strength * (1 - normX * normX);
-  const baseline = textMetrics.baseline;
+  const baseline = textMetrics.yMin;
+
+  if (y >= baseline * 0.85) return { x, y }; 
+
   return { x, y: baseline + (y - baseline) * scaleY };
 }
 
