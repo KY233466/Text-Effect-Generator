@@ -12,6 +12,7 @@ import { flagWarp, flagConfig } from "./flag.js";
 import { concaveTopWarp, concaveTopConfig } from "./concaveTop.js";
 import { concaveBottomWarp, concaveBottomConfig } from "./concaveBottom.js";
 import { slantDownRightWarp, slantDownRightConfig } from "./slantDownRight.js";
+import { slantDownLeftWarp, slantDownLeftConfig } from "./slantDownLeft.js";
 
 // 导出所有变形函数
 export const warpFunctions = {
@@ -27,6 +28,7 @@ export const warpFunctions = {
   concaveTop: concaveTopWarp,
   concaveBottom: concaveBottomWarp,
   slantDownRight: slantDownRightWarp,
+  slantDownLeft: slantDownLeftWarp,
 };
 
 // 导出所有配置
@@ -43,6 +45,7 @@ export const warpConfigs = {
   concaveTop: concaveTopConfig,
   concaveBottom: concaveBottomConfig,
   slantDownRight: slantDownRightConfig,
+  slantDownLeft: slantDownLeftConfig,
 };
 
 // 导出效果列表（用于UI渲染）
@@ -59,6 +62,7 @@ export const effectsList = [
   { key: "concaveTop", ...concaveTopConfig },
   { key: "concaveBottom", ...concaveBottomConfig },
   { key: "slantDownRight", ...slantDownRightConfig },
+  { key: "slantDownLeft", ...slantDownLeftConfig },
 ];
 
 // 辅助函数：获取变形函数
