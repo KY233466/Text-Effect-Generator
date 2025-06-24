@@ -22,6 +22,7 @@ export default function SelectText({
   const [fontUrl, setFontUrl] = useState("./fonts/Arial.ttf");
   const [lineHeight, setLineHeight] = useState(1.2);
   const [letterSpacing, setLetterSpacing] = useState(0);
+  const [alignment, setAlignment] = useState("center");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const calculatePathBounds = commands => {
@@ -84,7 +85,7 @@ export default function SelectText({
           setSvgPath("");
           return;
         }
-        const fontSize = 120;
+        const fontSize = 20;
         const scale = fontSize / font.unitsPerEm;
         const baselineY = fontSize * 0.8;
         const actualLineHeight = fontSize * lineHeight;
@@ -109,7 +110,14 @@ export default function SelectText({
             lineWidth,
             y
           } = lineInfo;
-          let x = (maxLineWidth - lineWidth) / 2;
+          let x;
+          if (alignment === 'left') {
+            x = 0;
+          } else if (alignment === 'right') {
+            x = maxLineWidth - lineWidth;
+          } else {
+            x = (maxLineWidth - lineWidth) / 2;
+          }
           glyphs.forEach(g => {
             const path = g.getPath(x, y, fontSize);
             allCommands.push(...path.commands);
@@ -132,7 +140,7 @@ export default function SelectText({
         setError('生成文本路径时出现错误，请检查输入内容');
       }
     });
-  }, [text, fontUrl, lineHeight, letterSpacing]);
+  }, [text, fontUrl, lineHeight, letterSpacing, alignment]);
   const handleInsert = async () => {
     if (!svgPath || !sandboxProxy) {
       console.error('SVG路径或沙盒代理不可用');
@@ -159,9 +167,18 @@ export default function SelectText({
     }
   };
   return /*#__PURE__*/React.createElement("div", {
-    className: "text-warp-page"
-  }, /*#__PURE__*/React.createElement("div", null, "Preview"), /*#__PURE__*/React.createElement("div", {
-    className: "svg-preview"
+    className: "text-warp-page",
+    style: {
+      backgroundColor: '#FFFFFF'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "control-group"
+  }, /*#__PURE__*/React.createElement("label", null, "Preview"), /*#__PURE__*/React.createElement("div", {
+    className: "svg-preview",
+    style: {
+      width: '280px',
+      height: '240px'
+    }
   }, error ? /*#__PURE__*/React.createElement("div", {
     className: "error-message"
   }, error) : /*#__PURE__*/React.createElement("svg", {
@@ -169,21 +186,23 @@ export default function SelectText({
     width: "100%",
     height: "auto",
     style: {
-      border: '1px solid #C7C7C7',
+      border: '1px solid #1178FF',
       borderRadius: '10px',
       minHeight: '200px',
       maxHeight: '500px'
     }
   }, /*#__PURE__*/React.createElement("path", {
     d: svgPath,
-    fill: "hotpink",
+    fill: "black",
     stroke: "none"
-  }))), /*#__PURE__*/React.createElement("div", {
+  })))), /*#__PURE__*/React.createElement("div", {
     className: "control-group"
   }, /*#__PURE__*/React.createElement("label", null, "Text"), /*#__PURE__*/React.createElement("textarea", {
     style: {
-      border: '1px solid #C7C7C7',
-      borderRadius: '10px'
+      border: '1px solid #1178FF',
+      borderRadius: '10px',
+      width: '280px',
+      height: '72px'
     },
     value: text,
     onChange: e => setText(e.target.value),
@@ -191,43 +210,244 @@ export default function SelectText({
     className: "text-input content-textarea",
     rows: 3
   })), /*#__PURE__*/React.createElement("div", {
-    className: "control-group"
-  }, /*#__PURE__*/React.createElement("div", null, "Typography"), /*#__PURE__*/React.createElement("select", {
+    className: "control-group",
+    style: {
+      width: '280px',
+      height: '227px'
+    }
+  }, /*#__PURE__*/React.createElement("label", null, "Typography"), /*#__PURE__*/React.createElement("select", {
     value: fontUrl,
     onChange: e => setFontUrl(e.target.value),
-    className: "font-select"
+    className: "font-select",
+    style: {
+      border: '1px solid #1178FF',
+      borderRadius: '10px',
+      width: '100%',
+      marginBottom: '12px'
+    }
   }, fonts.map(f => /*#__PURE__*/React.createElement("option", {
     key: f.url,
     value: f.url
-  }, f.name)))), /*#__PURE__*/React.createElement("div", {
-    className: "control-group"
-  }, /*#__PURE__*/React.createElement("label", null, "\u884C\u9AD8\u500D\u6570\uFF1A", lineHeight), /*#__PURE__*/React.createElement("input", {
+  }, f.name))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      marginBottom: '8px',
+      backgroundColor: '#EBF3FE',
+      padding: '10px',
+      borderRadius: '5px'
+    }
+  }, /*#__PURE__*/React.createElement("img", {
+    src: "./icon/line_height.png",
+    alt: "icon",
+    style: {
+      width: '12px',
+      height: '12px',
+      marginTop: '2px'
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      width: '30px',
+      marginLeft: '12px',
+      fontSize: '12px'
+    }
+  }, lineHeight), /*#__PURE__*/React.createElement("input", {
     type: "range",
     min: "0.8",
     max: "2.5",
     step: "0.1",
     value: lineHeight,
-    onChange: e => setLineHeight(Number(e.target.value)),
-    className: "intensity-slider"
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "intensity-hint"
-  }, "0.8 (\u7D27\u5BC6) \u2014 2.5 (\u5BBD\u677E)")), /*#__PURE__*/React.createElement("div", {
-    className: "control-group"
-  }, /*#__PURE__*/React.createElement("label", null, "\u5B57\u7B26\u95F4\u8DDD\uFF1A", letterSpacing), /*#__PURE__*/React.createElement("input", {
+    onChange: e => {
+      const value = Number(e.target.value);
+      setLineHeight(value);
+      const progress = (value - 0.8) / (2.5 - 0.8) * 100;
+      e.target.style.setProperty('--progress', `${progress}%`);
+    },
+    onInput: e => {
+      const value = Number(e.target.value);
+      const progress = (value - 0.8) / (2.5 - 0.8) * 100;
+      e.target.style.setProperty('--progress', `${progress}%`);
+    },
+    className: "intensity-slider",
+    style: {
+      marginTop: '5px',
+      width: '80%',
+      '--progress': `${(lineHeight - 0.8) / (2.5 - 0.8) * 100}%`
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      marginBottom: '8px',
+      backgroundColor: '#EBF3FE',
+      padding: '10px',
+      borderRadius: '5px'
+    }
+  }, /*#__PURE__*/React.createElement("img", {
+    src: "./icon/letter_spacing.png",
+    alt: "icon",
+    style: {
+      width: '12px',
+      height: '12px',
+      marginTop: '2px'
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      width: '30px',
+      marginLeft: '12px',
+      fontSize: '12px'
+    }
+  }, letterSpacing), /*#__PURE__*/React.createElement("input", {
     type: "range",
     min: "0",
     max: "20",
     value: letterSpacing,
-    onChange: e => setLetterSpacing(Number(e.target.value)),
-    className: "intensity-slider"
+    onChange: e => {
+      const value = Number(e.target.value);
+      setLetterSpacing(value);
+      const progress = value / 20 * 100;
+      e.target.style.setProperty('--progress', `${progress}%`);
+    },
+    onInput: e => {
+      const value = Number(e.target.value);
+      const progress = value / 20 * 100;
+      e.target.style.setProperty('--progress', `${progress}%`);
+    },
+    className: "intensity-slider",
+    style: {
+      marginTop: '5px',
+      width: '80%',
+      '--progress': `${letterSpacing / 20 * 100}%`
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      gap: '12px',
+      marginBottom: '12px'
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setAlignment('left'),
+    style: {
+      width: '86px',
+      height: '37px',
+      backgroundColor: alignment === 'left' ? 'white' : '#EBF3FE',
+      border: alignment === 'left' ? '2px solid #1178FF' : 'none',
+      borderRadius: '8px',
+      cursor: 'pointer',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'flex-start',
+      justifyContent: 'center',
+      padding: '8px'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: '100%',
+      height: '2px',
+      backgroundColor: '#666',
+      marginBottom: '3px'
+    }
   }), /*#__PURE__*/React.createElement("div", {
-    className: "intensity-hint"
-  }, "0 (\u65E0\u95F4\u8DDD) \u2014 20 (\u6700\u5927\u95F4\u8DDD)")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: '75%',
+      height: '2px',
+      backgroundColor: '#666',
+      marginBottom: '3px'
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: '90%',
+      height: '2px',
+      backgroundColor: '#666'
+    }
+  })), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setAlignment('center'),
+    style: {
+      width: '86px',
+      height: '37px',
+      backgroundColor: alignment === 'center' ? 'white' : '#EBF3FE',
+      border: alignment === 'center' ? '2px solid #1178FF' : 'none',
+      borderRadius: '8px',
+      cursor: 'pointer',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '8px'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: '100%',
+      height: '2px',
+      backgroundColor: '#666',
+      marginBottom: '3px'
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: '75%',
+      height: '2px',
+      backgroundColor: '#666',
+      marginBottom: '3px'
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: '90%',
+      height: '2px',
+      backgroundColor: '#666'
+    }
+  })), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setAlignment('right'),
+    style: {
+      width: '86px',
+      height: '37px',
+      backgroundColor: alignment === 'right' ? 'white' : '#EBF3FE',
+      border: alignment === 'right' ? '2px solid #1178FF' : 'none',
+      borderRadius: '8px',
+      cursor: 'pointer',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'flex-end',
+      justifyContent: 'center',
+      padding: '8px'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: '100%',
+      height: '2px',
+      backgroundColor: '#666',
+      marginBottom: '3px'
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: '75%',
+      height: '2px',
+      backgroundColor: '#666',
+      marginBottom: '3px'
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: '90%',
+      height: '2px',
+      backgroundColor: '#666'
+    }
+  })))), /*#__PURE__*/React.createElement("div", {
+    className: "control-group",
+    style: {
+      marginTop: '40px'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
     className: "button-group"
   }, /*#__PURE__*/React.createElement("button", {
     onClick: handleInsert,
     disabled: isLoading || !svgPath,
-    className: "insert-button primary"
-  }, isLoading ? '插入中...' : '插入未变形文本')));
+    className: "insert-button primary",
+    style: {
+      width: '280px',
+      height: '37px',
+      fontSize: '14px',
+      padding: '0',
+      backgroundColor: '#1178FF'
+    }
+  }, isLoading ? '插入中...' : 'Add to design'))));
 }
 ;

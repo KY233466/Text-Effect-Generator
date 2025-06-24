@@ -17,6 +17,7 @@ export default function SelectText({ sandboxProxy,
   const [fontUrl, setFontUrl] = useState("./fonts/Arial.ttf");
   const [lineHeight, setLineHeight] = useState(1.2);
   const [letterSpacing, setLetterSpacing] = useState(0);
+  const [alignment, setAlignment] = useState("center");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -77,7 +78,7 @@ export default function SelectText({ sandboxProxy,
           return;
         }
 
-        const fontSize = 120;
+        const fontSize = 20;
         const scale = fontSize / font.unitsPerEm;
         const baselineY = fontSize * 0.8;
         const actualLineHeight = fontSize * lineHeight;
@@ -159,9 +160,10 @@ export default function SelectText({ sandboxProxy,
   };
 
   return (
-    <div className="text-warp-page">
-      <div>Preview</div>
-        <div className="svg-preview">
+    <div className="text-warp-page" style={{ backgroundColor: '#FFFFFF' }}>
+      <div className="control-group">
+        <label>Preview</label>
+        <div className="svg-preview" style={{ width: '280px', height: '240px' }}>
           {error ? (
             <div className="error-message">{error}</div>
           ) : (
@@ -173,23 +175,26 @@ export default function SelectText({ sandboxProxy,
               width="100%"
               height="auto"
               style={{
-                border: '1px solid #C7C7C7',
+                border: '1px solid #1178FF',
                 borderRadius: '10px',
                 minHeight: '200px',
                 maxHeight: '500px'
               }}
             >
-              <path d={svgPath} fill="hotpink" stroke="none" />
+              <path d={svgPath} fill="black" stroke="none" />
             </svg>
           )}
         </div>
+      </div>
 
       <div className="control-group">
         <label>Text</label>
         <textarea
           style={{
-            border: '1px solid #C7C7C7',
+            border: '1px solid #1178FF',
             borderRadius: '10px',
+            width: '280px',
+            height: '72px',
           }}
           value={text}
           onChange={e => setText(e.target.value)}
@@ -199,54 +204,150 @@ export default function SelectText({ sandboxProxy,
         />
       </div>
 
-      <div className="control-group">
-        <div>Typography</div>
+      <div className="control-group" style={{ width: '280px', height: '227px' }}>
+        <label>Typography</label>
         <select
           value={fontUrl}
           onChange={e => setFontUrl(e.target.value)}
           className="font-select"
+          style={{
+            border: '1px solid #1178FF',
+            borderRadius: '10px',
+            width: '100%',
+            marginBottom: '12px',
+          }}
         >
           {fonts.map(f => (
             <option key={f.url} value={f.url}>{f.name}</option>
           ))}
         </select>
+
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px', backgroundColor: '#EBF3FE', padding: '10px', borderRadius: '5px' }}>
+          <img src="./icon/line_height.png" alt="icon" style={{ width: '12px', height: '12px', marginTop: '2px' }} />
+          <span style={{ width: '30px', marginLeft: '12px', fontSize: '12px' }}>{lineHeight}</span>
+          <input
+            type="range"
+            min="0.8"
+            max="2.5"
+            step="0.1"
+            value={lineHeight}
+            onChange={e => {
+              const value = Number(e.target.value);
+              setLineHeight(value);
+              const progress = ((value - 0.8) / (2.5 - 0.8)) * 100;
+              e.target.style.setProperty('--progress', `${progress}%`);
+            }}
+            onInput={e => {
+              const value = Number(e.target.value);
+              const progress = ((value - 0.8) / (2.5 - 0.8)) * 100;
+              e.target.style.setProperty('--progress', `${progress}%`);
+            }}
+            className="intensity-slider"
+            style={{ marginTop: '5px', width: '80%', '--progress': `${((lineHeight - 0.8) / (2.5 - 0.8)) * 100}%` }}
+          />
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px', backgroundColor: '#EBF3FE', padding: '10px', borderRadius: '5px' }}>
+          <img src="./icon/letter_spacing.png" alt="icon" style={{ width: '12px', height: '12px', marginTop: '2px' }} />
+          <span style={{ width: '30px', marginLeft: '12px', fontSize: '12px' }}>{letterSpacing}</span>
+          <input
+            type="range"
+            min="0"
+            max="20"
+            value={letterSpacing}
+            onChange={e => {
+              const value = Number(e.target.value);
+              setLetterSpacing(value);
+              const progress = (value / 20) * 100;
+              e.target.style.setProperty('--progress', `${progress}%`);
+            }}
+            onInput={e => {
+              const value = Number(e.target.value);
+              const progress = (value / 20) * 100;
+              e.target.style.setProperty('--progress', `${progress}%`);
+            }}
+            className="intensity-slider"
+            style={{ marginTop: '5px', width: '80%', '--progress': `${(letterSpacing / 20) * 100}%` }}
+          />
+        </div>
+        
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
+          <button
+            onClick={() => setAlignment('left')}
+            style={{
+              width: '86px',
+              height: '37px',
+              backgroundColor: alignment === 'left' ? 'white' : '#EBF3FE',
+              border: alignment === 'left' ? '2px solid #1178FF' : 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+              justifyContent: 'center',
+              padding: '8px'
+            }}
+          >
+            <div style={{ width: '100%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
+            <div style={{ width: '75%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
+            <div style={{ width: '90%', height: '2px', backgroundColor: '#666' }}></div>
+          </button>
+
+          <button
+            onClick={() => setAlignment('center')}
+            style={{
+              width: '86px',
+              height: '37px',
+              backgroundColor: alignment === 'center' ? 'white' : '#EBF3FE',
+              border: alignment === 'center' ? '2px solid #1178FF' : 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '8px'
+            }}
+          >
+            <div style={{ width: '100%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
+            <div style={{ width: '75%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
+            <div style={{ width: '90%', height: '2px', backgroundColor: '#666' }}></div>
+          </button>
+
+          <button
+            onClick={() => setAlignment('right')}
+            style={{
+              width: '86px',
+              height: '37px',
+              backgroundColor: alignment === 'right' ? 'white' : '#EBF3FE',
+              border: alignment === 'right' ? '2px solid #1178FF' : 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-end',
+              justifyContent: 'center',
+              padding: '8px'
+            }}
+          >
+            <div style={{ width: '100%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
+            <div style={{ width: '75%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
+            <div style={{ width: '90%', height: '2px', backgroundColor: '#666' }}></div>
+          </button>
+        </div>
       </div>
 
-      <div className="control-group">
-        <label>行高倍数：{lineHeight}</label>
-        <input
-          type="range"
-          min="0.8"
-          max="2.5"
-          step="0.1"
-          value={lineHeight}
-          onChange={e => setLineHeight(Number(e.target.value))}
-          className="intensity-slider"
-        />
-        <div className="intensity-hint">0.8 (紧密) — 2.5 (宽松)</div>
-      </div>
-
-      <div className="control-group">
-        <label>字符间距：{letterSpacing}</label>
-        <input
-          type="range"
-          min="0"
-          max="20"
-          value={letterSpacing}
-          onChange={e => setLetterSpacing(Number(e.target.value))}
-          className="intensity-slider"
-        />
-        <div className="intensity-hint">0 (无间距) — 20 (最大间距)</div>
-      </div>
-
-      <div className="button-group">
-        <button
-          onClick={handleInsert}
-          disabled={isLoading || !svgPath}
-          className="insert-button primary"
-        >
-          {isLoading ? '插入中...' : '插入未变形文本'}
-        </button>
+      <div className="control-group" style={{ marginTop: '40px' }}>
+        <div className="button-group">
+          <button
+            onClick={handleInsert}
+            disabled={isLoading || !svgPath}
+            className="insert-button primary"
+            style={{ width: '280px', height: '37px', fontSize: '14px', padding: '0', backgroundColor: '#1178FF' }}
+          >
+            {isLoading ? '插入中...' : 'Add to design'}
+          </button>
+        </div>
       </div>
     </div>
   );
