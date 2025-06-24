@@ -5,6 +5,7 @@ const Warp = window.Warp;
 
 export default function Mesh({ sandboxProxy }) {
   const svgRef = useRef();
+  const pathRef = useRef();
   const svgControlRef = useRef();
   const controlPathRef = useRef();
   const controlCirclesRef = useRef([]);
@@ -12,6 +13,10 @@ export default function Mesh({ sandboxProxy }) {
   const controlPointsRef = useRef([]);
   const [dragIndex, setDragIndex] = useState(null);
   const [text, setText] = useState(null);
+  const [dPath, setDPath] = useState('');
+  const [pathBounds, setPathBounds] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (svgRef.current && text) {
@@ -28,11 +33,41 @@ export default function Mesh({ sandboxProxy }) {
           return;
         }
 
-        const pathData = font.getPath(text, 0, 100, 100).toSVG(3);
-        svgRef.current.innerHTML = pathData;
+        const svgWidth = svgRef.current.clientWidth;
+        const svgHeight = svgRef.current.clientHeight;
+        const fontSize = 100;
+        const textWidth = font.getAdvanceWidth(text, fontSize);
+        const xSvg = (svgWidth - textWidth) / 2;
+        const ySvg = svgHeight / 2 + fontSize / 3;
 
-        const path = svgRef.current.querySelector('path');
-        const box = path.getBBox();
+        // const path = font.getPath(text, xSvg, ySvg, fontSize);
+        const path = font.getPath(text, 0, 100, fontSize);
+        const commands = path.commands;
+
+        const d = commands.map(c => {
+          if (c.type === 'M') return `M ${c.x} ${c.y}`;
+          if (c.type === 'L') return `L ${c.x} ${c.y}`;
+          if (c.type === 'C') return `C ${c.x1} ${c.y1}, ${c.x2} ${c.y2}, ${c.x} ${c.y}`;
+          if (c.type === 'Q') return `Q ${c.x1} ${c.y1}, ${c.x} ${c.y}`;
+          if (c.type === 'Z') return 'Z';
+          return '';
+        }).join(' ');
+        setDPath(d);
+
+        const bounds = calculatePathBounds(commands);
+        setPathBounds(bounds);
+
+        // Create <path> manually
+        svgRef.current.innerHTML = '';
+        const pathEl = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        pathEl.setAttribute('d', d);
+        pathEl.setAttribute('fill', 'hotpink');
+        pathEl.setAttribute('stroke', 'none');
+        svgRef.current.appendChild(pathEl);
+        pathRef.current = pathEl;
+
+        const pathBox = svgRef.current.querySelector('path');
+        const box = pathBox.getBBox();
         const { x, y, width: w, height: h } = box;
 
         // 1. FIRST CREATE RECTANGULAR CONTROL POINTS (BOUNDING BOX)
@@ -65,6 +100,7 @@ export default function Mesh({ sandboxProxy }) {
         ];
         
         controlPointsRef.current = customControlPoints;
+        // controlPointsRef.current = initialControlPoints;
 
         const warp = new Warp(svgRef.current);
 
@@ -101,10 +137,38 @@ export default function Mesh({ sandboxProxy }) {
         // 4. APPLY CUSTOM SHAPE USING THE WEIGHTS
         warp.transform(reposition);
 
+        const newD = pathRef.current?.getAttribute('d');
+        if (newD) setDPath(newD);
+
         // 5. DRAW THE CUSTOM CONTROL SHAPE
         drawControlShape();
       }
     );
+  };
+
+  const calculatePathBounds = (commands) => {
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    commands.forEach(cmd => {
+      if ('x' in cmd && 'y' in cmd) {
+        minX = Math.min(minX, cmd.x);
+        maxX = Math.max(maxX, cmd.x);
+        minY = Math.min(minY, cmd.y);
+        maxY = Math.max(maxY, cmd.y);
+      }
+      if ('x1' in cmd && 'y1' in cmd) {
+        minX = Math.min(minX, cmd.x1);
+        maxX = Math.max(maxX, cmd.x1);
+        minY = Math.min(minY, cmd.y1);
+        maxY = Math.max(maxY, cmd.y1);
+      }
+      if ('x2' in cmd && 'y2' in cmd) {
+        minX = Math.min(minX, cmd.x2);
+        maxX = Math.max(maxX, cmd.x2);
+        minY = Math.min(minY, cmd.y2);
+        maxY = Math.max(maxY, cmd.y2);
+      }
+    });
+    return { minX, maxX, minY, maxY, width: maxX - minX, height: maxY - minY };
   };
 
   const reposition = ([x, y, ...W], V = controlPointsRef.current) => {
@@ -153,7 +217,38 @@ export default function Mesh({ sandboxProxy }) {
     if (dragIndex !== null) {
       console.log('Updated control points:', controlPointsRef.current);
     }
+    if (pathRef.current) {
+      const updatedD = svgRef.current.querySelector('path')?.getAttribute('d');
+      if (updatedD) {
+        console.log('Updated path D:', updatedD);
+        setDPath(updatedD);
+      }
+    }
     setDragIndex(null);
+  };
+
+  const handleInsert = async () => {
+    if (!sandboxProxy || !dPath || !pathBounds) {
+      console.error('缺少必要数据');
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const result = await sandboxProxy.insertWarpedSVG({
+        d: dPath,
+        bounds: pathBounds,
+        originalText: text,
+        warpType: 'mesh',
+        intensity: 1
+      });
+      if (!result.success) {
+        setError(result.error);
+      }
+    } catch (e) {
+      setError(`插入异常: ${e.message}`);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -219,6 +314,7 @@ export default function Mesh({ sandboxProxy }) {
 
       </div>
 
+      <div>Text</div>
       <input
         style={{ color: 'black', border: '1px solid black' }}
         type="text"
@@ -227,6 +323,13 @@ export default function Mesh({ sandboxProxy }) {
         id="text-input"
         required
       />
+
+      <button
+        onClick={handleInsert}
+        disabled={isLoading || !dPath}
+      >
+        {isLoading ? '插入中...' : '插入变形文本'}
+      </button>
     </div>
   );
 }
