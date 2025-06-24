@@ -2,12 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { effectsList, getWarpFunction } from '../shapes/index.js';
 import opentype from 'opentype.js';
 
-const fonts = [
-  { name: "Old Standard", url: "./fonts/OldStandardTT-Regular.ttf" },
-  { name: "Arial", url: "./fonts/Arial.ttf" },
-  { name: "Helvetica", url: "./fonts/Helvetica.ttf" }
-];
-
 const TextWarpPage = ({ sandboxProxy,
   pathBounds,
   setPathBounds,
@@ -25,13 +19,13 @@ const TextWarpPage = ({ sandboxProxy,
   // 计算路径边界
   const calculatePathBounds = (commands) => {
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-    
+
     commands.forEach(cmd => {
       const points = [];
       if ('x' in cmd && 'y' in cmd) points.push({ x: cmd.x, y: cmd.y });
       if ('x1' in cmd && 'y1' in cmd) points.push({ x: cmd.x1, y: cmd.y1 });
       if ('x2' in cmd && 'y2' in cmd) points.push({ x: cmd.x2, y: cmd.y2 });
-      
+
       points.forEach(p => {
         minX = Math.min(minX, p.x);
         maxX = Math.max(maxX, p.x);
@@ -39,7 +33,7 @@ const TextWarpPage = ({ sandboxProxy,
         maxY = Math.max(maxY, p.y);
       });
     });
-    
+
     return {
       minX: minX === Infinity ? 0 : minX,
       minY: minY === Infinity ? 0 : minY,
@@ -67,7 +61,7 @@ const TextWarpPage = ({ sandboxProxy,
       setError("OpenType.js 未加载完成，请刷新页面重试");
       return;
     }
-    
+
     opentype.load(fontUrl, (err, font) => {
       if (err || !font) {
         const errorMessage = `字体加载失败: ${fontUrl}. 请确保字体文件存在于 'src/ui/fonts' 目录下。`;
@@ -76,9 +70,9 @@ const TextWarpPage = ({ sandboxProxy,
         setSvgPath("");
         return;
       }
-      
+
       setError("");
-      
+
       try {
         // 处理多行文本
         const lines = text.split('\n').filter(line => line.trim()); // 过滤空行
@@ -91,10 +85,10 @@ const TextWarpPage = ({ sandboxProxy,
         const scale = fontSize / font.unitsPerEm;
         const baselineY = fontSize * 0.8;
         const actualLineHeight = fontSize * lineHeight;
-        
+
         let allCommands = [];
         let maxLineWidth = 0;
-        
+
         // 预先计算所有行的宽度，用于整体居中
         const lineInfos = lines.map((line, lineIndex) => {
           const glyphs = font.stringToGlyphs(line);
@@ -102,7 +96,7 @@ const TextWarpPage = ({ sandboxProxy,
           // 计算行宽度时包含字符间距
           const lineWidth = glyphWidths.reduce((a, b) => a + b, 0) + (glyphs.length - 1) * letterSpacing;
           maxLineWidth = Math.max(maxLineWidth, lineWidth);
-          
+
           return {
             line,
             glyphs,
@@ -111,20 +105,20 @@ const TextWarpPage = ({ sandboxProxy,
             y: baselineY + lineIndex * actualLineHeight
           };
         });
-        
+
         // 获取变形函数
         const warpFn = getWarpFunction(warpType);
         if (!warpFn) {
           setError(`未知的变形类型: ${warpType}`);
           return;
         }
-        
+
         // 计算整体文本的度量信息 - 关键改进！
         const totalHeight = (lines.length - 1) * actualLineHeight + fontSize;
         const overallTopY = baselineY - fontSize * 0.7; // 第一行顶部
         const overallBottomY = baselineY + (lines.length - 1) * actualLineHeight + fontSize * 0.2; // 最后一行底部
         const overallCenterY = (overallTopY + overallBottomY) / 2; // 整体垂直中心
-        
+
         // 统一的文本度量信息 - 所有字符都使用这个
         const unifiedTextMetrics = {
           baseline: overallCenterY, // 使用整体的垂直中心作为基线
@@ -133,19 +127,19 @@ const TextWarpPage = ({ sandboxProxy,
           yMax: overallTopY,
           yMin: overallBottomY
         };
-        
+
         // 整体变形参数
         const totalWidth = maxLineWidth;
         const centerX = maxLineWidth / 2;
         const arcHeight = intensity;
-        
+
         // 处理每一行
         lineInfos.forEach((lineInfo, lineIndex) => {
           const { glyphs, lineWidth, y } = lineInfo;
-          
+
           // 水平居中对齐
           let x = (maxLineWidth - lineWidth) / 2;
-          
+
           // 处理当前行的每个字符 - 全部使用统一的文本度量！
           glyphs.forEach((g) => {
             const path = g.getPath(x, y, fontSize);
@@ -186,7 +180,7 @@ const TextWarpPage = ({ sandboxProxy,
         const bounds = calculatePathBounds(allCommands);
         setPathBounds(bounds);
         setSvgPath(d);
-        
+
       } catch (error) {
         console.error('生成多行文本变形时出错:', error);
         setError('生成文本变形时出现错误，请检查输入内容');
@@ -197,7 +191,7 @@ const TextWarpPage = ({ sandboxProxy,
   const handleInsert = async () => {
     console.log("准备插入SVG路径:", svgPath.substring(0, 100));
     console.log("路径边界信息:", pathBounds);
-    
+
     if (!svgPath || !sandboxProxy) {
       console.error('SVG路径或沙盒代理不可用');
       return;
@@ -206,8 +200,8 @@ const TextWarpPage = ({ sandboxProxy,
     setIsLoading(true);
     try {
       // 传递更多信息到sandbox，包括边界信息
-      const result = await sandboxProxy.insertWarpedSVG({ 
-        d: svgPath, 
+      const result = await sandboxProxy.insertWarpedSVG({
+        d: svgPath,
         bounds: pathBounds,
         originalText: text,
         warpType: warpType,
@@ -309,7 +303,7 @@ const TextWarpPage = ({ sandboxProxy,
         >
           {isLoading ? '插入中...' : '插入变形文本'}
         </button>
-        
+
         <button
           onClick={handleTestRectangle}
           className="insert-button secondary"

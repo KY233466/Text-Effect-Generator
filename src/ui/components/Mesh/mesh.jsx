@@ -3,13 +3,17 @@ import opentype from 'opentype.js';
 
 const Warp = window.Warp;
 
-export default function Mesh({ 
-  sandboxProxy, 
+export default function Mesh({
+  sandboxProxy,
   pathBounds,
   setPathBounds,
   text,
   svgPath,
-  setSvgPath }) {
+  setSvgPath,
+  isLoading,
+  setIsLoading,
+  error,
+  setError }) {
   const svgRef = useRef();
   const pathRef = useRef();
   const svgControlRef = useRef();
@@ -18,8 +22,6 @@ export default function Mesh({
   const warpRef = useRef();
   const controlPointsRef = useRef([]);
   const [dragIndex, setDragIndex] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (!svgRef.current) return;
@@ -119,7 +121,7 @@ export default function Mesh({
           [450 * c + xShift, 20 * c + yShift],
           [200 * c + xShift, 80 * c + yShift],
         ];
-        
+
         controlPointsRef.current = customControlPoints;
 
         const warp = new Warp(svgRef.current);
@@ -247,30 +249,6 @@ export default function Mesh({
     setDragIndex(null);
   };
 
-  const handleInsert = async () => {
-    if (!sandboxProxy || !svgPath || !pathBounds) {
-      console.error('缺少必要数据');
-      return;
-    }
-    setIsLoading(true);
-    try {
-      const result = await sandboxProxy.insertWarpedSVG({
-        d: svgPath,
-        bounds: pathBounds,
-        originalText: text,
-        warpType: 'mesh',
-        intensity: 1
-      });
-      if (!result.success) {
-        setError(result.error);
-      }
-    } catch (e) {
-      setError(`插入异常: ${e.message}`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <div
       style={{
@@ -331,15 +309,7 @@ export default function Mesh({
             borderRadius: '10px', overflow: 'visible'
           }}
         />
-
       </div>
-
-      <button
-        onClick={handleInsert}
-        disabled={isLoading || !svgPath}
-      >
-        {isLoading ? '插入中...' : '插入变形文本'}
-      </button>
     </div>
   );
 }

@@ -110,14 +110,7 @@ export default function SelectText({
             lineWidth,
             y
           } = lineInfo;
-          let x;
-          if (alignment === 'left') {
-            x = 0;
-          } else if (alignment === 'right') {
-            x = maxLineWidth - lineWidth;
-          } else {
-            x = (maxLineWidth - lineWidth) / 2;
-          }
+          let x = (maxLineWidth - lineWidth) / 2;
           glyphs.forEach(g => {
             const path = g.getPath(x, y, fontSize);
             allCommands.push(...path.commands);
@@ -140,7 +133,7 @@ export default function SelectText({
         setError('生成文本路径时出现错误，请检查输入内容');
       }
     });
-  }, [text, fontUrl, lineHeight, letterSpacing, alignment]);
+  }, [text, fontUrl, lineHeight, letterSpacing]);
   const handleInsert = async () => {
     if (!svgPath || !sandboxProxy) {
       console.error('SVG路径或沙盒代理不可用');

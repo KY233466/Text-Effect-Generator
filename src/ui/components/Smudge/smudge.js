@@ -9,7 +9,11 @@ export default function Smudge({
   setPathBounds,
   text,
   svgPath,
-  setSvgPath
+  setSvgPath,
+  isLoading,
+  setIsLoading,
+  error,
+  setError
 }) {
   const svgRef = useRef();
   const pathRef = useRef();
@@ -20,8 +24,6 @@ export default function Smudge({
   const lastMouseY = useRef(null);
   const touchPoints = useRef({});
   const [isMouseDown, setIsMouseDown] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
   useEffect(() => {
     window.addEventListener('mouseup', handleMouseUp);
     window.addEventListener('touchend', handleTouchEnd);
@@ -198,29 +200,6 @@ export default function Smudge({
       warpRef.current.transform(smudgeFactory(point.lastX - rect.left, point.lastY - rect.top, point.x - rect.left, point.y - rect.top, SMUDGE_RADIUS, SMUDGE_STRENGTH));
     });
   };
-  const handleInsert = async () => {
-    if (!sandboxProxy || !svgPath || !pathBounds) {
-      console.error('缺少必要数据');
-      return;
-    }
-    setIsLoading(true);
-    try {
-      const result = await sandboxProxy.insertWarpedSVG({
-        d: svgPath,
-        bounds: pathBounds,
-        originalText: text,
-        warpType: 'smudge',
-        intensity: 1
-      });
-      if (!result.success) {
-        setError(result.error);
-      }
-    } catch (e) {
-      setError(`插入异常: ${e.message}`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", null, "Preview"), /*#__PURE__*/React.createElement("svg", {
     ref: svgRef,
     width: "100%",
@@ -237,8 +216,5 @@ export default function Smudge({
     onMouseMove: handleMouseMove,
     onTouchStart: handleTouchStart,
     onTouchMove: handleTouchMove
-  }), /*#__PURE__*/React.createElement("button", {
-    onClick: handleInsert,
-    disabled: isLoading || !svgPath
-  }, isLoading ? '插入中...' : '插入变形文本'));
+  }));
 }

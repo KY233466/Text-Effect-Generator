@@ -1,16 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { effectsList, getWarpFunction } from '../shapes/index.js';
 import opentype from 'opentype.js';
-const fonts = [{
-  name: "Old Standard",
-  url: "./fonts/OldStandardTT-Regular.ttf"
-}, {
-  name: "Arial",
-  url: "./fonts/Arial.ttf"
-}, {
-  name: "Helvetica",
-  url: "./fonts/Helvetica.ttf"
-}];
 const TextWarpPage = ({
   sandboxProxy,
   pathBounds,

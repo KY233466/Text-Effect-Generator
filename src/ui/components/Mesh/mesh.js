@@ -7,7 +7,11 @@ export default function Mesh({
   setPathBounds,
   text,
   svgPath,
-  setSvgPath
+  setSvgPath,
+  isLoading,
+  setIsLoading,
+  error,
+  setError
 }) {
   const svgRef = useRef();
   const pathRef = useRef();
@@ -17,8 +21,6 @@ export default function Mesh({
   const warpRef = useRef();
   const controlPointsRef = useRef([]);
   const [dragIndex, setDragIndex] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
   useEffect(() => {
     if (!svgRef.current) return;
     if (text === "") {
@@ -217,29 +219,6 @@ export default function Mesh({
     }
     setDragIndex(null);
   };
-  const handleInsert = async () => {
-    if (!sandboxProxy || !svgPath || !pathBounds) {
-      console.error('缺少必要数据');
-      return;
-    }
-    setIsLoading(true);
-    try {
-      const result = await sandboxProxy.insertWarpedSVG({
-        d: svgPath,
-        bounds: pathBounds,
-        originalText: text,
-        warpType: 'mesh',
-        intensity: 1
-      });
-      if (!result.success) {
-        setError(result.error);
-      }
-    } catch (e) {
-      setError(`插入异常: ${e.message}`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
   return /*#__PURE__*/React.createElement("div", {
     style: {
       width: '100%',
@@ -301,8 +280,5 @@ export default function Mesh({
       borderRadius: '10px',
       overflow: 'visible'
     }
-  })), /*#__PURE__*/React.createElement("button", {
-    onClick: handleInsert,
-    disabled: isLoading || !svgPath
-  }, isLoading ? '插入中...' : '插入变形文本'));
+  })));
 }

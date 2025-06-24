@@ -11,7 +11,11 @@ export default function Smudge({ sandboxProxy,
     setPathBounds,
     text,
     svgPath,
-    setSvgPath }) {
+    setSvgPath,
+    isLoading,
+    setIsLoading,
+    error,
+    setError }) {
     const svgRef = useRef();
     const pathRef = useRef();
     const warpRef = useRef();
@@ -21,8 +25,6 @@ export default function Smudge({ sandboxProxy,
     const lastMouseY = useRef(null);
     const touchPoints = useRef({});
     const [isMouseDown, setIsMouseDown] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState(null);
 
     useEffect(() => {
         window.addEventListener('mouseup', handleMouseUp);
@@ -229,30 +231,6 @@ export default function Smudge({ sandboxProxy,
         });
     };
 
-    const handleInsert = async () => {
-        if (!sandboxProxy || !svgPath || !pathBounds) {
-            console.error('缺少必要数据');
-            return;
-        }
-        setIsLoading(true);
-        try {
-            const result = await sandboxProxy.insertWarpedSVG({
-                d: svgPath,
-                bounds: pathBounds,
-                originalText: text,
-                warpType: 'smudge',
-                intensity: 1
-            });
-            if (!result.success) {
-                setError(result.error);
-            }
-        } catch (e) {
-            setError(`插入异常: ${e.message}`);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     return (
         <div>
             <div>Preview</div>
@@ -273,13 +251,6 @@ export default function Smudge({ sandboxProxy,
                 onTouchStart={handleTouchStart}
                 onTouchMove={handleTouchMove}
             />
-
-            <button
-                onClick={handleInsert}
-                disabled={isLoading || !svgPath}
-            >
-                {isLoading ? '插入中...' : '插入变形文本'}
-            </button>
         </div>
     );
 }
