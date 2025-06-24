@@ -11,7 +11,7 @@ const fonts = [
 const TextWarpPage = ({ sandboxProxy }) => {
   const [text, setText] = useState("TYPE WARP");
   const [warpType, setWarpType] = useState("wave");
-  const [fontUrl, setFontUrl] = useState(fonts[0].url);
+  const [fontUrl, setFontUrl] = useState(fonts[2].url);
   const [intensity, setIntensity] = useState(50);
   const [svgPath, setSvgPath] = useState("");
   const [isLoading, setIsLoading] = useState(false);
