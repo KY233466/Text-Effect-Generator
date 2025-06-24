@@ -1,12 +1,9 @@
 import React, { useRef, useState } from 'react';
 import opentype from 'opentype.js';
 
-// import Warp from 'warpjs';
-import * as Warp from '../../../lib/warp.js';
-// import { Warp } from '../../../lib/warp.js';
-// import Warp from '../../../lib/warp.js';
+const Warp = window.Warp;
 
-export default function Mesh() {
+export default function Mesh({ sandboxProxy }) {
   const textInputRef = useRef();
   const svgRef = useRef();
   const svgControlRef = useRef();
@@ -19,8 +16,6 @@ export default function Mesh() {
 
   const handleSubmit = (e, targetText) => {
     e.preventDefault();
-
-    console.log("?" + targetText);
 
     opentype.load(
       'https://s3-us-west-2.amazonaws.com/s.cdpn.io/135636/FiraSansExtraCondensed-Black.ttf',
@@ -68,7 +63,7 @@ export default function Mesh() {
         
         controlPointsRef.current = customControlPoints;
 
-        const warp = new Warp.Warp(svgRef.current);
+        const warp = new Warp(svgRef.current);
 
         warp.interpolate(4);
         warpRef.current = warp;
@@ -157,43 +152,13 @@ export default function Mesh() {
 
   return (
     <div
-      style={{ padding: '0.5em' }}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
     >
-      <input
-          style={{ color: 'black', border: '1px solid black' }}
-          type="text"
-          value={text}
-          onChange={e => {setText(e.target.value); handleSubmit(e, e.target.value);}}
-          id="text-input"
-          required
-      />
-
-      {/* <button
-          onClick={handleSubmit}
-          // onClick={handleTestRectangle}
-          className="insert-button secondary"
-        >
-          WARP
-      </button> */}
-
-      {/* <form id="text-form" onSubmit={handleSubmit} style={{ paddingBottom: '0.5em' }}>
-        <input
-          style={{ color: 'black', border: '1px solid black' }}
-          type="text"
-          ref={textInputRef}
-          id="text-input"
-          placeholder="Lorem ipsum"
-          required
-        />
-        <input type="submit" value="WARP" style={{ color: 'black', border: '1px solid black' }} />
-      </form> */}
-
       <svg
         ref={svgControlRef}
         id="svg-control"
-        width="500"
+        width="50%"
         height="200"
         style={{
           border: '1px solid black',
@@ -226,9 +191,18 @@ export default function Mesh() {
       <svg
         ref={svgRef}
         id="svg-element"
-        width="500"
+        width="50%"
         height="200"
         style={{ border: '1px solid black', overflow: 'visible' }}
+      />
+
+      <input
+        style={{ color: 'black', border: '1px solid black' }}
+        type="text"
+        value={text}
+        onChange={e => { setText(e.target.value); handleSubmit(e, e.target.value); }}
+        id="text-input"
+        required
       />
     </div>
   );

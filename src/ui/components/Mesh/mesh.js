@@ -1,12 +1,9 @@
 import React, { useRef, useState } from 'react';
 import opentype from 'opentype.js';
-
-// import Warp from 'warpjs';
-import * as Warp from '../../../lib/warp.js';
-// import { Warp } from '../../../lib/warp.js';
-// import Warp from '../../../lib/warp.js';
-
-export default function Mesh() {
+const Warp = window.Warp;
+export default function Mesh({
+  sandboxProxy
+}) {
   const textInputRef = useRef();
   const svgRef = useRef();
   const svgControlRef = useRef();
@@ -45,7 +42,7 @@ export default function Mesh() {
       // 2. SET CUSTOM CONTROL POINTS (THE ONES YOU WANT TO SHOW/DRAG)
       const customControlPoints = [[20, -5], [5, 120], [100, 210], [350, 160], [520, 180], [450, 20], [250, 80]];
       controlPointsRef.current = customControlPoints;
-      const warp = new Warp.Warp(svgRef.current);
+      const warp = new Warp(svgRef.current);
       warp.interpolate(4);
       warpRef.current = warp;
 
@@ -124,28 +121,12 @@ export default function Mesh() {
     setDragIndex(null);
   };
   return /*#__PURE__*/React.createElement("div", {
-    style: {
-      padding: '0.5em'
-    },
     onMouseMove: handleMouseMove,
     onMouseUp: handleMouseUp
-  }, /*#__PURE__*/React.createElement("input", {
-    style: {
-      color: 'black',
-      border: '1px solid black'
-    },
-    type: "text",
-    value: text,
-    onChange: e => {
-      setText(e.target.value);
-      handleSubmit(e, e.target.value);
-    },
-    id: "text-input",
-    required: true
-  }), /*#__PURE__*/React.createElement("svg", {
+  }, /*#__PURE__*/React.createElement("svg", {
     ref: svgControlRef,
     id: "svg-control",
-    width: "500",
+    width: "50%",
     height: "200",
     style: {
       border: '1px solid black',
@@ -176,11 +157,24 @@ export default function Mesh() {
   }))), /*#__PURE__*/React.createElement("svg", {
     ref: svgRef,
     id: "svg-element",
-    width: "500",
+    width: "50%",
     height: "200",
     style: {
       border: '1px solid black',
       overflow: 'visible'
     }
+  }), /*#__PURE__*/React.createElement("input", {
+    style: {
+      color: 'black',
+      border: '1px solid black'
+    },
+    type: "text",
+    value: text,
+    onChange: e => {
+      setText(e.target.value);
+      handleSubmit(e, e.target.value);
+    },
+    id: "text-input",
+    required: true
   }));
 }

@@ -4,7 +4,7 @@ import Smudge from "./Smudge/smudge.js";
 const CustomTextPage = ({
   sandboxProxy
 }) => {
-  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Smudge, {
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Mesh, {
     sandboxProxy: sandboxProxy
   }));
 };

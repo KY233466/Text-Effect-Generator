@@ -15,7 +15,6 @@ export default function Smudge({
   const lastMouseY = useRef(null);
   const touchPoints = useRef({});
   const [isMouseDown, setIsMouseDown] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
   const [text, setText] = useState('');
   const [dPath, setDPath] = useState('');
   const [pathBounds, setPathBounds] = useState(null);
