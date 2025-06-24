@@ -32,10 +32,10 @@ export default function Smudge({
   }, []);
   useEffect(() => {
     if (svgRef.current && text) {
-      generateTextPath(text);
+      generateTextPath();
     }
   }, [text]);
-  const generateTextPath = inputText => {
+  const generateTextPath = () => {
     setIsGenerating(true);
     opentype.load('https://s3-us-west-2.amazonaws.com/s.cdpn.io/135636/FiraSansExtraCondensed-Black.ttf', (err, font) => {
       if (err) {
@@ -46,10 +46,10 @@ export default function Smudge({
       const svgWidth = svgRef.current.clientWidth;
       const svgHeight = svgRef.current.clientHeight;
       const fontSize = 100;
-      const textWidth = font.getAdvanceWidth(inputText, fontSize);
+      const textWidth = font.getAdvanceWidth(text, fontSize);
       const x = (svgWidth - textWidth) / 2;
       const y = svgHeight / 2 + fontSize / 3;
-      const path = font.getPath(inputText, x, y, fontSize);
+      const path = font.getPath(text, x, y, fontSize);
       const commands = path.commands;
       const d = commands.map(c => {
         if (c.type === 'M') return `M ${c.x} ${c.y}`;

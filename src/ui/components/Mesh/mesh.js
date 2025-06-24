@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import opentype from 'opentype.js';
 const Warp = window.Warp;
 export default function Mesh({
@@ -13,15 +13,18 @@ export default function Mesh({
   const controlPointsRef = useRef([]);
   const [dragIndex, setDragIndex] = useState(null);
   const [text, setText] = useState(null);
-  const handleSubmit = (e, targetText) => {
-    e.preventDefault();
-    console.log("?" + targetText);
+  useEffect(() => {
+    if (svgRef.current && text) {
+      generateTextPath();
+    }
+  }, [text]);
+  const generateTextPath = () => {
     opentype.load('https://s3-us-west-2.amazonaws.com/s.cdpn.io/135636/FiraSansExtraCondensed-Black.ttf', (err, font) => {
       if (err) {
         console.error('Font could not be loaded:', err);
         return;
       }
-      const pathData = font.getPath(targetText, 0, 100, 100).toSVG(3);
+      const pathData = font.getPath(text, 0, 100, 100).toSVG(3);
       svgRef.current.innerHTML = pathData;
       const path = svgRef.current.querySelector('path');
       const box = path.getBBox();
@@ -40,7 +43,7 @@ export default function Mesh({
       initialControlPoints = initialControlPoints.map(([cx, cy]) => [cx === x ? cx - buffer : cx === x + w ? cx + buffer : cx, cy === y ? cy - buffer : cy === y + h ? cy + buffer : cy]);
 
       // 2. SET CUSTOM CONTROL POINTS (THE ONES YOU WANT TO SHOW/DRAG)
-      const customControlPoints = [[20, -5], [5, 120], [100, 210], [350, 160], [520, 180], [450, 20], [250, 80]];
+      const customControlPoints = [[20, 5], [5, 120], [100, 210], [350, 160], [520, 180], [450, 20], [250, 80]];
       controlPointsRef.current = customControlPoints;
       const warp = new Warp(svgRef.current);
       warp.interpolate(4);
@@ -118,18 +121,36 @@ export default function Mesh({
     warpRef.current.transform(reposition);
   };
   const handleMouseUp = () => {
+    if (dragIndex !== null) {
+      console.log('Updated control points:', controlPointsRef.current);
+    }
     setDragIndex(null);
   };
   return /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: '100%',
+      maxWidth: '350px',
+      position: 'relative',
+      overflow: 'hidden'
+    },
     onMouseMove: handleMouseMove,
     onMouseUp: handleMouseUp
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      width: '100%'
+    }
   }, /*#__PURE__*/React.createElement("svg", {
     ref: svgControlRef,
     id: "svg-control",
-    width: "50%",
-    height: "200",
+    width: "100%",
+    height: "200"
+    // viewBox={`0 0 350 200`}
+    // preserveAspectRatio="xMidYMid meet"
+    ,
     style: {
-      border: '1px solid black',
+      border: '1px solid #C7C7C7',
+      borderRadius: '10px',
       overflow: 'visible',
       position: 'absolute',
       pointerEvents: 'none'
@@ -140,7 +161,7 @@ export default function Mesh({
     fill: "none",
     stroke: "red",
     strokeWidth: "1px"
-  }), Array.from({
+  }), controlPathRef.current && Array.from({
     length: 7
   }).map((_, i) => /*#__PURE__*/React.createElement("circle", {
     key: i,
@@ -157,23 +178,24 @@ export default function Mesh({
   }))), /*#__PURE__*/React.createElement("svg", {
     ref: svgRef,
     id: "svg-element",
-    width: "50%",
-    height: "200",
+    width: "100%",
+    height: "200"
+    // viewBox={`0 0 350 200`}
+    // preserveAspectRatio="xMidYMid meet"
+    ,
     style: {
-      border: '1px solid black',
+      border: '1px solid #C7C7C7',
+      borderRadius: '10px',
       overflow: 'visible'
     }
-  }), /*#__PURE__*/React.createElement("input", {
+  })), /*#__PURE__*/React.createElement("input", {
     style: {
       color: 'black',
       border: '1px solid black'
     },
     type: "text",
     value: text,
-    onChange: e => {
-      setText(e.target.value);
-      handleSubmit(e, e.target.value);
-    },
+    onChange: e => setText(e.target.value),
     id: "text-input",
     required: true
   }));

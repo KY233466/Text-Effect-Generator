@@ -1,10 +1,9 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import opentype from 'opentype.js';
 
 const Warp = window.Warp;
 
 export default function Mesh({ sandboxProxy }) {
-  const textInputRef = useRef();
   const svgRef = useRef();
   const svgControlRef = useRef();
   const controlPathRef = useRef();
@@ -14,9 +13,13 @@ export default function Mesh({ sandboxProxy }) {
   const [dragIndex, setDragIndex] = useState(null);
   const [text, setText] = useState(null);
 
-  const handleSubmit = (e, targetText) => {
-    e.preventDefault();
+  useEffect(() => {
+    if (svgRef.current && text) {
+      generateTextPath();
+    }
+  }, [text]);
 
+  const generateTextPath = () => {
     opentype.load(
       'https://s3-us-west-2.amazonaws.com/s.cdpn.io/135636/FiraSansExtraCondensed-Black.ttf',
       (err, font) => {
@@ -25,7 +28,7 @@ export default function Mesh({ sandboxProxy }) {
           return;
         }
 
-        const pathData = font.getPath(targetText, 0, 100, 100).toSVG(3);
+        const pathData = font.getPath(text, 0, 100, 100).toSVG(3);
         svgRef.current.innerHTML = pathData;
 
         const path = svgRef.current.querySelector('path');
@@ -52,7 +55,7 @@ export default function Mesh({ sandboxProxy }) {
 
         // 2. SET CUSTOM CONTROL POINTS (THE ONES YOU WANT TO SHOW/DRAG)
         const customControlPoints = [
-          [20, -5],
+          [20, 5],
           [5, 120],
           [100, 210],
           [350, 160],
@@ -97,7 +100,7 @@ export default function Mesh({ sandboxProxy }) {
 
         // 4. APPLY CUSTOM SHAPE USING THE WEIGHTS
         warp.transform(reposition);
-        
+
         // 5. DRAW THE CUSTOM CONTROL SHAPE
         drawControlShape();
       }
@@ -147,60 +150,80 @@ export default function Mesh({ sandboxProxy }) {
   };
 
   const handleMouseUp = () => {
+    if (dragIndex !== null) {
+      console.log('Updated control points:', controlPointsRef.current);
+    }
     setDragIndex(null);
   };
 
   return (
     <div
+      style={{
+        width: '100%',
+        maxWidth: '350px',
+        position: 'relative',
+        overflow: 'hidden',
+      }}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
     >
-      <svg
-        ref={svgControlRef}
-        id="svg-control"
-        width="50%"
-        height="200"
-        style={{
-          border: '1px solid black',
-          overflow: 'visible',
-          position: 'absolute',
-          pointerEvents: 'none',
-        }}
-      >
-        <path
-          ref={controlPathRef}
-          id="control-path"
-          fill="none"
-          stroke="red"
-          strokeWidth="1px"
-        />
-        {Array.from({ length: 7 }).map((_, i) => (
-          <circle
-            key={i}
-            ref={(el) => (controlCirclesRef.current[i] = el)}
-            r="5"
-            fill="blue"
-            stroke="white"
-            strokeWidth="1"
-            onMouseDown={handleMouseDown(i)}
-            style={{ cursor: 'grab', pointerEvents: 'all' }}
+      <div style={{ display: 'flex', width: '100%' }}>
+        <svg
+          ref={svgControlRef}
+          id="svg-control"
+          width="100%"
+          height="200"
+          // viewBox={`0 0 350 200`}
+          // preserveAspectRatio="xMidYMid meet"
+          style={{
+            border: '1px solid #C7C7C7',
+            borderRadius: '10px',
+            overflow: 'visible',
+            position: 'absolute',
+            pointerEvents: 'none',
+          }}
+        >
+          <path
+            ref={controlPathRef}
+            id="control-path"
+            fill="none"
+            stroke="red"
+            strokeWidth="1px"
           />
-        ))}
-      </svg>
+          {text && Array.from({ length: 7 }).map((_, i) => (
+            <circle
+              key={i}
+              ref={(el) => (controlCirclesRef.current[i] = el)}
+              r="5"
+              fill="blue"
+              stroke="white"
+              strokeWidth="1"
+              onMouseDown={handleMouseDown(i)}
+              style={{ cursor: 'grab', pointerEvents: 'all' }}
+            />
+          ))}
+        </svg>
 
-      <svg
-        ref={svgRef}
-        id="svg-element"
-        width="50%"
-        height="200"
-        style={{ border: '1px solid black', overflow: 'visible' }}
-      />
+        <svg
+          ref={svgRef}
+          id="svg-element"
+          width="100%"
+          height="200"
+          // viewBox={`0 0 350 200`}
+          // preserveAspectRatio="xMidYMid meet"
+          style={{
+            border: '1px solid #C7C7C7',
+            borderRadius: '10px', overflow: 'visible'
+          }}
+        />
+
+      </div>
 
       <input
         style={{ color: 'black', border: '1px solid black' }}
         type="text"
         value={text}
-        onChange={e => { setText(e.target.value); handleSubmit(e, e.target.value); }}
+        onChange={e => setText(e.target.value)}
         id="text-input"
         required
       />
