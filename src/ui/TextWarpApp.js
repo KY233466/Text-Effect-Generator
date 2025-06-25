@@ -44,7 +44,7 @@ const TextWarpApp = ({
     className: `tab ${activeTab === "custom" ? "active" : ""}`,
     style: tabStyle("custom"),
     onClick: () => setActiveTab("custom")
-  }, "\u2728 Custom")), activeTab === "text" && /*#__PURE__*/React.createElement(SelectText, {
+  }, "\u2728 Customize")), activeTab === "text" && /*#__PURE__*/React.createElement(SelectText, {
     text: text,
     setText: setText,
     fontUrl: fontUrl,

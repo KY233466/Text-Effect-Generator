@@ -14,339 +14,329 @@ const TextWarpPage = ({
   const [intensity, setIntensity] = useState(50);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
   const [svgPath, setSvgPath] = useState("");
   const [pathBounds, setPathBounds] = useState(null);
+  const [pageIndex, setPageIndex] = useState(0);
 
-  // 计算路径边界
+  const pageSize = 3;
+  const totalPages = Math.ceil(effectsList.length / pageSize);
+  const currentPageEffects = effectsList.slice(
+    pageIndex * pageSize,
+    (pageIndex + 1) * pageSize
+  );
+
   const calculatePathBounds = (commands) => {
     let minX = Infinity,
       minY = Infinity,
       maxX = -Infinity,
       maxY = -Infinity;
-
     commands.forEach((cmd) => {
-      const points = [];
-      if ("x" in cmd && "y" in cmd) points.push({ x: cmd.x, y: cmd.y });
-      if ("x1" in cmd && "y1" in cmd) points.push({ x: cmd.x1, y: cmd.y1 });
-      if ("x2" in cmd && "y2" in cmd) points.push({ x: cmd.x2, y: cmd.y2 });
-
-      points.forEach((p) => {
+      const pts = [];
+      if ("x" in cmd && "y" in cmd) pts.push({ x: cmd.x, y: cmd.y });
+      if ("x1" in cmd && "y1" in cmd) pts.push({ x: cmd.x1, y: cmd.y1 });
+      if ("x2" in cmd && "y2" in cmd) pts.push({ x: cmd.x2, y: cmd.y2 });
+      pts.forEach((p) => {
         minX = Math.min(minX, p.x);
         maxX = Math.max(maxX, p.x);
         minY = Math.min(minY, p.y);
         maxY = Math.max(maxY, p.y);
       });
     });
-
     return {
       minX: minX === Infinity ? 0 : minX,
       minY: minY === Infinity ? 0 : minY,
       maxX: maxX === -Infinity ? 0 : maxX,
       maxY: maxY === -Infinity ? 0 : maxY,
-      width: maxX === -Infinity || minX === Infinity ? 0 : maxX - minX,
-      height: maxY === -Infinity || minY === Infinity ? 0 : maxY - minY,
+      width: maxX - minX,
+      height: maxY - minY,
     };
   };
 
-  console.log("text is", text);
-
-  // 当参数变化时重新生成路径 - 修改为支持多行
   useEffect(() => {
-    console.log("text is", text);
-
-    if (!text) {
-      setSvgPath("");
-      setError("");
-      return;
-    }
-
-    // 直接使用导入的opentype对象
-    if (!opentype) {
-      setError("OpenType.js 未加载完成，请刷新页面重试");
-      return;
-    }
-
+    if (!text || !opentype) return;
     opentype.load(fontUrl, (err, font) => {
       if (err || !font) {
-        const errorMessage = `字体加载失败: ${fontUrl}. 请确保字体文件存在于 'src/ui/fonts' 目录下。`;
-        console.error(errorMessage, err);
-        setError(errorMessage);
-        setSvgPath("");
+        setError("字体加载失败");
         return;
       }
+      const fontSize = 120;
+      const scale = fontSize / font.unitsPerEm;
+      const baselineY = fontSize * 0.8;
+      const actualLineHeight = fontSize * lineHeight;
 
-      setError("");
+      const lines = text.split("\n").filter((line) => line.trim());
+      let allCommands = [],
+        maxLineWidth = 0;
 
-      try {
-        // 处理多行文本
-        const lines = text.split("\n").filter((line) => line.trim()); // 过滤空行
-        if (lines.length === 0) {
-          setSvgPath("");
-          return;
-        }
-
-        const fontSize = 120;
-        const scale = fontSize / font.unitsPerEm;
-        const baselineY = fontSize * 0.8;
-        const actualLineHeight = fontSize * lineHeight;
-
-        let allCommands = [];
-        let maxLineWidth = 0;
-
-        // 预先计算所有行的宽度，用于整体居中
-        const lineInfos = lines.map((line, lineIndex) => {
-          const glyphs = font.stringToGlyphs(line);
-          const glyphWidths = glyphs.map((g) => g.advanceWidth * scale);
-          // 计算行宽度时包含字符间距
-          const lineWidth =
-            glyphWidths.reduce((a, b) => a + b, 0) +
-            (glyphs.length - 1) * letterSpacing;
-          maxLineWidth = Math.max(maxLineWidth, lineWidth);
-
-          return {
-            line,
-            glyphs,
-            glyphWidths,
-            lineWidth,
-            y: baselineY + lineIndex * actualLineHeight,
-          };
-        });
-
-        // 获取变形函数
-        const warpFn = getWarpFunction(warpType);
-        if (!warpFn) {
-          setError(`未知的变形类型: ${warpType}`);
-          return;
-        }
-
-        // 计算整体文本的度量信息 - 关键改进！
-        const totalHeight = (lines.length - 1) * actualLineHeight + fontSize;
-        const overallTopY = baselineY - fontSize * 0.7; // 第一行顶部
-        const overallBottomY =
-          baselineY + (lines.length - 1) * actualLineHeight + fontSize * 0.2; // 最后一行底部
-        const overallCenterY = (overallTopY + overallBottomY) / 2; // 整体垂直中心
-
-        // 统一的文本度量信息 - 所有字符都使用这个
-        const unifiedTextMetrics = {
-          baseline: overallCenterY, // 使用整体的垂直中心作为基线
-          ascender: overallTopY,
-          descender: overallBottomY,
-          yMax: overallTopY,
-          yMin: overallBottomY,
+      const lineInfos = lines.map((line, i) => {
+        const glyphs = font.stringToGlyphs(line);
+        const widths = glyphs.map((g) => g.advanceWidth * scale);
+        const lineWidth =
+          widths.reduce((a, b) => a + b, 0) +
+          (glyphs.length - 1) * letterSpacing;
+        maxLineWidth = Math.max(maxLineWidth, lineWidth);
+        return {
+          glyphs,
+          widths,
+          lineWidth,
+          y: baselineY + i * actualLineHeight,
         };
+      });
 
-        // 整体变形参数
-        const totalWidth = maxLineWidth;
-        const centerX = maxLineWidth / 2;
-        const arcHeight = intensity;
+      const warpFn = getWarpFunction(warpType);
+      const totalHeight = (lines.length - 1) * actualLineHeight + fontSize;
+      const centerY = baselineY + ((lines.length - 1) * actualLineHeight) / 2;
+      const centerX = maxLineWidth / 2;
 
-        // 处理每一行
-        lineInfos.forEach((lineInfo, lineIndex) => {
-          const { glyphs, lineWidth, y } = lineInfo;
+      const textMetrics = {
+        baseline: centerY,
+        ascender: centerY - totalHeight / 2,
+        descender: centerY + totalHeight / 2,
+      };
 
-          // 水平居中对齐
-          let x = (maxLineWidth - lineWidth) / 2;
-
-          // 处理当前行的每个字符 - 全部使用统一的文本度量！
-          glyphs.forEach((g) => {
-            const path = g.getPath(x, y, fontSize);
-            path.commands.forEach((cmd) => {
-              const warped = { ...cmd };
-              if ("x" in warped && "y" in warped) {
-                const { x: newX, y: newY } = warpFn(
-                  warped.x,
-                  warped.y,
-                  totalWidth,
+      lineInfos.forEach(({ glyphs, lineWidth, y }) => {
+        let x = (maxLineWidth - lineWidth) / 2;
+        glyphs.forEach((g) => {
+          const path = g.getPath(x, y, fontSize);
+          path.commands.forEach((cmd) => {
+            const copy = { ...cmd };
+            ["", "1", "2"].forEach((suffix) => {
+              const xKey = "x" + suffix;
+              const yKey = "y" + suffix;
+              if (xKey in copy && yKey in copy) {
+                const warped = warpFn(
+                  copy[xKey],
+                  copy[yKey],
+                  maxLineWidth,
                   centerX,
-                  arcHeight,
-                  unifiedTextMetrics
+                  intensity,
+                  textMetrics
                 );
-                warped.x = newX;
-                warped.y = newY;
+                copy[xKey] = warped.x;
+                copy[yKey] = warped.y;
               }
-              if ("x1" in warped && "y1" in warped) {
-                const { x: newX1, y: newY1 } = warpFn(
-                  warped.x1,
-                  warped.y1,
-                  totalWidth,
-                  centerX,
-                  arcHeight,
-                  unifiedTextMetrics
-                );
-                warped.x1 = newX1;
-                warped.y1 = newY1;
-              }
-              if ("x2" in warped && "y2" in warped) {
-                const { x: newX2, y: newY2 } = warpFn(
-                  warped.x2,
-                  warped.y2,
-                  totalWidth,
-                  centerX,
-                  arcHeight,
-                  unifiedTextMetrics
-                );
-                warped.x2 = newX2;
-                warped.y2 = newY2;
-              }
-              allCommands.push(warped);
             });
-            // 应用字符间距到x坐标
-            x += g.advanceWidth * scale + letterSpacing;
+            allCommands.push(copy);
           });
+          x += g.advanceWidth * scale + letterSpacing;
         });
+      });
 
-        const d = allCommands
-          .map((c) => {
-            if (c.type === "M") return `M ${c.x} ${c.y}`;
-            if (c.type === "L") return `L ${c.x} ${c.y}`;
-            if (c.type === "C")
-              return `C ${c.x1} ${c.y1}, ${c.x2} ${c.y2}, ${c.x} ${c.y}`;
-            if (c.type === "Q") return `Q ${c.x1} ${c.y1}, ${c.x} ${c.y}`;
-            if (c.type === "Z") return "Z";
-            return "";
-          })
-          .join(" ");
+      const d = allCommands
+        .map((c) => {
+          if (c.type === "M") return `M ${c.x} ${c.y}`;
+          if (c.type === "L") return `L ${c.x} ${c.y}`;
+          if (c.type === "C")
+            return `C ${c.x1} ${c.y1}, ${c.x2} ${c.y2}, ${c.x} ${c.y}`;
+          if (c.type === "Q") return `Q ${c.x1} ${c.y1}, ${c.x} ${c.y}`;
+          if (c.type === "Z") return "Z";
+          return "";
+        })
+        .join(" ");
 
-        // 计算并保存路径边界信息
-        const bounds = calculatePathBounds(allCommands);
-        setPathBounds(bounds);
-        setSvgPath(d);
-      } catch (error) {
-        console.error("生成多行文本变形时出错:", error);
-        setError("生成文本变形时出现错误，请检查输入内容");
-      }
+      setSvgPath(d);
+      setPathBounds(calculatePathBounds(allCommands));
     });
-  }, [text, warpType, fontUrl, intensity, lineHeight, letterSpacing]); // 添加lineHeight和letterSpacing依赖
+  }, [
+    text,
+    fontUrl,
+    warpType,
+    intensity,
+    lineHeight,
+    letterSpacing,
+    alignment,
+  ]);
 
   const handleInsert = async () => {
-    console.log("准备插入SVG路径:", svgPath.substring(0, 100));
-    console.log("路径边界信息:", pathBounds);
-
-    if (!svgPath || !sandboxProxy) {
-      console.error("SVG路径或沙盒代理不可用");
-      return;
-    }
-
+    if (!svgPath || !sandboxProxy) return;
     setIsLoading(true);
     try {
-      // 传递更多信息到sandbox，包括边界信息
       const result = await sandboxProxy.insertWarpedSVG({
         d: svgPath,
         bounds: pathBounds,
         originalText: text,
-        warpType: warpType,
-        intensity: intensity,
+        warpType,
+        intensity,
       });
-      if (result.success) {
-        console.log("SVG 路径插入成功");
-      } else {
-        console.error("沙盒端插入失败:", result.error);
-        setError(`插入失败: ${result.error}`);
-      }
+      if (!result.success) throw new Error(result.error);
     } catch (e) {
-      console.error("调用沙盒API失败:", e);
-      setError(`插入异常: ${e.message}`);
+      setError(e.message);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // 添加测试函数
-  const handleTestRectangle = async () => {
-    if (!sandboxProxy) {
-      console.error("沙盒代理不可用");
-      return;
-    }
-
-    try {
-      const result = await sandboxProxy.createRectangle();
-      if (result.success) {
-        console.log("测试矩形创建成功");
-      } else {
-        console.error("测试矩形创建失败:", result.error);
-        setError(`测试失败: ${result.error}`);
-      }
-    } catch (e) {
-      console.error("测试API调用失败:", e);
-      setError(`测试异常: ${e.message}`);
-    }
-  };
-
   return (
-    <div className="text-warp-page">
-      <div className="preview-container">
-        <label>Preview</label>
-        <div className="svg-preview">
-          {error ? (
-            <div className="error-message">{error}</div>
-          ) : (
-            <svg
-              viewBox={
-                pathBounds
-                  ? `${pathBounds.minX - 20} ${pathBounds.minY - 20} ${
-                      pathBounds.width + 40
-                    } ${pathBounds.height + 40}`
-                  : "0 0 1000 300"
-              }
-              width="100%"
-              height="200"
+    <div
+      style={{
+        backgroundColor: "#FFFFFF",
+      }}
+    >
+      <label style={{ fontWeight: "bold", marginBottom: "8px" }}>Preview</label>
+      <div
+        style={{
+          width: "100%",
+          height: "240px",
+          border: "1px solid #1178FF",
+          borderRadius: "10px",
+          marginBottom: "32px",
+        }}
+      >
+        <svg
+          viewBox={
+            pathBounds
+              ? `${pathBounds.minX - 20} ${pathBounds.minY - 20} ${
+                  pathBounds.width + 40
+                } ${pathBounds.height + 40}`
+              : "0 0 1000 300"
+          }
+          width="100%"
+          height="100%"
+        >
+          <path d={svgPath} fill="#06001A" stroke="none" />
+        </svg>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+        }}
+      >
+        <label
+          style={{ fontWeight: "bold", display: "block", marginBottom: "8px" }}
+        >
+          Shape
+        </label>
+        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "8px",
+            }}
+          >
+            <div
               style={{
-                border: "1px solid #eee",
-                minHeight: "200px",
-                maxHeight: "500px",
+                display: "flex",
+                alignItems: "center",
+                gap: "1px",
+                padding: "2px",
+                backgroundColor: "#F0F0F0",
+                borderRadius: "20px",
               }}
             >
-              <path d={svgPath} fill="hotpink" stroke="none" />
-            </svg>
-          )}
+              <button
+                onClick={() => setPageIndex((p) => Math.max(p - 1, 0))}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                &lt;
+              </button>
+              <span style={{ fontSize: 10 }}>{pageIndex + 1}</span>
+              <button
+                onClick={() =>
+                  setPageIndex((p) => Math.min(p + 1, totalPages - 1))
+                }
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                &gt;
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "8px",
+        }}
+      >
+        <div style={{ display: "flex", gap: "12px" }}>
+          {currentPageEffects.map((effect) => (
+            <button
+              key={effect.key}
+              onClick={() => setWarpType(effect.key)}
+              style={{
+                width: "85px",
+                height: "86px",
+                border:
+                  warpType === effect.key
+                    ? "2px solid #1178FF"
+                    : "1px solid #ccc",
+                borderRadius: "8px",
+                backgroundColor: warpType === effect.key ? "#EBF3FE" : "#fff",
+                fontSize: "12px",
+              }}
+            >
+              {effect.label}
+            </button>
+          ))}
         </div>
       </div>
 
-      <div className="control-group">
-        <label>变形类型：</label>
-        <select
-          value={warpType}
-          onChange={(e) => setWarpType(e.target.value)}
-          className="warp-select"
-        >
-          {effectsList.map((effect) => (
-            <option key={effect.key} value={effect.key}>
-              {effect.label}
-            </option>
-          ))}
-        </select>
+      <label
+        style={{ fontWeight: "bold", display: "block", marginBottom: "8px" }}
+      >
+        Type
+      </label>
+      <div style={{ display: "flex", gap: "12px", marginBottom: "20px" }}>
+        <button style={{ width: "85px", height: "86px" }}>A</button>
+        <button style={{ width: "85px", height: "86px" }}>B</button>
+        <button style={{ width: "85px", height: "86px" }}>C</button>
       </div>
 
-      <div className="control-group">
-        <label>变形强度：{intensity}</label>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          padding: "8px 12px",
+          backgroundColor: "#EBF3FE",
+          borderRadius: "12px",
+          marginBottom: "32px",
+        }}
+      >
+        <span style={{ fontSize: "14px", color: "#06001A" }}>
+          Bend {intensity}
+        </span>
         <input
           type="range"
           min="0"
           max="100"
           value={intensity}
           onChange={(e) => setIntensity(Number(e.target.value))}
-          className="intensity-slider"
+          style={{ flexGrow: 1 }}
         />
-        <div className="intensity-hint">0 (无变形) — 100 (最大变形)</div>
       </div>
 
-      <div className="button-group">
-        <button
-          onClick={handleInsert}
-          disabled={isLoading || !svgPath}
-          className="insert-button primary"
-        >
-          {isLoading ? "插入中..." : "插入变形文本"}
-        </button>
-
-        <button
-          onClick={handleTestRectangle}
-          className="insert-button secondary"
-        >
-          测试API
-        </button>
-      </div>
+      <button
+        onClick={handleInsert}
+        disabled={isLoading || !svgPath}
+        style={{
+          width: "100%",
+          padding: "10px 0",
+          fontSize: "14px",
+          backgroundColor: "#1178FF",
+          color: "#fff",
+          border: "none",
+          borderRadius: "8px",
+          cursor: "pointer",
+        }}
+      >
+        {isLoading ? "插入中..." : "Add to design"}
+      </button>
     </div>
   );
 };

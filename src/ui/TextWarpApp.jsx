@@ -47,7 +47,7 @@ const TextWarpApp = ({ sandboxProxy }) => {
           style={tabStyle("custom")}
           onClick={() => setActiveTab("custom")}
         >
-          ✨ Custom
+          ✨ Customize
         </button>
       </div>
 
