@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { effectsList, getWarpFunction } from '../shapes/index.js';
-import opentype from 'opentype.js';
+import React, { useEffect, useState } from "react";
+import { effectsList, getWarpFunction } from "../shapes/index.js";
+import opentype from "opentype.js";
 const TextWarpPage = ({
   sandboxProxy,
   text,
@@ -24,15 +24,15 @@ const TextWarpPage = ({
       maxY = -Infinity;
     commands.forEach(cmd => {
       const points = [];
-      if ('x' in cmd && 'y' in cmd) points.push({
+      if ("x" in cmd && "y" in cmd) points.push({
         x: cmd.x,
         y: cmd.y
       });
-      if ('x1' in cmd && 'y1' in cmd) points.push({
+      if ("x1" in cmd && "y1" in cmd) points.push({
         x: cmd.x1,
         y: cmd.y1
       });
-      if ('x2' in cmd && 'y2' in cmd) points.push({
+      if ("x2" in cmd && "y2" in cmd) points.push({
         x: cmd.x2,
         y: cmd.y2
       });
@@ -79,7 +79,7 @@ const TextWarpPage = ({
       setError("");
       try {
         // 处理多行文本
-        const lines = text.split('\n').filter(line => line.trim()); // 过滤空行
+        const lines = text.split("\n").filter(line => line.trim()); // 过滤空行
         if (lines.length === 0) {
           setSvgPath("");
           return;
@@ -153,7 +153,7 @@ const TextWarpPage = ({
               const warped = {
                 ...cmd
               };
-              if ('x' in warped && 'y' in warped) {
+              if ("x" in warped && "y" in warped) {
                 const {
                   x: newX,
                   y: newY
@@ -161,7 +161,7 @@ const TextWarpPage = ({
                 warped.x = newX;
                 warped.y = newY;
               }
-              if ('x1' in warped && 'y1' in warped) {
+              if ("x1" in warped && "y1" in warped) {
                 const {
                   x: newX1,
                   y: newY1
@@ -169,7 +169,7 @@ const TextWarpPage = ({
                 warped.x1 = newX1;
                 warped.y1 = newY1;
               }
-              if ('x2' in warped && 'y2' in warped) {
+              if ("x2" in warped && "y2" in warped) {
                 const {
                   x: newX2,
                   y: newY2
@@ -184,21 +184,21 @@ const TextWarpPage = ({
           });
         });
         const d = allCommands.map(c => {
-          if (c.type === 'M') return `M ${c.x} ${c.y}`;
-          if (c.type === 'L') return `L ${c.x} ${c.y}`;
-          if (c.type === 'C') return `C ${c.x1} ${c.y1}, ${c.x2} ${c.y2}, ${c.x} ${c.y}`;
-          if (c.type === 'Q') return `Q ${c.x1} ${c.y1}, ${c.x} ${c.y}`;
-          if (c.type === 'Z') return 'Z';
-          return '';
-        }).join(' ');
+          if (c.type === "M") return `M ${c.x} ${c.y}`;
+          if (c.type === "L") return `L ${c.x} ${c.y}`;
+          if (c.type === "C") return `C ${c.x1} ${c.y1}, ${c.x2} ${c.y2}, ${c.x} ${c.y}`;
+          if (c.type === "Q") return `Q ${c.x1} ${c.y1}, ${c.x} ${c.y}`;
+          if (c.type === "Z") return "Z";
+          return "";
+        }).join(" ");
 
         // 计算并保存路径边界信息
         const bounds = calculatePathBounds(allCommands);
         setPathBounds(bounds);
         setSvgPath(d);
       } catch (error) {
-        console.error('生成多行文本变形时出错:', error);
-        setError('生成文本变形时出现错误，请检查输入内容');
+        console.error("生成多行文本变形时出错:", error);
+        setError("生成文本变形时出现错误，请检查输入内容");
       }
     });
   }, [text, warpType, fontUrl, intensity, lineHeight, letterSpacing]); // 添加lineHeight和letterSpacing依赖
@@ -207,7 +207,7 @@ const TextWarpPage = ({
     console.log("准备插入SVG路径:", svgPath.substring(0, 100));
     console.log("路径边界信息:", pathBounds);
     if (!svgPath || !sandboxProxy) {
-      console.error('SVG路径或沙盒代理不可用');
+      console.error("SVG路径或沙盒代理不可用");
       return;
     }
     setIsLoading(true);
@@ -221,13 +221,13 @@ const TextWarpPage = ({
         intensity: intensity
       });
       if (result.success) {
-        console.log('SVG 路径插入成功');
+        console.log("SVG 路径插入成功");
       } else {
-        console.error('沙盒端插入失败:', result.error);
+        console.error("沙盒端插入失败:", result.error);
         setError(`插入失败: ${result.error}`);
       }
     } catch (e) {
-      console.error('调用沙盒API失败:', e);
+      console.error("调用沙盒API失败:", e);
       setError(`插入异常: ${e.message}`);
     } finally {
       setIsLoading(false);
@@ -237,19 +237,19 @@ const TextWarpPage = ({
   // 添加测试函数
   const handleTestRectangle = async () => {
     if (!sandboxProxy) {
-      console.error('沙盒代理不可用');
+      console.error("沙盒代理不可用");
       return;
     }
     try {
       const result = await sandboxProxy.createRectangle();
       if (result.success) {
-        console.log('测试矩形创建成功');
+        console.log("测试矩形创建成功");
       } else {
-        console.error('测试矩形创建失败:', result.error);
+        console.error("测试矩形创建失败:", result.error);
         setError(`测试失败: ${result.error}`);
       }
     } catch (e) {
-      console.error('测试API调用失败:', e);
+      console.error("测试API调用失败:", e);
       setError(`测试异常: ${e.message}`);
     }
   };
@@ -257,18 +257,18 @@ const TextWarpPage = ({
     className: "text-warp-page"
   }, /*#__PURE__*/React.createElement("div", {
     className: "preview-container"
-  }, /*#__PURE__*/React.createElement("h3", null, "\u9884\u89C8\u6548\u679C"), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("label", null, "Preview"), /*#__PURE__*/React.createElement("div", {
     className: "svg-preview"
   }, error ? /*#__PURE__*/React.createElement("div", {
     className: "error-message"
   }, error) : /*#__PURE__*/React.createElement("svg", {
-    viewBox: pathBounds ? `${pathBounds.minX - 20} ${pathBounds.minY - 20} ${pathBounds.width + 40} ${pathBounds.height + 40}` : '0 0 1000 300',
+    viewBox: pathBounds ? `${pathBounds.minX - 20} ${pathBounds.minY - 20} ${pathBounds.width + 40} ${pathBounds.height + 40}` : "0 0 1000 300",
     width: "100%",
     height: "200",
     style: {
-      border: '1px solid #eee',
-      minHeight: '200px',
-      maxHeight: '500px'
+      border: "1px solid #eee",
+      minHeight: "200px",
+      maxHeight: "500px"
     }
   }, /*#__PURE__*/React.createElement("path", {
     d: svgPath,
@@ -300,7 +300,7 @@ const TextWarpPage = ({
     onClick: handleInsert,
     disabled: isLoading || !svgPath,
     className: "insert-button primary"
-  }, isLoading ? '插入中...' : '插入变形文本'), /*#__PURE__*/React.createElement("button", {
+  }, isLoading ? "插入中..." : "插入变形文本"), /*#__PURE__*/React.createElement("button", {
     onClick: handleTestRectangle,
     className: "insert-button secondary"
   }, "\u6D4B\u8BD5API")));
