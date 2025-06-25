@@ -106,7 +106,16 @@ export default function SelectText({ sandboxProxy,
 
         lineInfos.forEach((lineInfo, lineIndex) => {
           const { glyphs, lineWidth, y } = lineInfo;
-          let x = (maxLineWidth - lineWidth) / 2;
+          let x;
+          
+          // 根据对齐方式计算起始x位置
+          if (alignment === 'left') {
+            x = 0;
+          } else if (alignment === 'right') {
+            x = maxLineWidth - lineWidth;
+          } else {
+            x = (maxLineWidth - lineWidth) / 2;
+          }
 
           glyphs.forEach((g) => {
             const path = g.getPath(x, y, fontSize);
@@ -133,7 +142,7 @@ export default function SelectText({ sandboxProxy,
         setError('生成文本路径时出现错误，请检查输入内容');
       }
     });
-  }, [text, fontUrl, lineHeight, letterSpacing]);
+  }, [text, fontUrl, lineHeight, letterSpacing, alignment]);
 
   const handleInsert = async () => {
     if (!svgPath || !sandboxProxy) {
