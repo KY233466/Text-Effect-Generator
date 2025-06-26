@@ -80,7 +80,7 @@ const CustomTextPage = ({
       width: '85px',
       height: '85px',
       borderRadius: '10px',
-      border: '1px solid black',
+      border: '1px solid #CBE2FF',
       cursor: ''
     },
     onClick: () => setSelected(s)

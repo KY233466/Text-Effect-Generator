@@ -187,20 +187,6 @@ const TextWarpPage = ({
   };
 
   return (
-<<<<<<< HEAD
-    <div style={{ backgroundColor: "#FFFFFF" }}>
-      <label
-        style={{
-          fontWeight: "bold",
-          display: "block",
-          paddingTop: "18px",
-          marginBottom: "10px",
-          display: "block",
-        }}
-      >
-        Preview
-      </label>
-=======
     <div style={{ 
       backgroundColor: "#FFFFFF", 
       marginTop: "24px",
@@ -215,7 +201,6 @@ const TextWarpPage = ({
         fontWeight: "600",
         marginBottom: "8px" 
       }}>Preview</label>
->>>>>>> 9253c22 (improve UI page one)
       <div
         style={{
           width: "280px",
@@ -363,13 +348,6 @@ const TextWarpPage = ({
       </div>
 
       <label
-<<<<<<< HEAD
-        style={{
-          fontWeight: "bold",
-          display: "block",
-          marginBottom: "8px",
-          marginTop: "18px",
-=======
         style={{ 
           color: "#06001A",
           fontSize: "14px",
@@ -377,7 +355,6 @@ const TextWarpPage = ({
           fontWeight: "600",
           display: "block", 
           marginBottom: "8px" 
->>>>>>> 9253c22 (improve UI page one)
         }}
       >
         Type

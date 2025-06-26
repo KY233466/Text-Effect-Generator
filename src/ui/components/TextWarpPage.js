@@ -315,8 +315,7 @@ const TextWarpPage = ({
       fontFamily: "Avenir Next",
       fontWeight: "600",
       display: "block",
-      marginBottom: "8px",
-      marginTop: "18px"
+      marginBottom: "8px"
     }
   }, "Type"), /*#__PURE__*/React.createElement("div", {
     style: {
