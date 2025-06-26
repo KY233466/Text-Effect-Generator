@@ -112,10 +112,15 @@ const TextWarpPage = ({
       const totalHeight = (lines.length - 1) * actualLineHeight + fontSize;
       const centerY = baselineY + (lines.length - 1) * actualLineHeight / 2;
       const centerX = maxLineWidth / 2;
+      const overallTopY = baselineY - fontSize * 0.7; // 第一行顶部
+      const overallBottomY = baselineY + (lines.length - 1) * actualLineHeight + fontSize * 0.2; // 最后一行底部
+
       const textMetrics = {
         baseline: centerY,
         ascender: centerY - totalHeight / 2,
-        descender: centerY + totalHeight / 2
+        descender: centerY + totalHeight / 2,
+        yMax: overallTopY,
+        yMin: overallBottomY
       };
       lineInfos.forEach(({
         glyphs,
