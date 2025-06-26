@@ -4,13 +4,13 @@ export function bulgeUpWarp(x, y, totalWidth, centerX, intensity, textMetrics) {
   const scaleY = 1 + strength * (1 - normX * normX);
   const baseline = textMetrics.yMin;
 
-  if (y >= baseline * 0.85) return { x, y }; 
+  if (y >= baseline * 0.85) return { x, y };
 
   return { x, y: baseline + (y - baseline) * scaleY };
 }
 
 export const bulgeUpConfig = {
-  label: "上膨胀形",
+  label: "arc",
   description: "文字中部向上膨胀",
   defaultIntensity: 50,
   intensityRange: { min: 0, max: 100 },

@@ -24,7 +24,7 @@ export function slantDownLeftWarp(
 }
 
 export const slantDownLeftConfig = {
-  label: "向左斜切（底部对齐）",
+  label: "curtain",
   description: "文字底部向左渐窄倾斜",
   defaultIntensity: 50,
   intensityRange: { min: 0, max: 100 },

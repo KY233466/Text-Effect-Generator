@@ -16,7 +16,7 @@ export function arcLowerWarp(
 }
 
 export const arcLowerConfig = {
-  label: "Arc Lower",
+  label: "bridge2",
   description: "Bend text downward into an arc",
   defaultIntensity: 50,
   intensityRange: { min: 0, max: 100 },

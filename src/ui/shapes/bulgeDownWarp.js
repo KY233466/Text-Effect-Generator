@@ -20,7 +20,7 @@ export function bulgeDownWarp(
 }
 
 export const bulgeDownConfig = {
-  label: "下膨胀形",
+  label: "arc3",
   description: "文字底部向外膨胀",
   defaultIntensity: 50,
   intensityRange: { min: 0, max: 100 },

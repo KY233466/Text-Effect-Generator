@@ -10,7 +10,7 @@ export function bouquetWarp(x, y, totalWidth, centerX, intensity, textMetrics) {
 }
 
 export const bouquetConfig = {
-  label: "花束型",
+  label: "bouquet",
   description: "从中间向外左右自然展开，如花束扇形",
   defaultIntensity: 60,
   intensityRange: { min: 0, max: 100 },

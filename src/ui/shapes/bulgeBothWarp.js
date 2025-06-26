@@ -29,7 +29,7 @@ export function bulgeBothWarp(
 }
 
 export const bulgeBothConfig = {
-  label: "BulgeBoth",
+  label: "arc2",
   description: "Bulge up and down",
   defaultIntensity: 50,
   intensityRange: { min: 0, max: 100 },

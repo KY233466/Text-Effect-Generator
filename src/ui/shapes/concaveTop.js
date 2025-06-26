@@ -17,7 +17,7 @@ export function concaveTopWarp(
   const normY = (baseline - y) / (baseline - top); // y 越靠近 top，值越大
   const verticalFactor = normY;
 
-  const offsetY = (intensity / 50) * 50 *horizontalFactor * verticalFactor; // 自适应强度
+  const offsetY = (intensity / 50) * 50 * horizontalFactor * verticalFactor; // 自适应强度
 
   return {
     x,
@@ -26,7 +26,7 @@ export function concaveTopWarp(
 }
 
 export const concaveTopConfig = {
-  label: "上凹形（底部对齐）",
+  label: "pit",
   description: "文字顶部中间凹陷",
   defaultIntensity: 50,
   intensityRange: { min: 0, max: 100 },

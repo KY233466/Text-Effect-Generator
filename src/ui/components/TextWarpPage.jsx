@@ -25,6 +25,24 @@ const TextWarpPage = ({
     (pageIndex + 1) * pageSize
   );
 
+  const shapeToTypesMap = {
+    bulgeUp: ["bulgeUp", "bulgeBoth", "bulgeDown"],
+    bulgeDown: ["bulgeUp", "bulgeBoth", "bulgeDown"],
+    bulgeBoth: ["bulgeUp", "bulgeBoth", "bulgeDown"],
+    wave: ["wave"],
+    flag: ["flag"],
+    arcUpper: ["arcUpper", "arcLower"],
+    arcLower: ["arcUpper", "arcLower"],
+    concaveTop: ["concaveTop", "concaveBottom"],
+    concaveBottom: ["concaveTop", "concaveBottom"],
+    triangleUpper: ["triangleUpper", "triangleLower"],
+    triangleLower: ["triangleUpper", "triangleLower"],
+    slantDownRight: ["slantDownRight", "slantDownLeft"],
+    slantDownLeft: ["slantDownRight", "slantDownLeft"],
+  };
+
+  const relatedTypes = shapeToTypesMap[warpType] || [warpType];
+
   const calculatePathBounds = (commands) => {
     let minX = Infinity,
       minY = Infinity,
@@ -278,9 +296,25 @@ const TextWarpPage = ({
                 borderRadius: "8px",
                 backgroundColor: warpType === effect.key ? "#EBF3FE" : "#fff",
                 fontSize: "12px",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                padding: "8px",
               }}
             >
-              {effect.label}
+              <div
+                style={{
+                  flexGrow: 1,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <img src={`./icon/${effect.label}.png`} alt={effect.label} />
+              </div>
+              <div style={{ textAlign: "center", marginTop: "2px" }}>
+                {effect.label}
+              </div>
             </button>
           ))}
         </div>
@@ -292,9 +326,47 @@ const TextWarpPage = ({
         Type
       </label>
       <div style={{ display: "flex", gap: "12px", marginBottom: "20px" }}>
-        <button style={{ width: "85px", height: "86px" }}>A</button>
-        <button style={{ width: "85px", height: "86px" }}>B</button>
-        <button style={{ width: "85px", height: "86px" }}>C</button>
+        {relatedTypes.map((typeKey) => {
+          const type = effectsList.find((e) => e.key === typeKey);
+          return (
+            <button
+              key={typeKey}
+              onClick={() => setWarpType(typeKey)}
+              style={{
+                width: "85px",
+                height: "86px",
+                border:
+                  warpType === typeKey ? "2px solid #1178FF" : "1px solid #ccc",
+                borderRadius: "8px",
+                backgroundColor: warpType === typeKey ? "#EBF3FE" : "#fff",
+                fontSize: "12px",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+                padding: "8px",
+              }}
+            >
+              <div
+                style={{
+                  flexGrow: 1,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <img
+                  src={`./icon/${typeKey}.png`}
+                  alt={type?.label || typeKey}
+                  style={{ width: "32px", height: "32px" }}
+                />
+              </div>
+              <div style={{ textAlign: "center", marginTop: "2px" }}>
+                {type?.label || typeKey}
+              </div>
+            </button>
+          );
+        })}
       </div>
 
       <div

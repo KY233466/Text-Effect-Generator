@@ -18,19 +18,19 @@ export function concaveBottomWarp(
   const verticalFactor = Math.max(0, Math.min(1, normY));
 
   const offsetY = (intensity / 50) * 50 * horizontalFactor * verticalFactor;
-  
+
   if (y <= baseline * 0.85) {
     return { x, y }; // baseline 以上不变
   } else {
     return {
       x,
-      y: y-offsetY, // baseline 以下缩放
+      y: y - offsetY, // baseline 以下缩放
     };
   }
 }
 
 export const concaveBottomConfig = {
-  label: "下凹形（顶部对齐）",
+  label: "pit2",
   description: "文字底部向内凹陷（反向膨胀）",
   defaultIntensity: 50,
   intensityRange: { min: 0, max: 100 },
