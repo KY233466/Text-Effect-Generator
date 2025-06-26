@@ -258,7 +258,7 @@ export default function Smudge({
     };
 
     return (
-        <div>
+        <div styles={{ marginBottom: '20px' }}>
             <div>Preview</div>
             <svg
                 ref={svgRef}

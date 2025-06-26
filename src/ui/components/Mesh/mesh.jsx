@@ -3,6 +3,29 @@ import opentype from 'opentype.js';
 
 const Warp = window.Warp;
 
+const styles = {
+  svgControl: {
+    border: '1px solid #CBE2FF',
+    borderRadius: '10px',
+    overflow: 'visible',
+    position: 'absolute',
+    pointerEvents: 'none',
+  },
+  svg: {
+    border: '1px solid #CBE2FF',
+    borderRadius: '10px',
+    overflow: 'visible'
+  },
+  label: {
+    color: "#06001A",
+    fontSize: "14px",
+    fontFamily: "Avenir Next",
+    fontWeight: "600",
+    marginBottom: "8px",
+    display: "block"
+  },
+};
+
 export default function Mesh({
   setPathBounds,
   text,
@@ -257,24 +280,19 @@ export default function Mesh({
         width: '100%',
         position: 'relative',
         overflow: 'hidden',
+        marginBottom: '20px'
       }}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
     >
-      <div>Preview</div>
+      <label style={styles.label}>Preview</label>
       <div style={{ display: 'flex', width: '100%' }}>
         <svg
           ref={svgControlRef}
           id="svg-control"
           width="100%"
           height="200"
-          style={{
-            border: '1px solid #C7C7C7',
-            borderRadius: '10px',
-            overflow: 'visible',
-            position: 'absolute',
-            pointerEvents: 'none',
-          }}
+          style={styles.svgControl}
         >
           <path
             ref={controlPathRef}
@@ -302,10 +320,7 @@ export default function Mesh({
           id="svg-element"
           width="100%"
           height="200"
-          style={{
-            border: '1px solid #C7C7C7',
-            borderRadius: '10px', overflow: 'visible'
-          }}
+          style={styles.svg}
         />
       </div>
     </div>

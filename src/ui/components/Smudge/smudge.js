@@ -229,7 +229,11 @@ export default function Smudge({
       warpRef.current.transform(smudgeFactory(start.x, start.y, end.x, end.y, SMUDGE_RADIUS, SMUDGE_STRENGTH));
     });
   };
-  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", null, "Preview"), /*#__PURE__*/React.createElement("svg", {
+  return /*#__PURE__*/React.createElement("div", {
+    styles: {
+      marginBottom: '20px'
+    }
+  }, /*#__PURE__*/React.createElement("div", null, "Preview"), /*#__PURE__*/React.createElement("svg", {
     ref: svgRef,
     width: "100%",
     height: "200",

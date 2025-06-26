@@ -2,12 +2,19 @@ import React, { useState } from 'react';
 import Mesh from "./Mesh/mesh.js";
 import Smudge from "./Smudge/smudge.js";
 
+// import mesh from "../../assets/mesh.png";
+
 // 样式对象
 const styles = {
   container: {
-    width: '280px',
-    marginLeft: '20px',
-    marginRight: '20px'
+    display: 'flex',
+    flexDirection: 'column',
+    width: '100%',
+    height: 'calc(100% - 65px)'
+  },
+  content: {
+    flex: 1,
+    overflowY: 'auto'
   },
   label: {
     color: "#06001A",
@@ -33,21 +40,12 @@ const styles = {
     fontSize: '14px',
     fontFamily: 'Avenir Next',
     fontWeight: '500',
-    color: '#495057',
-    transition: 'all 0.3s ease',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-    ':hover': {
-      backgroundColor: '#007bff',
-      color: 'white',
-      borderColor: '#007bff',
-      transform: 'translateY(-2px)',
-      boxShadow: '0 4px 8px rgba(0,123,255,0.3)'
-    }
+    transition: 'all 0.3s ease'
   },
   shapeButtonSelected: {
-    backgroundColor: '#007bff',
-    color: 'white',
-    borderColor: '#007bff'
+    backgroundColor: '#EBF3FE',
+    color: 'black',
+    borderColor: '#CBE2FF'
   },
   buttonGroup: {
     display: 'flex',
@@ -63,13 +61,24 @@ const styles = {
     fontWeight: '600',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
-    minWidth: '120px',
+    width: '100%',
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
     padding: '12px 24px',
     background: '#1178FF',
     color: 'white'
   },
   insertButtonDisabled: {
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '14px',
+    width: '100%',
+    fontFamily: 'Avenir Next',
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    minWidth: '120px',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    padding: '12px 24px',
     backgroundColor: '#ccc',
     color: '#666',
     cursor: 'not-allowed',
@@ -125,6 +134,8 @@ const CustomTextPage = ({
   };
   return /*#__PURE__*/React.createElement("div", {
     style: styles.container
+  }, /*#__PURE__*/React.createElement("div", {
+    style: styles.content
   }, selected == "mesh" ? /*#__PURE__*/React.createElement(Mesh, {
     setPathBounds: setPathBounds,
     text: text,
@@ -144,7 +155,7 @@ const CustomTextPage = ({
     alignment: alignment
   }), /*#__PURE__*/React.createElement("label", {
     style: styles.label
-  }, "Shape"), /*#__PURE__*/React.createElement("div", {
+  }, "Type"), /*#__PURE__*/React.createElement("div", {
     style: styles.shapeContainer
   }, Shape.map(s => /*#__PURE__*/React.createElement("button", {
     key: s,
@@ -155,33 +166,25 @@ const CustomTextPage = ({
     onClick: () => setSelected(s),
     onMouseEnter: e => {
       if (selected !== s) {
-        e.target.style.backgroundColor = '#007bff';
-        e.target.style.color = 'white';
         e.target.style.borderColor = '#007bff';
-        e.target.style.transform = 'translateY(-2px)';
-        e.target.style.boxShadow = '0 4px 8px rgba(0,123,255,0.3)';
       }
     },
     onMouseLeave: e => {
       if (selected !== s) {
-        e.target.style.backgroundColor = 'white';
-        e.target.style.color = '#495057';
         e.target.style.borderColor = '#CBE2FF';
-        e.target.style.transform = 'translateY(0)';
-        e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
       }
     }
-  }, s))), error && /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("img", {
+    src: `./icon/${s}.svg`,
+    alt: s
+  }), s))), error && /*#__PURE__*/React.createElement("div", {
     style: styles.errorMessage
-  }, error), /*#__PURE__*/React.createElement("div", {
+  }, error)), /*#__PURE__*/React.createElement("div", {
     style: styles.buttonGroup
   }, /*#__PURE__*/React.createElement("button", {
     onClick: handleInsert,
     disabled: isLoading || !svgPath,
-    style: {
-      ...styles.insertButton,
-      ...(isLoading || !svgPath ? styles.insertButtonDisabled : {})
-    },
+    style: isLoading || !svgPath ? styles.insertButtonDisabled : styles.insertButton,
     onMouseEnter: e => {
       if (!isLoading && svgPath) {
         e.target.style.transform = 'translateY(-2px)';
@@ -194,6 +197,6 @@ const CustomTextPage = ({
         e.target.style.boxShadow = '0 4px 15px rgba(17, 120, 255, 0.3)';
       }
     }
-  }, isLoading ? '插入中...' : '插入变形文本')));
+  }, isLoading ? 'Inserting...' : 'Add to Design')));
 };
 export default CustomTextPage;
