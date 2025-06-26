@@ -7,8 +7,8 @@ export function triangleUpperWarp(
   intensity,
   textMetrics
 ) {
-  const fixedLine = textMetrics.yMin; // 底部作为固定线（底部对齐）
-  const variableLine = textMetrics.yMax; // 顶部作为变形边界
+  const fixedLine = textMetrics.descender; // 底部作为固定线（底部对齐）
+  const variableLine = textMetrics.ascender; // 顶部作为变形边界
 
   // 只有在固定线以上的部分才变形
   if (y >= fixedLine) {

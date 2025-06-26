@@ -7,8 +7,8 @@ export function triangleLowerWarp(
   intensity,
   textMetrics
 ) {
-  const fixedLine = textMetrics.yMax; // 顶部作为固定线（顶部对齐）
-  const variableLine = textMetrics.yMin; // 底部作为变形边界
+  const fixedLine = textMetrics.ascender; // 顶部作为固定线（顶部对齐）
+  const variableLine = textMetrics.descender; // 底部作为变形边界
 
   // 只有在固定线以下的部分才变形
   if (y <= fixedLine) {

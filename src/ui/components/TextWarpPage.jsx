@@ -18,30 +18,29 @@ const TextWarpPage = ({
   const [pathBounds, setPathBounds] = useState(null);
   const [pageIndex, setPageIndex] = useState(0);
 
+  const shapeGroups = [
+    { label: "Arc", types: ["bulgeUp", "bulgeDown", "bulgeBoth"] },
+    { label: "Wave", types: ["wave"] },
+    { label: "Flag", types: ["flag"] },
+    { label: "Bridge", types: ["arcLower", "arcUpper"] },
+    { label: "Hill", types: ["triangleUpper", "triangleLower"] },
+    { label: "Pit", types: ["concaveTop", "concaveBottom"] },
+    { label: "Curtain", types: ["slantDownRight", "slantDownLeft"] },
+    { label: "Other", types: ["envelopeWave", "bouquet"] },
+  ];
+
   const pageSize = 3;
-  const totalPages = Math.ceil(effectsList.length / pageSize);
-  const currentPageEffects = effectsList.slice(
+  const totalPages = Math.ceil(shapeGroups.length / pageSize);
+  const currentGroups = shapeGroups.slice(
     pageIndex * pageSize,
     (pageIndex + 1) * pageSize
   );
+  const selectedGroup =
+    shapeGroups.find((group) => group.types.includes(warpType)) ||
+    shapeGroups[0];
+  const relatedTypes = selectedGroup.types;
 
-  const shapeToTypesMap = {
-    bulgeUp: ["bulgeUp", "bulgeBoth", "bulgeDown"],
-    bulgeDown: ["bulgeUp", "bulgeBoth", "bulgeDown"],
-    bulgeBoth: ["bulgeUp", "bulgeBoth", "bulgeDown"],
-    wave: ["wave"],
-    flag: ["flag"],
-    arcUpper: ["arcUpper", "arcLower"],
-    arcLower: ["arcUpper", "arcLower"],
-    concaveTop: ["concaveTop", "concaveBottom"],
-    concaveBottom: ["concaveTop", "concaveBottom"],
-    triangleUpper: ["triangleUpper", "triangleLower"],
-    triangleLower: ["triangleUpper", "triangleLower"],
-    slantDownRight: ["slantDownRight", "slantDownLeft"],
-    slantDownLeft: ["slantDownRight", "slantDownLeft"],
-  };
-
-  const relatedTypes = shapeToTypesMap[warpType] || [warpType];
+  const currentPageEffects = currentGroups;
 
   const calculatePathBounds = (commands) => {
     let minX = Infinity,
@@ -185,11 +184,7 @@ const TextWarpPage = ({
   };
 
   return (
-    <div
-      style={{
-        backgroundColor: "#FFFFFF",
-      }}
-    >
+    <div style={{ backgroundColor: "#FFFFFF" }}>
       <label style={{ fontWeight: "bold", marginBottom: "8px" }}>Preview</label>
       <div
         style={{
@@ -273,6 +268,7 @@ const TextWarpPage = ({
           </div>
         </div>
       </div>
+
       <div
         style={{
           display: "flex",
@@ -282,19 +278,22 @@ const TextWarpPage = ({
         }}
       >
         <div style={{ display: "flex", gap: "12px" }}>
-          {currentPageEffects.map((effect) => (
+          {currentGroups.map((group) => (
             <button
-              key={effect.key}
-              onClick={() => setWarpType(effect.key)}
+              key={group.label}
+              onClick={() => {
+                setWarpType(group.types[0]);
+              }}
               style={{
                 width: "85px",
                 height: "86px",
                 border:
-                  warpType === effect.key
+                  selectedGroup.label === group.label
                     ? "2px solid #1178FF"
                     : "1px solid #ccc",
                 borderRadius: "8px",
-                backgroundColor: warpType === effect.key ? "#EBF3FE" : "#fff",
+                backgroundColor:
+                  selectedGroup.label === group.label ? "#EBF3FE" : "#fff",
                 fontSize: "12px",
                 display: "flex",
                 flexDirection: "column",
@@ -310,10 +309,10 @@ const TextWarpPage = ({
                   justifyContent: "center",
                 }}
               >
-                <img src={`./icon/${effect.label}.png`} alt={effect.label} />
+                <img src={`./icon/${group.types[0]}.png`} alt={group.label} />
               </div>
               <div style={{ textAlign: "center", marginTop: "2px" }}>
-                {effect.label}
+                {group.label}
               </div>
             </button>
           ))}
@@ -358,11 +357,7 @@ const TextWarpPage = ({
                 <img
                   src={`./icon/${typeKey}.png`}
                   alt={type?.label || typeKey}
-                  style={{ width: "32px", height: "32px" }}
                 />
-              </div>
-              <div style={{ textAlign: "center", marginTop: "2px" }}>
-                {type?.label || typeKey}
               </div>
             </button>
           );

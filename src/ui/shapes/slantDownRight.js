@@ -6,7 +6,7 @@ export function slantDownRightWarp(
   intensity,
   textMetrics
 ) {
-  const baseline = 10;
+  const baseline = textMetrics.baseline;
   if (y <= baseline) return { x, y };
 
   const leftX = centerX - totalWidth / 2;
