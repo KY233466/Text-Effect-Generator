@@ -185,7 +185,11 @@ const TextWarpPage = ({
 
   return (
     <div style={{ backgroundColor: "#FFFFFF" }}>
-      <label style={{ fontWeight: "bold", marginBottom: "8px" }}>Preview</label>
+      <label
+        style={{ fontWeight: "bold", marginBottom: "10px", display: "block" }}
+      >
+        Preview
+      </label>
       <div
         style={{
           width: "100%",
@@ -243,10 +247,12 @@ const TextWarpPage = ({
             >
               <button
                 onClick={() => setPageIndex((p) => Math.max(p - 1, 0))}
+                disabled={pageIndex === 0}
                 style={{
                   background: "none",
                   border: "none",
-                  cursor: "pointer",
+                  cursor: pageIndex === 0 ? "not-allowed" : "pointer",
+                  color: pageIndex === 0 ? "#ccc" : "#000",
                 }}
               >
                 &lt;
@@ -256,10 +262,13 @@ const TextWarpPage = ({
                 onClick={() =>
                   setPageIndex((p) => Math.min(p + 1, totalPages - 1))
                 }
+                disabled={pageIndex === totalPages - 1}
                 style={{
                   background: "none",
                   border: "none",
-                  cursor: "pointer",
+                  cursor:
+                    pageIndex === totalPages - 1 ? "not-allowed" : "pointer",
+                  color: pageIndex === totalPages - 1 ? "#ccc" : "#000",
                 }}
               >
                 &gt;

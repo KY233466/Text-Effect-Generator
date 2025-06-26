@@ -180,7 +180,8 @@ const TextWarpPage = ({
   }, /*#__PURE__*/React.createElement("label", {
     style: {
       fontWeight: "bold",
-      marginBottom: "8px"
+      marginBottom: "10px",
+      display: "block"
     }
   }, "Preview"), /*#__PURE__*/React.createElement("div", {
     style: {
@@ -234,10 +235,12 @@ const TextWarpPage = ({
     }
   }, /*#__PURE__*/React.createElement("button", {
     onClick: () => setPageIndex(p => Math.max(p - 1, 0)),
+    disabled: pageIndex === 0,
     style: {
       background: "none",
       border: "none",
-      cursor: "pointer"
+      cursor: pageIndex === 0 ? "not-allowed" : "pointer",
+      color: pageIndex === 0 ? "#ccc" : "#000"
     }
   }, "<"), /*#__PURE__*/React.createElement("span", {
     style: {
@@ -245,10 +248,12 @@ const TextWarpPage = ({
     }
   }, pageIndex + 1), /*#__PURE__*/React.createElement("button", {
     onClick: () => setPageIndex(p => Math.min(p + 1, totalPages - 1)),
+    disabled: pageIndex === totalPages - 1,
     style: {
       background: "none",
       border: "none",
-      cursor: "pointer"
+      cursor: pageIndex === totalPages - 1 ? "not-allowed" : "pointer",
+      color: pageIndex === totalPages - 1 ? "#ccc" : "#000"
     }
   }, ">"))))), /*#__PURE__*/React.createElement("div", {
     style: {
