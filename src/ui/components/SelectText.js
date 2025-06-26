@@ -171,13 +171,13 @@ export default function SelectText({
     }
   };
   return /*#__PURE__*/React.createElement("div", {
-    className: "text-warp-page",
     style: {
       backgroundColor: '#FFFFFF',
-      width: '280px'
+      width: '280px',
+      padding: '0',
+      margin: '0 auto'
     }
   }, /*#__PURE__*/React.createElement("div", {
-    className: "control-group",
     style: {
       marginBottom: "0"
     }
@@ -187,30 +187,38 @@ export default function SelectText({
       fontSize: "14px",
       fontFamily: "Avenir Next",
       fontWeight: "600",
-      marginBottom: "8px"
+      marginBottom: "8px",
+      display: "block"
     }
   }, "Preview"), /*#__PURE__*/React.createElement("div", {
-    className: "svg-preview",
     style: {
       width: '280px',
-      height: '240px'
+      height: '240px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
     }
   }, error ? /*#__PURE__*/React.createElement("div", {
-    className: "error-message"
+    style: {
+      color: '#ff4444',
+      fontSize: '12px',
+      textAlign: 'center',
+      padding: '20px'
+    }
   }, error) : /*#__PURE__*/React.createElement("svg", {
     viewBox: pathBounds ? `${pathBounds.minX - 20} ${pathBounds.minY - 20} ${pathBounds.width + 40} ${pathBounds.height + 40}` : '0 0 1000 300',
     width: "100%",
     height: "100%",
     style: {
       border: '1px solid #CBE2FF',
-      borderRadius: '10px'
+      borderRadius: '10px',
+      backgroundColor: '#FFFFFF'
     }
   }, /*#__PURE__*/React.createElement("path", {
     d: svgPath,
     fill: "black",
     stroke: "none"
   })))), /*#__PURE__*/React.createElement("div", {
-    className: "control-group",
     style: {
       marginTop: '32px',
       marginBottom: "0"
@@ -221,22 +229,30 @@ export default function SelectText({
       fontSize: "14px",
       fontFamily: "Avenir Next",
       fontWeight: "600",
-      marginBottom: "8px"
+      marginBottom: "8px",
+      display: "block"
     }
   }, "Text"), /*#__PURE__*/React.createElement("textarea", {
     style: {
       border: '1px solid #CBE2FF',
       borderRadius: '10px',
       width: '280px',
-      height: '72px'
+      height: '72px',
+      padding: '12px',
+      fontSize: '14px',
+      fontFamily: 'Avenir Next',
+      resize: 'none',
+      outline: 'none',
+      transition: 'border-color 0.2s ease',
+      boxSizing: 'border-box'
     },
     value: text,
     onChange: e => setText(e.target.value),
     placeholder: "Enter text to render\\nMulti-line supported\\nEach line renders separately",
-    className: "text-input content-textarea",
-    rows: 3
+    rows: 3,
+    onFocus: e => e.target.style.borderColor = '#1178FF',
+    onBlur: e => e.target.style.borderColor = '#CBE2FF'
   })), /*#__PURE__*/React.createElement("div", {
-    className: "control-group",
     style: {
       width: '280px',
       height: '227px',
@@ -249,17 +265,23 @@ export default function SelectText({
       fontSize: "14px",
       fontFamily: "Avenir Next",
       fontWeight: "600",
-      marginBottom: "8px"
+      marginBottom: "8px",
+      display: "block"
     }
   }, "Typography"), /*#__PURE__*/React.createElement("select", {
     value: fontUrl,
     onChange: e => setFontUrl(e.target.value),
-    className: "font-select",
     style: {
       border: '1px solid #CBE2FF',
       borderRadius: '10px',
       width: '100%',
-      marginBottom: '12px'
+      height: '40px',
+      fontSize: '14px',
+      fontFamily: 'Avenir Next',
+      marginBottom: '12px',
+      outline: 'none',
+      cursor: 'pointer',
+      boxSizing: 'border-box'
     }
   }, fonts.map(f => /*#__PURE__*/React.createElement("option", {
     key: f.url,
@@ -268,7 +290,7 @@ export default function SelectText({
     style: {
       display: 'flex',
       alignItems: 'center',
-      marginBottom: '8px',
+      marginBottom: '12px',
       backgroundColor: '#EBF3FE',
       padding: '10px',
       borderRadius: '5px'
@@ -314,7 +336,7 @@ export default function SelectText({
     style: {
       display: 'flex',
       alignItems: 'center',
-      marginBottom: '8px',
+      marginBottom: '12px',
       backgroundColor: '#EBF3FE',
       padding: '10px',
       borderRadius: '5px'
@@ -358,8 +380,7 @@ export default function SelectText({
   })), /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
-      gap: '12px',
-      marginBottom: '12px'
+      gap: '12px'
     }
   }, /*#__PURE__*/React.createElement("button", {
     onClick: () => setAlignment('left'),
@@ -467,16 +488,18 @@ export default function SelectText({
       backgroundColor: '#666'
     }
   })))), /*#__PURE__*/React.createElement("div", {
-    className: "control-group",
     style: {
       marginTop: '40px'
     }
   }, /*#__PURE__*/React.createElement("div", {
-    className: "button-group"
+    style: {
+      display: 'flex',
+      flexWrap: 'wrap',
+      justifyContent: 'center'
+    }
   }, /*#__PURE__*/React.createElement("button", {
     onClick: handleInsert,
     disabled: isLoading || !svgPath,
-    className: "insert-button primary",
     style: {
       width: '280px',
       height: '37px',
@@ -484,8 +507,13 @@ export default function SelectText({
       fontFamily: 'Avenir Next',
       fontWeight: '600',
       padding: '0',
-      backgroundColor: '#1178FF',
-      color: 'white'
+      backgroundColor: isLoading || !svgPath ? '#CCCCCC' : '#1178FF',
+      color: 'white',
+      border: 'none',
+      borderRadius: '8px',
+      cursor: isLoading || !svgPath ? 'not-allowed' : 'pointer',
+      transition: 'background-color 0.2s ease',
+      boxSizing: 'border-box'
     }
   }, isLoading ? '插入中...' : 'Add to design'))));
 }

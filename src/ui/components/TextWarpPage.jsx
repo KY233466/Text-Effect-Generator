@@ -2,6 +2,191 @@ import React, { useEffect, useState } from "react";
 import { effectsList, getWarpFunction } from "../shapes/index.js";
 import opentype from "opentype.js";
 
+// 样式对象
+const styles = {
+  container: {
+    backgroundColor: "#FFFFFF",
+    marginTop: "24px",
+    width: '280px',
+    marginLeft: '20px',
+    marginRight: '20px'
+  },
+  label: {
+    color: "#06001A",
+    fontSize: "14px",
+    fontFamily: "Avenir Next",
+    fontWeight: "600",
+    marginBottom: "8px",
+    display: "block"
+  },
+  previewContainer: {
+    width: '280px',
+    height: '240px',
+    border: '1px solid #CBE2FF',
+    borderRadius: '10px',
+    marginBottom: '24px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF'
+  },
+  svg: {
+    width: '100%',
+    height: '100%'
+  },
+  controlSection: {
+    marginBottom: '24px'
+  },
+  sliderContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    marginBottom: '8px',
+    backgroundColor: '#EBF3FE',
+    padding: '10px',
+    borderRadius: '5px'
+  },
+  sliderIcon: {
+    width: '12px',
+    height: '12px',
+    marginTop: '2px'
+  },
+  sliderValue: {
+    width: '30px',
+    marginLeft: '12px',
+    fontSize: '12px'
+  },
+  slider: {
+    marginTop: '5px',
+    width: '80%',
+    WebkitAppearance: 'none',
+    appearance: 'none',
+    height: '6px',
+    background: 'white',
+    borderRadius: '3px',
+    outline: 'none',
+    border: '1px solid #ddd'
+  },
+  gridContainer: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(3, 1fr)',
+    gap: '12px',
+    marginBottom: '16px'
+  },
+  effectButton: {
+    width: '86px',
+    height: '86px',
+    borderRadius: '8px',
+    border: '2px solid #CBE2FF',
+    backgroundColor: 'white',
+    cursor: 'pointer',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transition: 'all 0.2s ease',
+    boxSizing: 'border-box'
+  },
+  effectButtonSelected: {
+    backgroundColor: '#1178FF',
+    borderColor: '#1178FF'
+  },
+  effectIcon: {
+    width: '32px',
+    height: '32px',
+    marginBottom: '4px'
+  },
+  effectLabel: {
+    fontSize: '10px',
+    color: '#666',
+    textAlign: 'center',
+    fontFamily: 'Avenir Next'
+  },
+  effectLabelSelected: {
+    color: 'white'
+  },
+  paginationContainer: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: '12px',
+    marginBottom: '16px'
+  },
+  paginationButton: {
+    width: '32px',
+    height: '32px',
+    borderRadius: '50%',
+    border: '1px solid #CBE2FF',
+    backgroundColor: 'white',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '14px',
+    color: '#666',
+    transition: 'all 0.2s ease'
+  },
+  paginationButtonDisabled: {
+    cursor: 'not-allowed',
+    opacity: 0.5
+  },
+  paginationInfo: {
+    fontSize: '12px',
+    color: '#666',
+    fontFamily: 'Avenir Next'
+  },
+  typeButtonsContainer: {
+    display: 'flex',
+    gap: '8px',
+    marginBottom: '24px',
+    flexWrap: 'wrap'
+  },
+  typeButton: {
+    padding: '8px 12px',
+    borderRadius: '6px',
+    border: '1px solid #CBE2FF',
+    backgroundColor: 'white',
+    cursor: 'pointer',
+    fontSize: '12px',
+    fontFamily: 'Avenir Next',
+    color: '#666',
+    transition: 'all 0.2s ease'
+  },
+  typeButtonSelected: {
+    backgroundColor: '#1178FF',
+    borderColor: '#1178FF',
+    color: 'white'
+  },
+  insertButton: {
+    width: '280px',
+    height: '37px',
+    fontSize: '14px',
+    fontFamily: 'Avenir Next',
+    fontWeight: '600',
+    padding: '0',
+    backgroundColor: '#1178FF',
+    color: 'white',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    transition: 'background-color 0.2s ease',
+    boxSizing: 'border-box'
+  },
+  insertButtonDisabled: {
+    backgroundColor: '#CCCCCC',
+    cursor: 'not-allowed'
+  },
+  errorMessage: {
+    color: '#dc3545',
+    backgroundColor: '#f8d7da',
+    border: '1px solid #f5c6cb',
+    padding: '8px 12px',
+    borderRadius: '4px',
+    textAlign: 'center',
+    marginTop: '12px',
+    fontSize: '12px'
+  }
+};
+
 const TextWarpPage = ({
   sandboxProxy,
   text,
@@ -187,29 +372,9 @@ const TextWarpPage = ({
   };
 
   return (
-    <div style={{ 
-      backgroundColor: "#FFFFFF", 
-      marginTop: "24px",
-      width: '280px',
-      marginLeft: '20px',
-      marginRight: '20px'
-    }}>
-      <label style={{ 
-        color: "#06001A",
-        fontSize: "14px",
-        fontFamily: "Avenir Next",
-        fontWeight: "600",
-        marginBottom: "8px" 
-      }}>Preview</label>
-      <div
-        style={{
-          width: "280px",
-          height: "240px",
-          backgroundColor: "#CBE2FF",
-          borderRadius: "10px",
-          marginBottom: "32px",
-        }}
-      >
+    <div style={styles.container}>
+      <label style={styles.label}>Preview</label>
+      <div style={styles.previewContainer}>
         <svg
           viewBox={
             pathBounds
@@ -218,177 +383,62 @@ const TextWarpPage = ({
                 } ${pathBounds.height + 40}`
               : "0 0 1000 300"
           }
-          width="100%"
-          height="100%"
+          style={styles.svg}
         >
           <path d={svgPath} fill="#06001A" stroke="none" />
         </svg>
       </div>
 
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
-      >
-        <label
-          style={{ 
-            color: "#06001A",
-            fontSize: "14px",
-            fontFamily: "Avenir Next",
-            fontWeight: "600",
-            display: "block", 
-            marginBottom: "8px" 
-          }}
-        >
-          Shape
-        </label>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "6px",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: "14px",
-            }}
+      <div style={styles.controlSection}>
+        <div style={styles.paginationContainer}>
+          <button
+            onClick={() => setPageIndex((p) => Math.max(p - 1, 0))}
+            style={styles.paginationButton}
+            disabled={pageIndex === 0}
           >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "1px",
-                padding: "2px",
-                backgroundColor: "#F0F0F0",
-                borderRadius: "20px",
-              }}
-            >
-              <button
-                onClick={() => setPageIndex((p) => Math.max(p - 1, 0))}
-                style={{
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                }}
-              >
-                &lt;
-              </button>
-              <span style={{ fontSize: 10 }}>{pageIndex + 1}</span>
-              <button
-                onClick={() =>
-                  setPageIndex((p) => Math.min(p + 1, totalPages - 1))
-                }
-                style={{
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                }}
-              >
-                &gt;
-              </button>
+            &lt;
+          </button>
+          <span style={styles.paginationInfo}>{pageIndex + 1} / {totalPages}</span>
+          <button
+            onClick={() =>
+              setPageIndex((p) => Math.min(p + 1, totalPages - 1))
+            }
+            style={styles.paginationButton}
+            disabled={pageIndex === totalPages - 1}
+          >
+            &gt;
+          </button>
+        </div>
+      </div>
+
+      <div style={styles.gridContainer}>
+        {currentGroups.map((group) => (
+          <button
+            key={group.label}
+            onClick={() => {
+              setWarpType(group.types[0]);
+            }}
+            style={styles.effectButton}
+          >
+            <div style={styles.effectIcon}>
+              <img src={`./icon/${group.types[0]}.png`} alt={group.label} />
             </div>
-          </div>
-        </div>
+            <div style={styles.effectLabel}>{group.label}</div>
+          </button>
+        ))}
       </div>
 
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "8px",
-        }}
-      >
-        <div style={{ display: "flex", gap: "12px" }}>
-          {currentGroups.map((group) => (
-            <button
-              key={group.label}
-              onClick={() => {
-                setWarpType(group.types[0]);
-              }}
-              style={{
-                width: "85px",
-                height: "86px",
-                border:
-                  selectedGroup.label === group.label
-                    ? "2px solid #1178FF"
-                    : "1px solid #ccc",
-                borderRadius: "8px",
-                backgroundColor:
-                  selectedGroup.label === group.label ? "#EBF3FE" : "#fff",
-                fontSize: "12px",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                padding: "8px",
-              }}
-            >
-              <div
-                style={{
-                  flexGrow: 1,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <img src={`./icon/${group.types[0]}.png`} alt={group.label} />
-              </div>
-              <div style={{ textAlign: "center", marginTop: "2px" }}>
-                {group.label}
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <label
-        style={{ 
-          color: "#06001A",
-          fontSize: "14px",
-          fontFamily: "Avenir Next",
-          fontWeight: "600",
-          display: "block", 
-          marginBottom: "8px" 
-        }}
-      >
-        Type
-      </label>
-      <div style={{ display: "flex", gap: "12px", marginBottom: "8px" }}>
+      <label style={styles.label}>Type</label>
+      <div style={styles.typeButtonsContainer}>
         {relatedTypes.map((typeKey) => {
           const type = effectsList.find((e) => e.key === typeKey);
           return (
             <button
               key={typeKey}
               onClick={() => setWarpType(typeKey)}
-              style={{
-                width: "85px",
-                height: "86px",
-                border:
-                  warpType === typeKey ? "2px solid #1178FF" : "1px solid #ccc",
-                borderRadius: "8px",
-                backgroundColor: warpType === typeKey ? "#EBF3FE" : "#fff",
-                fontSize: "12px",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-                padding: "8px",
-              }}
+              style={styles.typeButton}
             >
-              <div
-                style={{
-                  flexGrow: 1,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
+              <div style={styles.effectIcon}>
                 <img
                   src={`./icon/${typeKey}.png`}
                   alt={type?.label || typeKey}
@@ -399,48 +449,28 @@ const TextWarpPage = ({
         })}
       </div>
 
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "12px",
-          padding: "8px 12px",
-          backgroundColor: "#EBF3FE",
-          borderRadius: "12px",
-          marginBottom: "32px",
-        }}
-      >
-        <span style={{ fontSize: "14px", color: "#06001A" }}>
-          Bend {intensity}
-        </span>
+      <div style={styles.sliderContainer}>
+        <span style={styles.sliderIcon}></span>
+        <span style={styles.sliderValue}>{intensity}</span>
         <input
           type="range"
           min="0"
           max="100"
           value={intensity}
           onChange={(e) => setIntensity(Number(e.target.value))}
-          style={{ flexGrow: 1 }}
+          style={styles.slider}
         />
       </div>
 
       <button
         onClick={handleInsert}
         disabled={isLoading || !svgPath}
-        style={{
-          width: "100%",
-          padding: "10px 0",
-          fontSize: "14px",
-          fontFamily: "Avenir Next",
-          fontWeight: "600",
-          backgroundColor: "#1178FF",
-          color: "white",
-          border: "none",
-          borderRadius: "8px",
-          cursor: "pointer",
-        }}
+        style={styles.insertButton}
       >
         {isLoading ? "插入中..." : "Add to design"}
       </button>
+
+      {error && <div style={styles.errorMessage}>{error}</div>}
     </div>
   );
 };
