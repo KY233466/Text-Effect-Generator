@@ -3,6 +3,13 @@ import opentype from 'opentype.js';
 const SMUDGE_RADIUS = 100;
 const SMUDGE_STRENGTH = 0.33;
 const Warp = window.Warp;
+const styles = {
+  svg: {
+    border: '1px solid #CBE2FF',
+    borderRadius: '10px',
+    backgroundColor: 'white'
+  }
+};
 export default function Smudge({
   pathBounds,
   setPathBounds,
@@ -93,7 +100,7 @@ export default function Smudge({
       svgRef.current.innerHTML = '';
       const pathEl = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       pathEl.setAttribute('d', d);
-      pathEl.setAttribute('fill', 'hotpink');
+      pathEl.setAttribute('fill', 'black');
       pathEl.setAttribute('stroke', 'none');
       svgRef.current.appendChild(pathEl);
       pathRef.current = pathEl;
@@ -230,20 +237,23 @@ export default function Smudge({
     });
   };
   return /*#__PURE__*/React.createElement("div", {
-    styles: {
+    style: {
+      width: '100%',
+      // position: 'relative',
+      // overflow: 'hidden',
       marginBottom: '20px'
     }
-  }, /*#__PURE__*/React.createElement("div", null, "Preview"), /*#__PURE__*/React.createElement("svg", {
+  }, /*#__PURE__*/React.createElement("svg", {
     ref: svgRef,
     width: "100%",
     height: "200",
     viewBox: pathBounds ? `${pathBounds.minX - 20} ${pathBounds.minY - 20} ${pathBounds.width + 40} ${pathBounds.height + 40}` : '0 0 600 200',
     preserveAspectRatio: "xMidYMid meet",
     style: {
-      border: '1px solid #C7C7C7',
-      borderRadius: '10px',
-      backgroundColor: 'white',
-      cursor: isMouseDown ? 'grabbing' : 'grab'
+      ...styles.svg,
+      ...{
+        cursor: isMouseDown ? 'grabbing' : 'grab'
+      }
     },
     onMouseDown: handleMouseDown,
     onMouseMove: handleMouseMove,

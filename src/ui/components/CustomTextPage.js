@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
 import Mesh from "./Mesh/mesh.js";
 import Smudge from "./Smudge/smudge.js";
-
-// import mesh from "../../assets/mesh.png";
-
-// 样式对象
 const styles = {
   container: {
     display: 'flex',
@@ -40,12 +36,13 @@ const styles = {
     fontSize: '14px',
     fontFamily: 'Avenir Next',
     fontWeight: '500',
-    transition: 'all 0.3s ease'
+    transition: 'all 0.3s ease',
+    outline: 'none'
   },
   shapeButtonSelected: {
     backgroundColor: '#EBF3FE',
-    color: 'black',
-    borderColor: '#CBE2FF'
+    borderColor: '#CBE2FF',
+    outline: 'none'
   },
   buttonGroup: {
     display: 'flex',
@@ -134,7 +131,9 @@ const CustomTextPage = ({
   };
   return /*#__PURE__*/React.createElement("div", {
     style: styles.container
-  }, /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("label", {
+    style: styles.label
+  }, "Preview"), /*#__PURE__*/React.createElement("div", {
     style: styles.content
   }, selected == "mesh" ? /*#__PURE__*/React.createElement(Mesh, {
     setPathBounds: setPathBounds,
@@ -159,21 +158,23 @@ const CustomTextPage = ({
     style: styles.shapeContainer
   }, Shape.map(s => /*#__PURE__*/React.createElement("button", {
     key: s,
+    onFocus: e => e.target.blur(),
     style: {
       ...styles.shapeButton,
-      ...(selected === s ? styles.shapeButtonSelected : {})
+      ...(selected === s ? styles.shapeButtonSelected : {}),
+      outline: 'none'
     },
-    onClick: () => setSelected(s),
-    onMouseEnter: e => {
-      if (selected !== s) {
-        e.target.style.borderColor = '#007bff';
-      }
-    },
-    onMouseLeave: e => {
-      if (selected !== s) {
-        e.target.style.borderColor = '#CBE2FF';
-      }
-    }
+    onClick: () => setSelected(s)
+    // onMouseEnter={(e) => {
+    //   if (selected !== s) {
+    //     e.target.style.borderColor = '#007bff';
+    //   }
+    // }}
+    // onMouseLeave={(e) => {
+    //   if (selected !== s) {
+    //     e.target.style.borderColor = '#CBE2FF';
+    //   }
+    // }}
   }, /*#__PURE__*/React.createElement("img", {
     src: `./icon/${s}.svg`,
     alt: s

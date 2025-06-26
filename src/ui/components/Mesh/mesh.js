@@ -13,14 +13,6 @@ const styles = {
     border: '1px solid #CBE2FF',
     borderRadius: '10px',
     overflow: 'visible'
-  },
-  label: {
-    color: "#06001A",
-    fontSize: "14px",
-    fontFamily: "Avenir Next",
-    fontWeight: "600",
-    marginBottom: "8px",
-    display: "block"
   }
 };
 export default function Mesh({
@@ -104,7 +96,7 @@ export default function Mesh({
       svgRef.current.innerHTML = '';
       const pathEl = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       pathEl.setAttribute('d', d);
-      pathEl.setAttribute('fill', 'hotpink');
+      pathEl.setAttribute('fill', 'black');
       pathEl.setAttribute('stroke', 'none');
       svgRef.current.appendChild(pathEl);
       pathRef.current = pathEl;
@@ -250,9 +242,7 @@ export default function Mesh({
     },
     onMouseMove: handleMouseMove,
     onMouseUp: handleMouseUp
-  }, /*#__PURE__*/React.createElement("label", {
-    style: styles.label
-  }, "Preview"), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
       width: '100%'
@@ -267,7 +257,7 @@ export default function Mesh({
     ref: controlPathRef,
     id: "control-path",
     fill: "none",
-    stroke: "red",
+    stroke: "#1178FF",
     strokeWidth: "1px"
   }), text != "" && Array.from({
     length: 7
