@@ -43,7 +43,11 @@ const CustomTextPage = ({
   };
 
   return (
-    <div>
+    <div style={{ 
+      width: '280px',
+      marginLeft: '20px',
+      marginRight: '20px'
+    }}>
       {selected == "mesh" ? <Mesh
         setPathBounds={setPathBounds}
         text={text}
@@ -62,11 +66,17 @@ const CustomTextPage = ({
         letterSpacing={letterSpacing}
         alignment={alignment}
       />}
-      <div>Shape</div>
+      <div style={{ 
+        color: "#06001A",
+        fontSize: "14px",
+        fontFamily: "Avenir Next",
+        fontWeight: "600",
+        marginBottom: "8px" 
+      }}>Shape</div>
       <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
         {Shape.map((s) => <button style={{
           width: '85px', height: '85px',
-          borderRadius: '10px', border: '1px solid black', cursor: ''
+          borderRadius: '10px', border: '1px solid #CBE2FF', cursor: ''
         }}
           onClick={() => setSelected(s)}
         >{s}</button>)}
@@ -77,6 +87,12 @@ const CustomTextPage = ({
           onClick={handleInsert}
           disabled={isLoading || !svgPath}
           className="insert-button primary"
+          style={{ 
+            fontSize: "14px",
+            fontFamily: "Avenir Next",
+            fontWeight: "600",
+            color: "white"
+          }}
         >
           {isLoading ? '插入中...' : '插入变形文本'}
         </button>

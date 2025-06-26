@@ -112,9 +112,8 @@ const TextWarpPage = ({
       const totalHeight = (lines.length - 1) * actualLineHeight + fontSize;
       const centerY = baselineY + (lines.length - 1) * actualLineHeight / 2;
       const centerX = maxLineWidth / 2;
-      const overallTopY = baselineY - fontSize * 0.7; // 第一行顶部
-      const overallBottomY = baselineY + (lines.length - 1) * actualLineHeight + fontSize * 0.2; // 最后一行底部
-
+      const overallTopY = baselineY - fontSize * 0.7;
+      const overallBottomY = baselineY + (lines.length - 1) * actualLineHeight + fontSize * 0.2;
       const textMetrics = {
         baseline: centerY,
         ascender: centerY - totalHeight / 2,
@@ -180,21 +179,25 @@ const TextWarpPage = ({
   };
   return /*#__PURE__*/React.createElement("div", {
     style: {
-      backgroundColor: "#FFFFFF"
+      backgroundColor: "#FFFFFF",
+      marginTop: "24px",
+      width: '280px',
+      marginLeft: '20px',
+      marginRight: '20px'
     }
   }, /*#__PURE__*/React.createElement("label", {
     style: {
-      fontWeight: "bold",
-      display: "block",
-      paddingTop: "18px",
-      marginBottom: "10px",
-      display: "block"
+      color: "#06001A",
+      fontSize: "14px",
+      fontFamily: "Avenir Next",
+      fontWeight: "600",
+      marginBottom: "8px"
     }
   }, "Preview"), /*#__PURE__*/React.createElement("div", {
     style: {
-      width: "100%",
+      width: "280px",
       height: "240px",
-      border: "1px solid #1178FF",
+      backgroundColor: "#CBE2FF",
       borderRadius: "10px",
       marginBottom: "32px"
     }
@@ -214,7 +217,10 @@ const TextWarpPage = ({
     }
   }, /*#__PURE__*/React.createElement("label", {
     style: {
-      fontWeight: "bold",
+      color: "#06001A",
+      fontSize: "14px",
+      fontFamily: "Avenir Next",
+      fontWeight: "600",
       display: "block",
       marginBottom: "8px"
     }
@@ -242,12 +248,10 @@ const TextWarpPage = ({
     }
   }, /*#__PURE__*/React.createElement("button", {
     onClick: () => setPageIndex(p => Math.max(p - 1, 0)),
-    disabled: pageIndex === 0,
     style: {
       background: "none",
       border: "none",
-      cursor: pageIndex === 0 ? "not-allowed" : "pointer",
-      color: pageIndex === 0 ? "#ccc" : "#000"
+      cursor: "pointer"
     }
   }, "<"), /*#__PURE__*/React.createElement("span", {
     style: {
@@ -255,12 +259,10 @@ const TextWarpPage = ({
     }
   }, pageIndex + 1), /*#__PURE__*/React.createElement("button", {
     onClick: () => setPageIndex(p => Math.min(p + 1, totalPages - 1)),
-    disabled: pageIndex === totalPages - 1,
     style: {
       background: "none",
       border: "none",
-      cursor: pageIndex === totalPages - 1 ? "not-allowed" : "pointer",
-      color: pageIndex === totalPages - 1 ? "#ccc" : "#000"
+      cursor: "pointer"
     }
   }, ">"))))), /*#__PURE__*/React.createElement("div", {
     style: {
@@ -308,7 +310,10 @@ const TextWarpPage = ({
     }
   }, group.label))))), /*#__PURE__*/React.createElement("label", {
     style: {
-      fontWeight: "bold",
+      color: "#06001A",
+      fontSize: "14px",
+      fontFamily: "Avenir Next",
+      fontWeight: "600",
       display: "block",
       marginBottom: "8px",
       marginTop: "18px"
@@ -379,8 +384,10 @@ const TextWarpPage = ({
       width: "100%",
       padding: "10px 0",
       fontSize: "14px",
+      fontFamily: "Avenir Next",
+      fontWeight: "600",
       backgroundColor: "#1178FF",
-      color: "#fff",
+      color: "white",
       border: "none",
       borderRadius: "8px",
       cursor: "pointer"

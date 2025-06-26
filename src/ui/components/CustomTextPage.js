@@ -38,7 +38,13 @@ const CustomTextPage = ({
       setIsLoading(false);
     }
   };
-  return /*#__PURE__*/React.createElement("div", null, selected == "mesh" ? /*#__PURE__*/React.createElement(Mesh, {
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: '280px',
+      marginLeft: '20px',
+      marginRight: '20px'
+    }
+  }, selected == "mesh" ? /*#__PURE__*/React.createElement(Mesh, {
     setPathBounds: setPathBounds,
     text: text,
     setSvgPath: setSvgPath,
@@ -55,7 +61,15 @@ const CustomTextPage = ({
     lineHeight: lineHeight,
     letterSpacing: letterSpacing,
     alignment: alignment
-  }), /*#__PURE__*/React.createElement("div", null, "Shape"), /*#__PURE__*/React.createElement("div", {
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: "#06001A",
+      fontSize: "14px",
+      fontFamily: "Avenir Next",
+      fontWeight: "600",
+      marginBottom: "8px"
+    }
+  }, "Shape"), /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
       flexDirection: 'row',
@@ -75,7 +89,13 @@ const CustomTextPage = ({
   }, /*#__PURE__*/React.createElement("button", {
     onClick: handleInsert,
     disabled: isLoading || !svgPath,
-    className: "insert-button primary"
+    className: "insert-button primary",
+    style: {
+      fontSize: "14px",
+      fontFamily: "Avenir Next",
+      fontWeight: "600",
+      color: "white"
+    }
   }, isLoading ? '插入中...' : '插入变形文本')));
 };
 export default CustomTextPage;

@@ -37,7 +37,7 @@
           margin-bottom: 32px;
           background: #f8f9fa;
           border-radius: 12px;
-          padding: 6px;
+          /* padding: 6px; */
           box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
@@ -76,7 +76,7 @@
           background: white;
           border-radius: 16px;
           box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-          padding: 32px;
+          /* padding: 32px; */
           min-height: 500px;
           position: relative;
           overflow: hidden;
@@ -94,18 +94,16 @@
 
         /* 文本变形页面样式 */
         .text-warp-page {
-          padding: 20px 0;
+          /* padding removed - now controlled by parent container */
         }
 
         .control-group {
-          margin-bottom: 16px;
+          /* margin-bottom removed - now controlled individually */
         }
 
         .control-group label {
           display: block;
-          margin-bottom: 4px;
-          font-weight: bold;
-          color: #333;
+          /* margin-bottom and styling now controlled inline */
         }
 
         .text-input,
@@ -163,13 +161,7 @@
         }
 
         .svg-preview {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          min-height: 200px;
-          background: white;
-          border-radius: 4px;
-          overflow: hidden;
+          /* All styling now controlled inline */
         }
 
         /* 自定义文本页面样式 */

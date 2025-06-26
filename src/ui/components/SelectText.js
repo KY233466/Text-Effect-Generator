@@ -173,11 +173,23 @@ export default function SelectText({
   return /*#__PURE__*/React.createElement("div", {
     className: "text-warp-page",
     style: {
-      backgroundColor: '#FFFFFF'
+      backgroundColor: '#FFFFFF',
+      width: '280px'
     }
   }, /*#__PURE__*/React.createElement("div", {
-    className: "control-group"
-  }, /*#__PURE__*/React.createElement("label", null, "Preview"), /*#__PURE__*/React.createElement("div", {
+    className: "control-group",
+    style: {
+      marginBottom: "0"
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    style: {
+      color: "#06001A",
+      fontSize: "14px",
+      fontFamily: "Avenir Next",
+      fontWeight: "600",
+      marginBottom: "8px"
+    }
+  }, "Preview"), /*#__PURE__*/React.createElement("div", {
     className: "svg-preview",
     style: {
       width: '280px',
@@ -188,22 +200,32 @@ export default function SelectText({
   }, error) : /*#__PURE__*/React.createElement("svg", {
     viewBox: pathBounds ? `${pathBounds.minX - 20} ${pathBounds.minY - 20} ${pathBounds.width + 40} ${pathBounds.height + 40}` : '0 0 1000 300',
     width: "100%",
-    height: "200",
+    height: "100%",
     style: {
-      border: '1px solid #1178FF',
-      borderRadius: '10px',
-      minHeight: '200px',
-      maxHeight: '500px'
+      border: '1px solid #CBE2FF',
+      borderRadius: '10px'
     }
   }, /*#__PURE__*/React.createElement("path", {
     d: svgPath,
     fill: "black",
     stroke: "none"
   })))), /*#__PURE__*/React.createElement("div", {
-    className: "control-group"
-  }, /*#__PURE__*/React.createElement("label", null, "Text"), /*#__PURE__*/React.createElement("textarea", {
+    className: "control-group",
     style: {
-      border: '1px solid #1178FF',
+      marginTop: '32px',
+      marginBottom: "0"
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    style: {
+      color: "#06001A",
+      fontSize: "14px",
+      fontFamily: "Avenir Next",
+      fontWeight: "600",
+      marginBottom: "8px"
+    }
+  }, "Text"), /*#__PURE__*/React.createElement("textarea", {
+    style: {
+      border: '1px solid #CBE2FF',
       borderRadius: '10px',
       width: '280px',
       height: '72px'
@@ -217,14 +239,24 @@ export default function SelectText({
     className: "control-group",
     style: {
       width: '280px',
-      height: '227px'
+      height: '227px',
+      marginTop: '24px',
+      marginBottom: "0"
     }
-  }, /*#__PURE__*/React.createElement("label", null, "Typography"), /*#__PURE__*/React.createElement("select", {
+  }, /*#__PURE__*/React.createElement("label", {
+    style: {
+      color: "#06001A",
+      fontSize: "14px",
+      fontFamily: "Avenir Next",
+      fontWeight: "600",
+      marginBottom: "8px"
+    }
+  }, "Typography"), /*#__PURE__*/React.createElement("select", {
     value: fontUrl,
     onChange: e => setFontUrl(e.target.value),
     className: "font-select",
     style: {
-      border: '1px solid #1178FF',
+      border: '1px solid #CBE2FF',
       borderRadius: '10px',
       width: '100%',
       marginBottom: '12px'
@@ -449,8 +481,11 @@ export default function SelectText({
       width: '280px',
       height: '37px',
       fontSize: '14px',
+      fontFamily: 'Avenir Next',
+      fontWeight: '600',
       padding: '0',
-      backgroundColor: '#1178FF'
+      backgroundColor: '#1178FF',
+      color: 'white'
     }
   }, isLoading ? '插入中...' : 'Add to design'))));
 }

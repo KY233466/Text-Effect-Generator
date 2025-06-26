@@ -17,13 +17,19 @@ const TextWarpApp = ({ sandboxProxy }) => {
     borderRadius: "30px",
     border: "none",
     backgroundColor: activeTab === tabName ? "#1178FF" : "#EBF3FE",
-    color: activeTab === tabName ? "#FFFFFF" : "#06001A",
-    fontWeight: "500",
+    color: activeTab === tabName ? "white" : "#06001A",
+    fontSize: "14px",
+    fontFamily: "Avenir Next",
+    fontWeight: activeTab === tabName ? "600" : "500",
     cursor: "pointer",
   });
 
   return (
-    <div className="app" style={{ margin: "15px" }}>
+    <div className="app" style={{ 
+      width: "320px", 
+      margin: "0 auto",
+      padding: "15px 20px"
+    }}>
       <div
         className="tab-container"
         style={{ display: "flex", marginBottom: "16px" }}

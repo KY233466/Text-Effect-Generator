@@ -172,9 +172,18 @@ export default function SelectText({ sandboxProxy,
   };
 
   return (
-    <div className="text-warp-page" style={{ backgroundColor: '#FFFFFF' }}>
-      <div className="control-group">
-        <label>Preview</label>
+    <div className="text-warp-page" style={{ 
+      backgroundColor: '#FFFFFF',
+      width: '280px'
+    }}>
+      <div className="control-group" style={{ marginBottom: "0" }}>
+        <label style={{ 
+          color: "#06001A",
+          fontSize: "14px",
+          fontFamily: "Avenir Next",
+          fontWeight: "600",
+          marginBottom: "8px"
+        }}>Preview</label>
         <div className="svg-preview" style={{ width: '280px', height: '240px' }}>
           {error ? (
             <div className="error-message">{error}</div>
@@ -185,12 +194,10 @@ export default function SelectText({ sandboxProxy,
                 '0 0 1000 300'
               }
               width="100%"
-              height="200"
+              height="100%"
               style={{
-                border: '1px solid #1178FF',
-                borderRadius: '10px',
-                minHeight: '200px',
-                maxHeight: '500px'
+                border: '1px solid #CBE2FF',
+                borderRadius: '10px'
               }}
             >
               <path d={svgPath} fill="black" stroke="none" />
@@ -199,11 +206,17 @@ export default function SelectText({ sandboxProxy,
         </div>
       </div>
 
-      <div className="control-group">
-        <label>Text</label>
+      <div className="control-group" style={{ marginTop: '32px', marginBottom: "0" }}>
+        <label style={{ 
+          color: "#06001A",
+          fontSize: "14px",
+          fontFamily: "Avenir Next",
+          fontWeight: "600",
+          marginBottom: "8px"
+        }}>Text</label>
         <textarea
           style={{
-            border: '1px solid #1178FF',
+            border: '1px solid #CBE2FF',
             borderRadius: '10px',
             width: '280px',
             height: '72px',
@@ -216,14 +229,20 @@ export default function SelectText({ sandboxProxy,
         />
       </div>
 
-      <div className="control-group" style={{ width: '280px', height: '227px' }}>
-        <label>Typography</label>
+      <div className="control-group" style={{ width: '280px', height: '227px', marginTop: '24px', marginBottom: "0" }}>
+        <label style={{ 
+          color: "#06001A",
+          fontSize: "14px",
+          fontFamily: "Avenir Next",
+          fontWeight: "600",
+          marginBottom: "8px"
+        }}>Typography</label>
         <select
           value={fontUrl}
           onChange={e => setFontUrl(e.target.value)}
           className="font-select"
           style={{
-            border: '1px solid #1178FF',
+            border: '1px solid #CBE2FF',
             borderRadius: '10px',
             width: '100%',
             marginBottom: '12px',
@@ -290,7 +309,7 @@ export default function SelectText({ sandboxProxy,
               width: '86px',
               height: '37px',
               backgroundColor: alignment === 'left' ? 'white' : '#EBF3FE',
-              border: alignment === 'left' ? '2px solid #1178FF' : 'none',
+                              border: alignment === 'left' ? '2px solid #CBE2FF' : 'none',
               borderRadius: '8px',
               cursor: 'pointer',
               display: 'flex',
@@ -311,7 +330,7 @@ export default function SelectText({ sandboxProxy,
               width: '86px',
               height: '37px',
               backgroundColor: alignment === 'center' ? 'white' : '#EBF3FE',
-              border: alignment === 'center' ? '2px solid #1178FF' : 'none',
+                              border: alignment === 'center' ? '2px solid #CBE2FF' : 'none',
               borderRadius: '8px',
               cursor: 'pointer',
               display: 'flex',
@@ -332,7 +351,7 @@ export default function SelectText({ sandboxProxy,
               width: '86px',
               height: '37px',
               backgroundColor: alignment === 'right' ? 'white' : '#EBF3FE',
-              border: alignment === 'right' ? '2px solid #1178FF' : 'none',
+                              border: alignment === 'right' ? '2px solid #CBE2FF' : 'none',
               borderRadius: '8px',
               cursor: 'pointer',
               display: 'flex',
@@ -355,7 +374,16 @@ export default function SelectText({ sandboxProxy,
             onClick={handleInsert}
             disabled={isLoading || !svgPath}
             className="insert-button primary"
-            style={{ width: '280px', height: '37px', fontSize: '14px', padding: '0', backgroundColor: '#1178FF' }}
+            style={{ 
+              width: '280px', 
+              height: '37px', 
+              fontSize: '14px', 
+              fontFamily: 'Avenir Next',
+              fontWeight: '600',
+              padding: '0', 
+              backgroundColor: '#1178FF',
+              color: 'white'
+            }}
           >
             {isLoading ? '插入中...' : 'Add to design'}
           </button>
