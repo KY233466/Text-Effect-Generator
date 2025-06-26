@@ -18,7 +18,8 @@ export default function Smudge({
   fontUrl,
   lineHeight,
   letterSpacing,
-  alignment
+  alignment,
+  calculatePathBounds
 }) {
   const svgRef = useRef();
   const pathRef = useRef();
@@ -110,40 +111,6 @@ export default function Smudge({
       lastMouseX.current = null;
       lastMouseY.current = null;
     });
-  };
-  const calculatePathBounds = commands => {
-    let minX = Infinity,
-      maxX = -Infinity,
-      minY = Infinity,
-      maxY = -Infinity;
-    commands.forEach(cmd => {
-      if ('x' in cmd && 'y' in cmd) {
-        minX = Math.min(minX, cmd.x);
-        maxX = Math.max(maxX, cmd.x);
-        minY = Math.min(minY, cmd.y);
-        maxY = Math.max(maxY, cmd.y);
-      }
-      if ('x1' in cmd && 'y1' in cmd) {
-        minX = Math.min(minX, cmd.x1);
-        maxX = Math.max(maxX, cmd.x1);
-        minY = Math.min(minY, cmd.y1);
-        maxY = Math.max(maxY, cmd.y1);
-      }
-      if ('x2' in cmd && 'y2' in cmd) {
-        minX = Math.min(minX, cmd.x2);
-        maxX = Math.max(maxX, cmd.x2);
-        minY = Math.min(minY, cmd.y2);
-        maxY = Math.max(maxY, cmd.y2);
-      }
-    });
-    return {
-      minX,
-      maxX,
-      minY,
-      maxY,
-      width: maxX - minX,
-      height: maxY - minY
-    };
   };
   const smudgeFactory = (startX, startY, endX, endY, radius, strength) => {
     const deltaX = endX - startX;
@@ -239,8 +206,6 @@ export default function Smudge({
   return /*#__PURE__*/React.createElement("div", {
     style: {
       width: '100%',
-      // position: 'relative',
-      // overflow: 'hidden',
       marginBottom: '20px'
     }
   }, /*#__PURE__*/React.createElement("svg", {

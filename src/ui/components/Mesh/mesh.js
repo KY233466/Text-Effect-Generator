@@ -22,7 +22,8 @@ export default function Mesh({
   fontUrl,
   lineHeight,
   letterSpacing,
-  alignment
+  alignment,
+  calculatePathBounds
 }) {
   const svgRef = useRef();
   const pathRef = useRef();
@@ -153,40 +154,6 @@ export default function Mesh({
       if (newD) setSvgPath(newD);
       drawControlShape();
     });
-  };
-  const calculatePathBounds = commands => {
-    let minX = Infinity,
-      maxX = -Infinity,
-      minY = Infinity,
-      maxY = -Infinity;
-    commands.forEach(cmd => {
-      if ('x' in cmd && 'y' in cmd) {
-        minX = Math.min(minX, cmd.x);
-        maxX = Math.max(maxX, cmd.x);
-        minY = Math.min(minY, cmd.y);
-        maxY = Math.max(maxY, cmd.y);
-      }
-      if ('x1' in cmd && 'y1' in cmd) {
-        minX = Math.min(minX, cmd.x1);
-        maxX = Math.max(maxX, cmd.x1);
-        minY = Math.min(minY, cmd.y1);
-        maxY = Math.max(maxY, cmd.y1);
-      }
-      if ('x2' in cmd && 'y2' in cmd) {
-        minX = Math.min(minX, cmd.x2);
-        maxX = Math.max(maxX, cmd.x2);
-        minY = Math.min(minY, cmd.y2);
-        maxY = Math.max(maxY, cmd.y2);
-      }
-    });
-    return {
-      minX,
-      maxX,
-      minY,
-      maxY,
-      width: maxX - minX,
-      height: maxY - minY
-    };
   };
   const reposition = ([x, y, ...W], V = controlPointsRef.current) => {
     let nx = 0,

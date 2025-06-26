@@ -33,16 +33,19 @@ const styles = {
     border: '1px solid #CBE2FF',
     cursor: 'pointer',
     backgroundColor: 'white',
-    fontSize: '14px',
-    fontFamily: 'Avenir Next',
-    fontWeight: '500',
     transition: 'all 0.3s ease',
-    outline: 'none'
+    outline: "none"
   },
   shapeButtonSelected: {
     backgroundColor: '#EBF3FE',
     borderColor: '#CBE2FF',
     outline: 'none'
+  },
+  icon: {
+    width: 60,
+    height: 30,
+    objectFit: 'contain',
+    pointerEvents: 'none'
   },
   buttonGroup: {
     display: 'flex',
@@ -54,7 +57,7 @@ const styles = {
     border: 'none',
     borderRadius: '8px',
     fontSize: '14px',
-    fontFamily: 'Avenir Next',
+    // fontFamily: 'Avenir Next',
     fontWeight: '600',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
@@ -69,7 +72,7 @@ const styles = {
     borderRadius: '8px',
     fontSize: '14px',
     width: '100%',
-    fontFamily: 'Avenir Next',
+    // fontFamily: 'Avenir Next',
     fontWeight: '600',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
@@ -129,6 +132,40 @@ const CustomTextPage = ({
       setIsLoading(false);
     }
   };
+  const calculatePathBounds = commands => {
+    let minX = Infinity,
+      maxX = -Infinity,
+      minY = Infinity,
+      maxY = -Infinity;
+    commands.forEach(cmd => {
+      if ('x' in cmd && 'y' in cmd) {
+        minX = Math.min(minX, cmd.x);
+        maxX = Math.max(maxX, cmd.x);
+        minY = Math.min(minY, cmd.y);
+        maxY = Math.max(maxY, cmd.y);
+      }
+      if ('x1' in cmd && 'y1' in cmd) {
+        minX = Math.min(minX, cmd.x1);
+        maxX = Math.max(maxX, cmd.x1);
+        minY = Math.min(minY, cmd.y1);
+        maxY = Math.max(maxY, cmd.y1);
+      }
+      if ('x2' in cmd && 'y2' in cmd) {
+        minX = Math.min(minX, cmd.x2);
+        maxX = Math.max(maxX, cmd.x2);
+        minY = Math.min(minY, cmd.y2);
+        maxY = Math.max(maxY, cmd.y2);
+      }
+    });
+    return {
+      minX,
+      maxX,
+      minY,
+      maxY,
+      width: maxX - minX,
+      height: maxY - minY
+    };
+  };
   return /*#__PURE__*/React.createElement("div", {
     style: styles.container
   }, /*#__PURE__*/React.createElement("label", {
@@ -142,7 +179,8 @@ const CustomTextPage = ({
     fontUrl: fontUrl,
     lineHeight: lineHeight,
     letterSpacing: letterSpacing,
-    alignment: alignment
+    alignment: alignment,
+    calculatePathBounds: calculatePathBounds
   }) : /*#__PURE__*/React.createElement(Smudge, {
     pathBounds: pathBounds,
     setPathBounds: setPathBounds,
@@ -151,7 +189,8 @@ const CustomTextPage = ({
     fontUrl: fontUrl,
     lineHeight: lineHeight,
     letterSpacing: letterSpacing,
-    alignment: alignment
+    alignment: alignment,
+    calculatePathBounds: calculatePathBounds
   }), /*#__PURE__*/React.createElement("label", {
     style: styles.label
   }, "Type"), /*#__PURE__*/React.createElement("div", {
@@ -162,22 +201,13 @@ const CustomTextPage = ({
     style: {
       ...styles.shapeButton,
       ...(selected === s ? styles.shapeButtonSelected : {}),
-      outline: 'none'
+      borderColor: '#CBE2FF'
     },
     onClick: () => setSelected(s)
-    // onMouseEnter={(e) => {
-    //   if (selected !== s) {
-    //     e.target.style.borderColor = '#007bff';
-    //   }
-    // }}
-    // onMouseLeave={(e) => {
-    //   if (selected !== s) {
-    //     e.target.style.borderColor = '#CBE2FF';
-    //   }
-    // }}
   }, /*#__PURE__*/React.createElement("img", {
     src: `./icon/${s}.svg`,
-    alt: s
+    alt: `${s} icon`,
+    style: styles.icon
   }), s))), error && /*#__PURE__*/React.createElement("div", {
     style: styles.errorMessage
   }, error)), /*#__PURE__*/React.createElement("div", {

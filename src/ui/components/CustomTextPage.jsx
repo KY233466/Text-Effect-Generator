@@ -34,16 +34,19 @@ const styles = {
 		border: '1px solid #CBE2FF',
 		cursor: 'pointer',
 		backgroundColor: 'white',
-		fontSize: '14px',
-		fontFamily: 'Avenir Next',
-		fontWeight: '500',
 		transition: 'all 0.3s ease',
-		outline: 'none',
+		outline: "none",
 	},
 	shapeButtonSelected: {
 		backgroundColor: '#EBF3FE',
 		borderColor: '#CBE2FF',
 		outline: 'none',
+	},
+	icon: {
+		width: 60,
+		height: 30,
+		objectFit: 'contain',
+		pointerEvents: 'none'
 	},
 	buttonGroup: {
 		display: 'flex',
@@ -193,22 +196,11 @@ const CustomTextPage = ({
 							style={{
 								...styles.shapeButton,
 								...(selected === s ? styles.shapeButtonSelected : {}),
-								outline: 'none',
-							}
-							}
+								borderColor: '#CBE2FF'
+							}}
 							onClick={() => setSelected(s)}
-							onMouseEnter={(e) => {
-								if (selected !== s) {
-									e.target.style.borderColor = '#007bff';
-								}
-							}}
-							onMouseLeave={(e) => {
-								if (selected !== s) {
-									e.target.style.borderColor = '#CBE2FF';
-								}
-							}}
 						>
-							<img src={`./icon/${s}.svg`} alt={s} />
+							<img src={`./icon/${s}.svg`} alt={`${s} icon`} style={styles.icon} />
 							{s}
 						</button>
 					))}
