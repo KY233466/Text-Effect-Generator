@@ -180,6 +180,8 @@ const TextWarpPage = ({
   }, /*#__PURE__*/React.createElement("label", {
     style: {
       fontWeight: "bold",
+      display: "block",
+      paddingTop: "18px",
       marginBottom: "10px",
       display: "block"
     }
@@ -222,7 +224,7 @@ const TextWarpPage = ({
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
-      marginBottom: "8px"
+      marginBottom: "14px"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -303,13 +305,14 @@ const TextWarpPage = ({
     style: {
       fontWeight: "bold",
       display: "block",
-      marginBottom: "8px"
+      marginBottom: "8px",
+      marginTop: "18px"
     }
   }, "Type"), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       gap: "12px",
-      marginBottom: "20px"
+      marginBottom: "8px"
     }
   }, relatedTypes.map(typeKey => {
     const type = effectsList.find(e => e.key === typeKey);

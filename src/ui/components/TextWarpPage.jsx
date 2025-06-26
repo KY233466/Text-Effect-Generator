@@ -186,7 +186,13 @@ const TextWarpPage = ({
   return (
     <div style={{ backgroundColor: "#FFFFFF" }}>
       <label
-        style={{ fontWeight: "bold", marginBottom: "10px", display: "block" }}
+        style={{
+          fontWeight: "bold",
+          display: "block",
+          paddingTop: "18px",
+          marginBottom: "10px",
+          display: "block",
+        }}
       >
         Preview
       </label>
@@ -226,13 +232,19 @@ const TextWarpPage = ({
         >
           Shape
         </label>
-        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+          }}
+        >
           <div
             style={{
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              marginBottom: "8px",
+              marginBottom: "14px",
             }}
           >
             <div
@@ -329,11 +341,16 @@ const TextWarpPage = ({
       </div>
 
       <label
-        style={{ fontWeight: "bold", display: "block", marginBottom: "8px" }}
+        style={{
+          fontWeight: "bold",
+          display: "block",
+          marginBottom: "8px",
+          marginTop: "18px",
+        }}
       >
         Type
       </label>
-      <div style={{ display: "flex", gap: "12px", marginBottom: "20px" }}>
+      <div style={{ display: "flex", gap: "12px", marginBottom: "8px" }}>
         {relatedTypes.map((typeKey) => {
           const type = effectsList.find((e) => e.key === typeKey);
           return (
