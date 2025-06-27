@@ -2,6 +2,21 @@ import React, { useState } from "react";
 import TextWarpPage from "./components/TextWarpPage.js";
 import CustomTextPage from "./components/CustomTextPage.js";
 import SelectText from "./components/SelectText.js";
+const styles = {
+  app: {
+    width: "100%",
+    height: "100%",
+    padding: "5px 20px"
+  },
+  tabs: {
+    backgroundColor: 'white',
+    display: "flex",
+    paddingBottom: "16px",
+    position: "sticky",
+    top: 0,
+    zIndex: 2
+  }
+};
 const TextWarpApp = ({
   sandboxProxy
 }) => {
@@ -25,21 +40,10 @@ const TextWarpApp = ({
   });
   return /*#__PURE__*/React.createElement("div", {
     className: "app",
-    style: {
-      width: "100%",
-      height: "100%",
-      padding: "5px 20px"
-    }
+    style: styles.app
   }, /*#__PURE__*/React.createElement("div", {
     className: "tab-container",
-    style: {
-      backgroundColor: 'white',
-      display: "flex",
-      paddingBottom: "16px",
-      position: "sticky",
-      top: 0,
-      zIndex: 2
-    }
+    style: styles.tabs
   }, /*#__PURE__*/React.createElement("button", {
     className: `tab ${activeTab === "text" ? "active" : ""}`,
     style: tabStyle("text"),

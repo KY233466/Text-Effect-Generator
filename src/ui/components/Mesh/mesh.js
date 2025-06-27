@@ -2,6 +2,12 @@ import React, { useRef, useState, useEffect } from 'react';
 import opentype from 'opentype.js';
 const Warp = window.Warp;
 const styles = {
+  container: {
+    width: '100%',
+    position: 'relative',
+    overflow: 'hidden',
+    marginBottom: '5px'
+  },
   svgControl: {
     border: '1px solid #CBE2FF',
     borderRadius: '10px',
@@ -201,24 +207,14 @@ export default function Mesh({
     setDragIndex(null);
   };
   return /*#__PURE__*/React.createElement("div", {
-    style: {
-      width: '100%',
-      position: 'relative',
-      overflow: 'hidden',
-      marginBottom: '5px'
-    },
+    style: styles.container,
     onMouseMove: handleMouseMove,
     onMouseUp: handleMouseUp
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'flex',
-      width: '100%'
-    }
   }, /*#__PURE__*/React.createElement("svg", {
     ref: svgControlRef,
     id: "svg-control",
     width: "100%",
-    height: "200",
+    height: "240",
     style: styles.svgControl
   }, /*#__PURE__*/React.createElement("path", {
     ref: controlPathRef,
@@ -244,7 +240,7 @@ export default function Mesh({
     ref: svgRef,
     id: "svg-element",
     width: "100%",
-    height: "200",
+    height: "240",
     style: styles.svg
-  })));
+  }));
 }

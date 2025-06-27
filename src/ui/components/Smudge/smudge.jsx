@@ -7,6 +7,10 @@ const SMUDGE_STRENGTH = 0.33;
 const Warp = window.Warp;
 
 const styles = {
+	container: {
+		width: '100%',
+		marginBottom: '5px'
+	},
 	svg: {
 		border: '1px solid #CBE2FF',
 		borderRadius: '10px',
@@ -242,11 +246,11 @@ export default function Smudge({
 	};
 
 	return (
-		<div style={{ width: '100%', marginBottom: '5px' }}>
+		<div style={styles.container}>
 			<svg
 				ref={svgRef}
 				width="100%"
-				height="200"
+				height="240"
 				viewBox={pathBounds ? `${pathBounds.minX - 20} ${pathBounds.minY - 20} ${pathBounds.width + 40} ${pathBounds.height + 40}` : '0 0 600 200'}
 				preserveAspectRatio="xMidYMid meet"
 				style={{

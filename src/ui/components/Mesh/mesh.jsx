@@ -4,6 +4,12 @@ import opentype from 'opentype.js';
 const Warp = window.Warp;
 
 const styles = {
+	container: {
+		width: '100%',
+		position: 'relative',
+		overflow: 'hidden',
+		marginBottom: '5px'
+	},
 	svgControl: {
 		border: '1px solid #CBE2FF',
 		borderRadius: '10px',
@@ -244,52 +250,45 @@ export default function Mesh({
 
 	return (
 		<div
-			style={{
-				width: '100%',
-				position: 'relative',
-				overflow: 'hidden',
-				marginBottom: '5px'
-			}}
+			style={styles.container}
 			onMouseMove={handleMouseMove}
 			onMouseUp={handleMouseUp}
 		>
-			<div style={{ display: 'flex', width: '100%' }}>
-				<svg
-					ref={svgControlRef}
-					id="svg-control"
-					width="100%"
-					height="200"
-					style={styles.svgControl}
-				>
-					<path
-						ref={controlPathRef}
-						id="control-path"
-						fill="none"
-						stroke="#1178FF"
-						strokeWidth="1px"
-					/>
-					{text != "" && Array.from({ length: 7 }).map((_, i) => (
-						<circle
-							key={i}
-							ref={(el) => (controlCirclesRef.current[i] = el)}
-							r="5"
-							fill="blue"
-							stroke="white"
-							strokeWidth="1"
-							onMouseDown={handleMouseDown(i)}
-							style={{ cursor: 'grab', pointerEvents: 'all' }}
-						/>
-					))}
-				</svg>
-
-				<svg
-					ref={svgRef}
-					id="svg-element"
-					width="100%"
-					height="200"
-					style={styles.svg}
+			<svg
+				ref={svgControlRef}
+				id="svg-control"
+				width="100%"
+				height="240"
+				style={styles.svgControl}
+			>
+				<path
+					ref={controlPathRef}
+					id="control-path"
+					fill="none"
+					stroke="#1178FF"
+					strokeWidth="1px"
 				/>
-			</div>
+				{text != "" && Array.from({ length: 7 }).map((_, i) => (
+					<circle
+						key={i}
+						ref={(el) => (controlCirclesRef.current[i] = el)}
+						r="5"
+						fill="blue"
+						stroke="white"
+						strokeWidth="1"
+						onMouseDown={handleMouseDown(i)}
+						style={{ cursor: 'grab', pointerEvents: 'all' }}
+					/>
+				))}
+			</svg>
+
+			<svg
+				ref={svgRef}
+				id="svg-element"
+				width="100%"
+				height="240"
+				style={styles.svg}
+			/>
 		</div>
 	);
 }

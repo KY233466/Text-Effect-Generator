@@ -211,7 +211,7 @@ export default function Smudge({
   }, /*#__PURE__*/React.createElement("svg", {
     ref: svgRef,
     width: "100%",
-    height: "200",
+    height: "240",
     viewBox: pathBounds ? `${pathBounds.minX - 20} ${pathBounds.minY - 20} ${pathBounds.width + 40} ${pathBounds.height + 40}` : '0 0 600 200',
     preserveAspectRatio: "xMidYMid meet",
     style: {
