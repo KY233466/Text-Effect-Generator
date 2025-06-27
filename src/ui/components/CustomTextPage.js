@@ -38,7 +38,7 @@ const styles = {
   },
   shapeButtonSelected: {
     backgroundColor: '#EBF3FE',
-    borderColor: '#CBE2FF',
+    borderColor: '#1178FF',
     outline: 'none'
   },
   icon: {
@@ -57,7 +57,7 @@ const styles = {
     border: 'none',
     borderRadius: '8px',
     fontSize: '14px',
-    // fontFamily: 'Avenir Next',
+    fontFamily: 'Avenir Next',
     fontWeight: '600',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
@@ -72,7 +72,7 @@ const styles = {
     borderRadius: '8px',
     fontSize: '14px',
     width: '100%',
-    // fontFamily: 'Avenir Next',
+    fontFamily: 'Avenir Next',
     fontWeight: '600',
     cursor: 'pointer',
     transition: 'all 0.3s ease',

@@ -39,7 +39,7 @@ const styles = {
 	},
 	shapeButtonSelected: {
 		backgroundColor: '#EBF3FE',
-		borderColor: '#CBE2FF',
+		borderColor: '#1178FF',
 		outline: 'none',
 	},
 	icon: {
