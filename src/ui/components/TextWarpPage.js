@@ -19,7 +19,7 @@ const styles = {
     display: "block"
   },
   previewContainer: {
-    border: "1px solid #CBE2FF",
+    border: "1px solid #EBF3FE",
     height: "240px",
     borderRadius: "10px",
     marginBottom: "24px",
@@ -43,16 +43,15 @@ const styles = {
     marginBottom: "24px",
     backgroundColor: "#EBF3FE",
     padding: "10px",
-    borderRadius: "5px"
+    borderRadius: "10px",
+    flexDirection: "row"
   },
   sliderIcon: {
-    width: "12px",
-    height: "12px",
-    marginTop: "2px"
+    fontSize: "12px"
   },
   sliderValue: {
     width: "30px",
-    marginLeft: "12px",
+    marginLeft: "4px",
     fontSize: "12px"
   },
   slider: {
@@ -76,7 +75,7 @@ const styles = {
     width: "86px",
     height: "86px",
     borderRadius: "8px",
-    border: "1px solid #CBE2FF",
+    border: "1px solid #EBF3FE",
     backgroundColor: "white",
     outline: "none",
     cursor: "pointer",
@@ -88,7 +87,7 @@ const styles = {
     boxSizing: "border-box"
   },
   effectButtonSelected: {
-    backgroundColor: "#CBE2FF",
+    backgroundColor: "#EBF3FE",
     border: "1px solid #1178FF",
     borderStyle: "solid"
   },
@@ -109,7 +108,7 @@ const styles = {
     alignItems: "center",
     gap: "1px",
     padding: "2px",
-    backgroundColor: "#CBE2FF",
+    backgroundColor: "#EBF3FE",
     borderRadius: "20px"
   },
   paginationButton: {
@@ -217,12 +216,12 @@ const TextWarpPage = ({
     label: "Other",
     types: ["envelopeWave", "bouquet"]
   }];
+  const getSliderBackground = intensity => `linear-gradient(to right, #1178FF 0%, #1178FF ${intensity}%, #ffffff ${intensity}%, #ffffff 100%)`;
   const pageSize = 3;
   const totalPages = Math.ceil(shapeGroups.length / pageSize);
   const currentGroups = shapeGroups.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
   const selectedGroup = shapeGroups.find(group => group.types.includes(warpType)) || shapeGroups[0];
   const relatedTypes = selectedGroup.types;
-  const currentPageEffects = currentGroups;
   const calculatePathBounds = commands => {
     let minX = Infinity,
       minY = Infinity,
@@ -429,7 +428,7 @@ const TextWarpPage = ({
     style: styles.sliderContainer
   }, /*#__PURE__*/React.createElement("span", {
     style: styles.sliderIcon
-  }), /*#__PURE__*/React.createElement("span", {
+  }, "Bend"), /*#__PURE__*/React.createElement("span", {
     style: styles.sliderValue
   }, intensity), /*#__PURE__*/React.createElement("input", {
     type: "range",
@@ -437,7 +436,10 @@ const TextWarpPage = ({
     max: "100",
     value: intensity,
     onChange: e => setIntensity(Number(e.target.value)),
-    style: styles.slider
+    style: {
+      ...styles.slider,
+      background: getSliderBackground(intensity)
+    }
   })), /*#__PURE__*/React.createElement("button", {
     onClick: handleInsert,
     disabled: isLoading || !svgPath,
