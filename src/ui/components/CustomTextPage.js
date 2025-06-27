@@ -34,6 +34,7 @@ const styles = {
     cursor: 'pointer',
     backgroundColor: 'white',
     transition: 'all 0.3s ease',
+    borderColor: '#CBE2FF',
     outline: "none"
   },
   shapeButtonSelected: {
@@ -200,8 +201,7 @@ const CustomTextPage = ({
     onFocus: e => e.target.blur(),
     style: {
       ...styles.shapeButton,
-      ...(selected === s ? styles.shapeButtonSelected : {}),
-      borderColor: '#CBE2FF'
+      ...(selected === s ? styles.shapeButtonSelected : {})
     },
     onClick: () => setSelected(s)
   }, /*#__PURE__*/React.createElement("img", {

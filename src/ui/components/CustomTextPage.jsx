@@ -35,6 +35,7 @@ const styles = {
 		cursor: 'pointer',
 		backgroundColor: 'white',
 		transition: 'all 0.3s ease',
+		borderColor: '#CBE2FF',
 		outline: "none",
 	},
 	shapeButtonSelected: {
@@ -196,7 +197,6 @@ const CustomTextPage = ({
 							style={{
 								...styles.shapeButton,
 								...(selected === s ? styles.shapeButtonSelected : {}),
-								borderColor: '#CBE2FF'
 							}}
 							onClick={() => setSelected(s)}
 						>
