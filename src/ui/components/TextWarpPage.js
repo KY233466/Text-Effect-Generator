@@ -5,11 +5,10 @@ import opentype from "opentype.js";
 // 样式对象
 const styles = {
   container: {
-    backgroundColor: "#FFFFFF",
-    marginTop: "24px",
-    width: '280px',
-    marginLeft: '20px',
-    marginRight: '20px'
+    display: "flex",
+    flexDirection: "column",
+    width: "100%",
+    height: "calc(100% - 65px)"
   },
   label: {
     color: "#06001A",
@@ -20,170 +19,162 @@ const styles = {
     display: "block"
   },
   previewContainer: {
-    width: '280px',
-    height: '240px',
-    border: '1px solid #CBE2FF',
-    borderRadius: '10px',
-    marginBottom: '24px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FFFFFF'
+    border: "1px solid #CBE2FF",
+    height: "240px",
+    borderRadius: "10px",
+    marginBottom: "24px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#FFFFFF"
   },
   svg: {
-    width: '100%',
-    height: '100%'
+    width: "100%",
+    height: "100%"
   },
   controlSection: {
-    marginBottom: '24px'
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-start"
   },
   sliderContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    marginBottom: '8px',
-    backgroundColor: '#EBF3FE',
-    padding: '10px',
-    borderRadius: '5px'
+    display: "flex",
+    alignItems: "center",
+    marginBottom: "24px",
+    backgroundColor: "#EBF3FE",
+    padding: "10px",
+    borderRadius: "5px"
   },
   sliderIcon: {
-    width: '12px',
-    height: '12px',
-    marginTop: '2px'
+    width: "12px",
+    height: "12px",
+    marginTop: "2px"
   },
   sliderValue: {
-    width: '30px',
-    marginLeft: '12px',
-    fontSize: '12px'
+    width: "30px",
+    marginLeft: "12px",
+    fontSize: "12px"
   },
   slider: {
-    marginTop: '5px',
-    width: '80%',
-    WebkitAppearance: 'none',
-    appearance: 'none',
-    height: '6px',
-    background: 'white',
-    borderRadius: '3px',
-    outline: 'none',
-    border: '1px solid #ddd'
+    marginTop: "5px",
+    width: "80%",
+    WebkitAppearance: "none",
+    appearance: "none",
+    height: "6px",
+    background: "white",
+    borderRadius: "3px",
+    outline: "none",
+    border: "1px solid #ddd"
   },
   gridContainer: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: '12px',
-    marginBottom: '16px'
+    display: "grid",
+    gridTemplateColumns: "repeat(3, 1fr)",
+    gap: "12px",
+    marginBottom: "12px"
   },
   effectButton: {
-    width: '86px',
-    height: '86px',
-    borderRadius: '8px',
-    border: '2px solid #CBE2FF',
-    backgroundColor: 'white',
-    cursor: 'pointer',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    transition: 'all 0.2s ease',
-    boxSizing: 'border-box'
+    width: "86px",
+    height: "86px",
+    borderRadius: "8px",
+    border: "1px solid #CBE2FF",
+    backgroundColor: "white",
+    outline: "none",
+    cursor: "pointer",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    transition: "all 0.2s ease",
+    boxSizing: "border-box"
   },
   effectButtonSelected: {
-    backgroundColor: '#1178FF',
-    borderColor: '#1178FF'
+    backgroundColor: "#CBE2FF",
+    border: "1px solid #1178FF",
+    borderStyle: "solid"
   },
   effectIcon: {
-    width: '32px',
-    height: '32px',
-    marginBottom: '4px'
+    marginBottom: "4px"
   },
   effectLabel: {
-    fontSize: '10px',
-    color: '#666',
-    textAlign: 'center',
-    fontFamily: 'Avenir Next'
+    fontSize: "10px",
+    color: "#666",
+    textAlign: "center",
+    fontFamily: "Avenir Next"
   },
   effectLabelSelected: {
-    color: 'white'
+    color: "white"
   },
-  paginationContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: '12px',
-    marginBottom: '16px'
+  paginationWrapper: {
+    display: "flex",
+    alignItems: "center",
+    gap: "1px",
+    padding: "2px",
+    backgroundColor: "#CBE2FF",
+    borderRadius: "20px"
   },
   paginationButton: {
-    width: '32px',
-    height: '32px',
-    borderRadius: '50%',
-    border: '1px solid #CBE2FF',
-    backgroundColor: 'white',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '14px',
-    color: '#666',
-    transition: 'all 0.2s ease'
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    color: "#000"
   },
   paginationButtonDisabled: {
-    cursor: 'not-allowed',
-    opacity: 0.5
+    cursor: "not-allowed",
+    color: "#ccc"
   },
-  paginationInfo: {
-    fontSize: '12px',
-    color: '#666',
-    fontFamily: 'Avenir Next'
+  pageIndexText: {
+    fontSize: 10
   },
   typeButtonsContainer: {
-    display: 'flex',
-    gap: '8px',
-    marginBottom: '24px',
-    flexWrap: 'wrap'
+    display: "flex",
+    gap: "8px",
+    marginBottom: "24px",
+    flexWrap: "wrap"
   },
   typeButton: {
-    padding: '8px 12px',
-    borderRadius: '6px',
-    border: '1px solid #CBE2FF',
-    backgroundColor: 'white',
-    cursor: 'pointer',
-    fontSize: '12px',
-    fontFamily: 'Avenir Next',
-    color: '#666',
-    transition: 'all 0.2s ease'
+    padding: "8px 12px",
+    borderRadius: "6px",
+    border: "1px solid #CBE2FF",
+    backgroundColor: "white",
+    cursor: "pointer",
+    fontSize: "12px",
+    fontFamily: "Avenir Next",
+    color: "#666",
+    transition: "all 0.2s ease"
   },
   typeButtonSelected: {
-    backgroundColor: '#1178FF',
-    borderColor: '#1178FF',
-    color: 'white'
+    backgroundColor: "#1178FF",
+    borderColor: "#1178FF",
+    color: "white"
   },
   insertButton: {
-    width: '280px',
-    height: '37px',
-    fontSize: '14px',
-    fontFamily: 'Avenir Next',
-    fontWeight: '600',
-    padding: '0',
-    backgroundColor: '#1178FF',
-    color: 'white',
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    transition: 'background-color 0.2s ease',
-    boxSizing: 'border-box'
+    width: "100%",
+    height: "37px",
+    fontSize: "14px",
+    fontFamily: "Avenir Next",
+    fontWeight: "600",
+    padding: "0",
+    backgroundColor: "#1178FF",
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
+    transition: "background-color 0.2s ease",
+    boxSizing: "border-box"
   },
   insertButtonDisabled: {
-    backgroundColor: '#CCCCCC',
-    cursor: 'not-allowed'
+    backgroundColor: "#CCCCCC",
+    cursor: "not-allowed"
   },
   errorMessage: {
-    color: '#dc3545',
-    backgroundColor: '#f8d7da',
-    border: '1px solid #f5c6cb',
-    padding: '8px 12px',
-    borderRadius: '4px',
-    textAlign: 'center',
-    marginTop: '12px',
-    fontSize: '12px'
+    color: "#dc3545",
+    backgroundColor: "#f8d7da",
+    border: "1px solid #f5c6cb",
+    padding: "8px 12px",
+    borderRadius: "4px",
+    textAlign: "center",
+    marginTop: "12px",
+    fontSize: "12px"
   }
 };
 const TextWarpPage = ({
@@ -377,18 +368,26 @@ const TextWarpPage = ({
     stroke: "none"
   }))), /*#__PURE__*/React.createElement("div", {
     style: styles.controlSection
-  }, /*#__PURE__*/React.createElement("div", {
-    style: styles.paginationContainer
+  }, /*#__PURE__*/React.createElement("label", {
+    style: styles.label
+  }, "Shape"), /*#__PURE__*/React.createElement("div", {
+    style: styles.paginationWrapper
   }, /*#__PURE__*/React.createElement("button", {
     onClick: () => setPageIndex(p => Math.max(p - 1, 0)),
-    style: styles.paginationButton,
-    disabled: pageIndex === 0
+    disabled: pageIndex === 0,
+    style: {
+      ...styles.paginationButton,
+      ...(pageIndex === 0 ? styles.paginationButtonDisabled : {})
+    }
   }, "<"), /*#__PURE__*/React.createElement("span", {
-    style: styles.paginationInfo
-  }, pageIndex + 1, " / ", totalPages), /*#__PURE__*/React.createElement("button", {
+    style: styles.pageIndexText
+  }, pageIndex + 1), /*#__PURE__*/React.createElement("button", {
     onClick: () => setPageIndex(p => Math.min(p + 1, totalPages - 1)),
-    style: styles.paginationButton,
-    disabled: pageIndex === totalPages - 1
+    disabled: pageIndex === totalPages - 1,
+    style: {
+      ...styles.paginationButton,
+      ...(pageIndex === totalPages - 1 ? styles.paginationButtonDisabled : {})
+    }
   }, ">"))), /*#__PURE__*/React.createElement("div", {
     style: styles.gridContainer
   }, currentGroups.map(group => /*#__PURE__*/React.createElement("button", {
@@ -396,7 +395,10 @@ const TextWarpPage = ({
     onClick: () => {
       setWarpType(group.types[0]);
     },
-    style: styles.effectButton
+    style: {
+      ...styles.effectButton,
+      ...(warpType === group.types[0] ? styles.effectButtonSelected : {})
+    }
   }, /*#__PURE__*/React.createElement("div", {
     style: styles.effectIcon
   }, /*#__PURE__*/React.createElement("img", {
@@ -413,7 +415,10 @@ const TextWarpPage = ({
     return /*#__PURE__*/React.createElement("button", {
       key: typeKey,
       onClick: () => setWarpType(typeKey),
-      style: styles.typeButton
+      style: {
+        ...styles.effectButton,
+        ...(warpType === typeKey ? styles.effectButtonSelected : {})
+      }
     }, /*#__PURE__*/React.createElement("div", {
       style: styles.effectIcon
     }, /*#__PURE__*/React.createElement("img", {
