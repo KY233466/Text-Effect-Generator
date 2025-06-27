@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { effectsList, getWarpFunction } from "../shapes/index.js";
 import opentype from "opentype.js";
-
-// 样式对象
 const styles = {
   container: {
     display: "flex",
     flexDirection: "column",
     width: "100%",
-    height: "calc(100% - 65px)"
+    height: "calc(100% - 55px)"
+  },
+  content: {
+    flex: 1,
+    overflowY: 'auto',
+    paddingTop: '22px'
   },
   label: {
     color: "#06001A",
@@ -21,12 +24,13 @@ const styles = {
   previewContainer: {
     border: "1px solid #EBF3FE",
     height: "240px",
+    width: "100%",
     borderRadius: "10px",
-    marginBottom: "24px",
+    marginBottom: '5px',
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FFFFFF"
+    position: "sticky"
   },
   svg: {
     width: "100%",
@@ -147,23 +151,38 @@ const styles = {
     color: "white"
   },
   insertButton: {
-    width: "100%",
-    height: "37px",
-    fontSize: "14px",
-    fontFamily: "Avenir Next",
-    fontWeight: "600",
-    padding: "0",
-    backgroundColor: "#1178FF",
-    color: "white",
-    border: "none",
-    borderRadius: "8px",
-    cursor: "pointer",
-    transition: "background-color 0.2s ease",
-    boxSizing: "border-box"
+    marginTop: '10px',
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '14px',
+    fontFamily: 'Avenir Next',
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    width: '100%',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    padding: '12px 24px',
+    background: '#1178FF',
+    color: 'white'
   },
   insertButtonDisabled: {
-    backgroundColor: "#CCCCCC",
-    cursor: "not-allowed"
+    marginTop: '10px',
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '14px',
+    width: '100%',
+    fontFamily: 'Avenir Next',
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    minWidth: '120px',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    padding: '12px 24px',
+    backgroundColor: '#ccc',
+    color: '#666',
+    cursor: 'not-allowed',
+    transform: 'none',
+    boxShadow: 'none'
   },
   errorMessage: {
     color: "#dc3545",
@@ -366,6 +385,8 @@ const TextWarpPage = ({
     fill: "#06001A",
     stroke: "none"
   }))), /*#__PURE__*/React.createElement("div", {
+    style: styles.content
+  }, /*#__PURE__*/React.createElement("div", {
     style: styles.controlSection
   }, /*#__PURE__*/React.createElement("label", {
     style: styles.label
@@ -440,11 +461,23 @@ const TextWarpPage = ({
       ...styles.slider,
       background: getSliderBackground(intensity)
     }
-  })), /*#__PURE__*/React.createElement("button", {
+  }))), /*#__PURE__*/React.createElement("button", {
     onClick: handleInsert,
     disabled: isLoading || !svgPath,
-    style: styles.insertButton
-  }, isLoading ? "插入中..." : "Add to design"), error && /*#__PURE__*/React.createElement("div", {
+    style: isLoading || !svgPath ? styles.insertButtonDisabled : styles.insertButton,
+    onMouseEnter: e => {
+      if (!isLoading && svgPath) {
+        e.target.style.transform = 'translateY(-2px)';
+        e.target.style.boxShadow = '0 6px 20px rgba(17, 120, 255, 0.4)';
+      }
+    },
+    onMouseLeave: e => {
+      if (!isLoading && svgPath) {
+        e.target.style.transform = 'translateY(0)';
+        e.target.style.boxShadow = '0 4px 15px rgba(17, 120, 255, 0.3)';
+      }
+    }
+  }, isLoading ? 'Inserting...' : 'Add to Design'), error && /*#__PURE__*/React.createElement("div", {
     style: styles.errorMessage
   }, error));
 };

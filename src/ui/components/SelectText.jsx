@@ -7,6 +7,117 @@ const fonts = [
   { name: "Helvetica", url: "./fonts/Helvetica.ttf" }
 ];
 
+const styles = {
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    width: '100%',
+    height: 'calc(100% - 55px)',
+  },
+  content: {
+    flex: 1,
+    overflowY: 'auto'
+  },
+  preview: {
+    width: '100%',
+    height: '240px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: "sticky",
+    top: 56,
+    zIndex: 1,
+    paddingBottom: "5px",
+  },
+  label: {
+    color: "#06001A",
+    fontSize: "14px",
+    fontFamily: "Avenir Next",
+    fontWeight: "600",
+    marginBottom: "8px",
+    display: "block"
+  },
+  alignment: {
+    width: '86px',
+    height: '37px',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    padding: '8px'
+  },
+  insertButton: {
+    marginTop: '10px',
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '14px',
+    fontFamily: 'Avenir Next',
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    width: '100%',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    padding: '12px 24px',
+    background: '#1178FF',
+    color: 'white'
+  },
+  insertButtonDisabled: {
+    marginTop: '10px',
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '14px',
+    width: '100%',
+    fontFamily: 'Avenir Next',
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    minWidth: '120px',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    padding: '12px 24px',
+    backgroundColor: '#ccc',
+    color: '#666',
+    cursor: 'not-allowed',
+    transform: 'none',
+    boxShadow: 'none'
+  },
+  errorMessage: {
+    color: '#dc3545',
+    backgroundColor: '#f8d7da',
+    border: '1px solid #f5c6cb',
+    padding: '8px 12px',
+    borderRadius: '4px',
+    textAlign: 'center',
+    marginTop: '12px'
+  },
+  textInput: {
+    border: '1px solid #CBE2FF',
+    borderRadius: '10px',
+    width: '280px',
+    height: '72px',
+    padding: '12px',
+    fontSize: '14px',
+    fontFamily: 'Avenir Next',
+    resize: 'none',
+    outline: 'none',
+    transition: 'border-color 0.2s ease',
+    boxSizing: 'border-box'
+  },
+  selectFont: {
+    border: '1px solid #CBE2FF',
+    borderRadius: '10px',
+    width: '100%',
+    height: '40px',
+    fontSize: '14px',
+    fontFamily: 'Avenir Next',
+    marginBottom: '12px',
+    outline: 'none',
+    cursor: 'pointer',
+    boxSizing: 'border-box'
+  }
+};
+
 export default function SelectText({ sandboxProxy,
   text,
   setText,
@@ -107,7 +218,7 @@ export default function SelectText({ sandboxProxy,
         lineInfos.forEach((lineInfo, lineIndex) => {
           const { glyphs, lineWidth, y } = lineInfo;
           let x;
-          
+
           // 根据对齐方式计算起始x位置
           if (alignment === 'left') {
             x = 0;
@@ -172,261 +283,172 @@ export default function SelectText({ sandboxProxy,
   };
 
   return (
-    <div style={{ 
-      backgroundColor: '#FFFFFF',
-      width: '280px',
-      padding: '0',
-      margin: '0 auto'
-    }}>
-      <div style={{ marginBottom: "0" }}>
-        <label style={{ 
-          color: "#06001A",
-          fontSize: "14px",
-          fontFamily: "Avenir Next",
-          fontWeight: "600",
-          marginBottom: "8px",
-          display: "block"
-        }}>Preview</label>
-        <div style={{ 
-          width: '280px', 
-          height: '240px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-          {error ? (
-            <div style={{
-              color: '#ff4444',
-              fontSize: '12px',
-              textAlign: 'center',
-              padding: '20px'
-            }}>{error}</div>
-          ) : (
-            <svg
-              viewBox={pathBounds ?
-                `${pathBounds.minX - 20} ${pathBounds.minY - 20} ${pathBounds.width + 40} ${pathBounds.height + 40}` :
-                '0 0 1000 300'
-              }
-              width="100%"
-              height="100%"
+    <div style={styles.container}>
+      <label style={styles.label}>Preview</label>
+      <div style={styles.preview}>
+        {error ? (
+          <div style={{
+            color: '#ff4444',
+            fontSize: '12px',
+            textAlign: 'center',
+            padding: '20px'
+          }}>{error}</div>
+        ) : (
+          <svg
+            viewBox={pathBounds ?
+              `${pathBounds.minX - 20} ${pathBounds.minY - 20} ${pathBounds.width + 40} ${pathBounds.height + 40}` :
+              '0 0 1000 300'
+            }
+            width="100%"
+            height="100%"
+            style={{
+              border: '1px solid #CBE2FF',
+              borderRadius: '10px',
+              backgroundColor: '#FFFFFF'
+            }}
+          >
+            <path d={svgPath} fill="black" stroke="none" />
+          </svg>
+        )}
+      </div>
+
+      <div style={styles.content}>
+        <div style={{ marginTop: '22px', marginBottom: "0" }}>
+          <label style={styles.label}>Text</label>
+          <textarea
+            style={styles.textInput}
+            value={text}
+            onChange={e => setText(e.target.value)}
+            placeholder="Enter text to render\nMulti-line supported\nEach line renders separately"
+            rows={3}
+            onFocus={e => e.target.style.borderColor = '#1178FF'}
+            onBlur={e => e.target.style.borderColor = '#CBE2FF'}
+          />
+        </div>
+
+        <div style={{ width: '280px', height: '227px', marginTop: '24px', marginBottom: "0" }}>
+          <label style={styles.label}>Typography</label>
+          <select
+            value={fontUrl}
+            onChange={e => setFontUrl(e.target.value)}
+            style={styles.selectFont}
+          >
+            {fonts.map(f => (
+              <option key={f.url} value={f.url}>{f.name}</option>
+            ))}
+          </select>
+
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px', backgroundColor: '#EBF3FE', padding: '10px', borderRadius: '5px' }}>
+            <img src="./icon/line_height.png" alt="icon" style={{ width: '12px', height: '12px', marginTop: '2px' }} />
+            <span style={{ width: '30px', marginLeft: '12px', fontSize: '12px' }}>{lineHeight}</span>
+            <input
+              type="range"
+              min="0.8"
+              max="2.5"
+              step="0.1"
+              value={lineHeight}
+              onChange={e => {
+                const value = Number(e.target.value);
+                setLineHeight(value);
+                const progress = ((value - 0.8) / (2.5 - 0.8)) * 100;
+                e.target.style.setProperty('--progress', `${progress}%`);
+              }}
+              onInput={e => {
+                const value = Number(e.target.value);
+                const progress = ((value - 0.8) / (2.5 - 0.8)) * 100;
+                e.target.style.setProperty('--progress', `${progress}%`);
+              }}
+              className="intensity-slider"
+              style={{ marginTop: '5px', width: '80%', '--progress': `${((lineHeight - 0.8) / (2.5 - 0.8)) * 100}%` }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px', backgroundColor: '#EBF3FE', padding: '10px', borderRadius: '5px' }}>
+            <img src="./icon/letter_spacing.png" alt="icon" style={{ width: '12px', height: '12px', marginTop: '2px' }} />
+            <span style={{ width: '30px', marginLeft: '12px', fontSize: '12px' }}>{letterSpacing}</span>
+            <input
+              type="range"
+              min="0"
+              max="20"
+              value={letterSpacing}
+              onChange={e => {
+                const value = Number(e.target.value);
+                setLetterSpacing(value);
+                const progress = (value / 20) * 100;
+                e.target.style.setProperty('--progress', `${progress}%`);
+              }}
+              onInput={e => {
+                const value = Number(e.target.value);
+                const progress = (value / 20) * 100;
+                e.target.style.setProperty('--progress', `${progress}%`);
+              }}
+              className="intensity-slider"
+              style={{ marginTop: '5px', width: '80%', '--progress': `${(letterSpacing / 20) * 100}%` }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <button
+              onClick={() => setAlignment('left')}
               style={{
-                border: '1px solid #CBE2FF',
-                borderRadius: '10px',
-                backgroundColor: '#FFFFFF'
+                ...styles.alignment,
+                backgroundColor: alignment === 'left' ? 'white' : '#EBF3FE',
+                border: alignment === 'left' ? '2px solid #CBE2FF' : 'none'
               }}
             >
-              <path d={svgPath} fill="black" stroke="none" />
-            </svg>
-          )}
+              <div style={{ width: '100%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
+              <div style={{ width: '75%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
+              <div style={{ width: '90%', height: '2px', backgroundColor: '#666' }}></div>
+            </button>
+
+            <button
+              onClick={() => setAlignment('center')}
+              style={{
+                ...styles.alignment,
+                backgroundColor: alignment === 'center' ? 'white' : '#EBF3FE',
+                border: alignment === 'center' ? '2px solid #CBE2FF' : 'none'
+              }}
+            >
+              <div style={{ width: '100%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
+              <div style={{ width: '75%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
+              <div style={{ width: '90%', height: '2px', backgroundColor: '#666' }}></div>
+            </button>
+
+            <button
+              onClick={() => setAlignment('right')}
+              style={{
+                ...styles.alignment,
+                backgroundColor: alignment === 'right' ? 'white' : '#EBF3FE',
+                border: alignment === 'right' ? '2px solid #CBE2FF' : 'none'
+              }}
+            >
+              <div style={{ width: '100%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
+              <div style={{ width: '75%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
+              <div style={{ width: '90%', height: '2px', backgroundColor: '#666' }}></div>
+            </button>
+          </div>
         </div>
       </div>
 
-      <div style={{ marginTop: '32px', marginBottom: "0" }}>
-        <label style={{ 
-          color: "#06001A",
-          fontSize: "14px",
-          fontFamily: "Avenir Next",
-          fontWeight: "600",
-          marginBottom: "8px",
-          display: "block"
-        }}>Text</label>
-        <textarea
-          style={{
-            border: '1px solid #CBE2FF',
-            borderRadius: '10px',
-            width: '280px',
-            height: '72px',
-            padding: '12px',
-            fontSize: '14px',
-            fontFamily: 'Avenir Next',
-            resize: 'none',
-            outline: 'none',
-            transition: 'border-color 0.2s ease',
-            boxSizing: 'border-box'
-          }}
-          value={text}
-          onChange={e => setText(e.target.value)}
-          placeholder="Enter text to render\nMulti-line supported\nEach line renders separately"
-          rows={3}
-          onFocus={e => e.target.style.borderColor = '#1178FF'}
-          onBlur={e => e.target.style.borderColor = '#CBE2FF'}
-        />
-      </div>
-
-      <div style={{ width: '280px', height: '227px', marginTop: '24px', marginBottom: "0" }}>
-        <label style={{ 
-          color: "#06001A",
-          fontSize: "14px",
-          fontFamily: "Avenir Next",
-          fontWeight: "600",
-          marginBottom: "8px",
-          display: "block"
-        }}>Typography</label>
-        <select
-          value={fontUrl}
-          onChange={e => setFontUrl(e.target.value)}
-          style={{
-            border: '1px solid #CBE2FF',
-            borderRadius: '10px',
-            width: '100%',
-            height: '40px',
-            fontSize: '14px',
-            fontFamily: 'Avenir Next',
-            marginBottom: '12px',
-            outline: 'none',
-            cursor: 'pointer',
-            boxSizing: 'border-box'
-          }}
-        >
-          {fonts.map(f => (
-            <option key={f.url} value={f.url}>{f.name}</option>
-          ))}
-        </select>
-
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px', backgroundColor: '#EBF3FE', padding: '10px', borderRadius: '5px' }}>
-          <img src="./icon/line_height.png" alt="icon" style={{ width: '12px', height: '12px', marginTop: '2px' }} />
-          <span style={{ width: '30px', marginLeft: '12px', fontSize: '12px' }}>{lineHeight}</span>
-          <input
-            type="range"
-            min="0.8"
-            max="2.5"
-            step="0.1"
-            value={lineHeight}
-            onChange={e => {
-              const value = Number(e.target.value);
-              setLineHeight(value);
-              const progress = ((value - 0.8) / (2.5 - 0.8)) * 100;
-              e.target.style.setProperty('--progress', `${progress}%`);
-            }}
-            onInput={e => {
-              const value = Number(e.target.value);
-              const progress = ((value - 0.8) / (2.5 - 0.8)) * 100;
-              e.target.style.setProperty('--progress', `${progress}%`);
-            }}
-            className="intensity-slider"
-            style={{ marginTop: '5px', width: '80%', '--progress': `${((lineHeight - 0.8) / (2.5 - 0.8)) * 100}%` }}
-          />
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px', backgroundColor: '#EBF3FE', padding: '10px', borderRadius: '5px' }}>
-          <img src="./icon/letter_spacing.png" alt="icon" style={{ width: '12px', height: '12px', marginTop: '2px' }} />
-          <span style={{ width: '30px', marginLeft: '12px', fontSize: '12px' }}>{letterSpacing}</span>
-          <input
-            type="range"
-            min="0"
-            max="20"
-            value={letterSpacing}
-            onChange={e => {
-              const value = Number(e.target.value);
-              setLetterSpacing(value);
-              const progress = (value / 20) * 100;
-              e.target.style.setProperty('--progress', `${progress}%`);
-            }}
-            onInput={e => {
-              const value = Number(e.target.value);
-              const progress = (value / 20) * 100;
-              e.target.style.setProperty('--progress', `${progress}%`);
-            }}
-            className="intensity-slider"
-            style={{ marginTop: '5px', width: '80%', '--progress': `${(letterSpacing / 20) * 100}%` }}
-          />
-        </div>
-
-        <div style={{ display: 'flex', gap: '12px' }}>
-          <button
-            onClick={() => setAlignment('left')}
-            style={{
-              width: '86px',
-              height: '37px',
-              backgroundColor: alignment === 'left' ? 'white' : '#EBF3FE',
-                              border: alignment === 'left' ? '2px solid #CBE2FF' : 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-start',
-              justifyContent: 'center',
-              padding: '8px'
-            }}
-          >
-            <div style={{ width: '100%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
-            <div style={{ width: '75%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
-            <div style={{ width: '90%', height: '2px', backgroundColor: '#666' }}></div>
-          </button>
-
-          <button
-            onClick={() => setAlignment('center')}
-            style={{
-              width: '86px',
-              height: '37px',
-              backgroundColor: alignment === 'center' ? 'white' : '#EBF3FE',
-                              border: alignment === 'center' ? '2px solid #CBE2FF' : 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '8px'
-            }}
-          >
-            <div style={{ width: '100%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
-            <div style={{ width: '75%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
-            <div style={{ width: '90%', height: '2px', backgroundColor: '#666' }}></div>
-          </button>
-
-          <button
-            onClick={() => setAlignment('right')}
-            style={{
-              width: '86px',
-              height: '37px',
-              backgroundColor: alignment === 'right' ? 'white' : '#EBF3FE',
-                              border: alignment === 'right' ? '2px solid #CBE2FF' : 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-end',
-              justifyContent: 'center',
-              padding: '8px'
-            }}
-          >
-            <div style={{ width: '100%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
-            <div style={{ width: '75%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
-            <div style={{ width: '90%', height: '2px', backgroundColor: '#666' }}></div>
-          </button>
-        </div>
-      </div>
-
-      <div style={{ marginTop: '40px' }}>
-        <div style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'center'
-        }}>
-          <button
-            onClick={handleInsert}
-            disabled={isLoading || !svgPath}
-            style={{ 
-              width: '280px', 
-              height: '37px', 
-              fontSize: '14px', 
-              fontFamily: 'Avenir Next',
-              fontWeight: '600',
-              padding: '0', 
-              backgroundColor: isLoading || !svgPath ? '#CCCCCC' : '#1178FF',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: isLoading || !svgPath ? 'not-allowed' : 'pointer',
-              transition: 'background-color 0.2s ease',
-              boxSizing: 'border-box'
-            }}
-          >
-            {isLoading ? '插入中...' : 'Add to design'}
-          </button>
-        </div>
-      </div>
+      <button
+        onClick={handleInsert}
+        disabled={isLoading || !svgPath}
+        style={isLoading || !svgPath ? styles.insertButtonDisabled : styles.insertButton}
+        onMouseEnter={(e) => {
+          if (!isLoading && svgPath) {
+            e.target.style.transform = 'translateY(-2px)';
+            e.target.style.boxShadow = '0 6px 20px rgba(17, 120, 255, 0.4)';
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!isLoading && svgPath) {
+            e.target.style.transform = 'translateY(0)';
+            e.target.style.boxShadow = '0 4px 15px rgba(17, 120, 255, 0.3)';
+          }
+        }}
+      >
+        {isLoading ? 'Inserting...' : 'Add to Design'}
+      </button>
     </div>
   );
 };

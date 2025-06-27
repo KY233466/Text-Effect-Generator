@@ -242,7 +242,7 @@ export default function Smudge({
 	};
 
 	return (
-		<div style={{ width: '100%', marginBottom: '20px' }}>
+		<div style={{ width: '100%', marginBottom: '5px' }}>
 			<svg
 				ref={svgRef}
 				width="100%"

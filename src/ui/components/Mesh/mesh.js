@@ -205,7 +205,7 @@ export default function Mesh({
       width: '100%',
       position: 'relative',
       overflow: 'hidden',
-      marginBottom: '20px'
+      marginBottom: '5px'
     },
     onMouseMove: handleMouseMove,
     onMouseUp: handleMouseUp

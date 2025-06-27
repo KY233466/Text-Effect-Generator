@@ -25,14 +25,21 @@ const TextWarpApp = ({ sandboxProxy }) => {
   });
 
   return (
-    <div className="app" style={{ 
-      width: "320px", 
-      margin: "0 auto",
-      padding: "15px 20px"
+    <div className="app" style={{
+      width: "100%",
+      height: "100%",
+      padding: "5px 20px"
     }}>
       <div
         className="tab-container"
-        style={{ display: "flex", marginBottom: "16px" }}
+        style={{
+          backgroundColor: 'white',
+          display: "flex",
+          paddingBottom: "16px",
+          position: "sticky",
+          top: 0,
+          zIndex: 2,
+        }}
       >
         <button
           className={`tab ${activeTab === "text" ? "active" : ""}`}

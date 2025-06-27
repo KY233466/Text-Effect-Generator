@@ -7,11 +7,12 @@ const styles = {
 		display: 'flex',
 		flexDirection: 'column',
 		width: '100%',
-		height: 'calc(100% - 65px)',
+		height: 'calc(100% - 55px)',
 	},
 	content: {
 		flex: 1,
-		overflowY: 'auto'
+		overflowY: 'auto',
+		paddingTop: '22px'
 	},
 	label: {
 		color: "#06001A",
@@ -49,13 +50,8 @@ const styles = {
 		objectFit: 'contain',
 		pointerEvents: 'none'
 	},
-	buttonGroup: {
-		display: 'flex',
-		flexWrap: 'wrap',
-		justifyContent: 'center',
-		marginTop: '20px'
-	},
 	insertButton: {
+		marginTop: '10px',
 		border: 'none',
 		borderRadius: '8px',
 		fontSize: '14px',
@@ -70,6 +66,7 @@ const styles = {
 		color: 'white'
 	},
 	insertButtonDisabled: {
+		marginTop: '10px',
 		border: 'none',
 		borderRadius: '8px',
 		fontSize: '14px',
@@ -166,28 +163,28 @@ const CustomTextPage = ({
 	return (
 		<div style={styles.container}>
 			<label style={styles.label}>Preview</label>
-			<div style={styles.content}>
-				{selected == "mesh" ? <Mesh
-					setPathBounds={setPathBounds}
-					text={text}
-					setSvgPath={setSvgPath}
-					fontUrl={fontUrl}
-					lineHeight={lineHeight}
-					letterSpacing={letterSpacing}
-					alignment={alignment}
-					calculatePathBounds={calculatePathBounds}
-				/> : <Smudge
-					pathBounds={pathBounds}
-					setPathBounds={setPathBounds}
-					text={text}
-					setSvgPath={setSvgPath}
-					fontUrl={fontUrl}
-					lineHeight={lineHeight}
-					letterSpacing={letterSpacing}
-					alignment={alignment}
-					calculatePathBounds={calculatePathBounds}
-				/>}
+			{selected == "mesh" ? <Mesh
+				setPathBounds={setPathBounds}
+				text={text}
+				setSvgPath={setSvgPath}
+				fontUrl={fontUrl}
+				lineHeight={lineHeight}
+				letterSpacing={letterSpacing}
+				alignment={alignment}
+				calculatePathBounds={calculatePathBounds}
+			/> : <Smudge
+				pathBounds={pathBounds}
+				setPathBounds={setPathBounds}
+				text={text}
+				setSvgPath={setSvgPath}
+				fontUrl={fontUrl}
+				lineHeight={lineHeight}
+				letterSpacing={letterSpacing}
+				alignment={alignment}
+				calculatePathBounds={calculatePathBounds}
+			/>}
 
+			<div style={styles.content}>
 				<label style={styles.label}>Type</label>
 				<div style={styles.shapeContainer}>
 					{Shape.map((s) => (
@@ -209,27 +206,25 @@ const CustomTextPage = ({
 				{error && <div style={styles.errorMessage}>{error}</div>}
 			</div>
 
-			<div style={styles.buttonGroup}>
-				<button
-					onClick={handleInsert}
-					disabled={isLoading || !svgPath}
-					style={isLoading || !svgPath ? styles.insertButtonDisabled : styles.insertButton}
-					onMouseEnter={(e) => {
-						if (!isLoading && svgPath) {
-							e.target.style.transform = 'translateY(-2px)';
-							e.target.style.boxShadow = '0 6px 20px rgba(17, 120, 255, 0.4)';
-						}
-					}}
-					onMouseLeave={(e) => {
-						if (!isLoading && svgPath) {
-							e.target.style.transform = 'translateY(0)';
-							e.target.style.boxShadow = '0 4px 15px rgba(17, 120, 255, 0.3)';
-						}
-					}}
-				>
-					{isLoading ? 'Inserting...' : 'Add to Design'}
-				</button>
-			</div>
+			<button
+				onClick={handleInsert}
+				disabled={isLoading || !svgPath}
+				style={isLoading || !svgPath ? styles.insertButtonDisabled : styles.insertButton}
+				onMouseEnter={(e) => {
+					if (!isLoading && svgPath) {
+						e.target.style.transform = 'translateY(-2px)';
+						e.target.style.boxShadow = '0 6px 20px rgba(17, 120, 255, 0.4)';
+					}
+				}}
+				onMouseLeave={(e) => {
+					if (!isLoading && svgPath) {
+						e.target.style.transform = 'translateY(0)';
+						e.target.style.boxShadow = '0 4px 15px rgba(17, 120, 255, 0.3)';
+					}
+				}}
+			>
+				{isLoading ? 'Inserting...' : 'Add to Design'}
+			</button>
 		</div>
 	);
 };

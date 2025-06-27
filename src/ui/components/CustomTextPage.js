@@ -6,11 +6,12 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     width: '100%',
-    height: 'calc(100% - 65px)'
+    height: 'calc(100% - 55px)'
   },
   content: {
     flex: 1,
-    overflowY: 'auto'
+    overflowY: 'auto',
+    paddingTop: '22px'
   },
   label: {
     color: "#06001A",
@@ -48,13 +49,8 @@ const styles = {
     objectFit: 'contain',
     pointerEvents: 'none'
   },
-  buttonGroup: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    marginTop: '20px'
-  },
   insertButton: {
+    marginTop: '10px',
     border: 'none',
     borderRadius: '8px',
     fontSize: '14px',
@@ -69,6 +65,7 @@ const styles = {
     color: 'white'
   },
   insertButtonDisabled: {
+    marginTop: '10px',
     border: 'none',
     borderRadius: '8px',
     fontSize: '14px',
@@ -171,9 +168,7 @@ const CustomTextPage = ({
     style: styles.container
   }, /*#__PURE__*/React.createElement("label", {
     style: styles.label
-  }, "Preview"), /*#__PURE__*/React.createElement("div", {
-    style: styles.content
-  }, selected == "mesh" ? /*#__PURE__*/React.createElement(Mesh, {
+  }, "Preview"), selected == "mesh" ? /*#__PURE__*/React.createElement(Mesh, {
     setPathBounds: setPathBounds,
     text: text,
     setSvgPath: setSvgPath,
@@ -192,7 +187,9 @@ const CustomTextPage = ({
     letterSpacing: letterSpacing,
     alignment: alignment,
     calculatePathBounds: calculatePathBounds
-  }), /*#__PURE__*/React.createElement("label", {
+  }), /*#__PURE__*/React.createElement("div", {
+    style: styles.content
+  }, /*#__PURE__*/React.createElement("label", {
     style: styles.label
   }, "Type"), /*#__PURE__*/React.createElement("div", {
     style: styles.shapeContainer
@@ -210,9 +207,7 @@ const CustomTextPage = ({
     style: styles.icon
   }), s))), error && /*#__PURE__*/React.createElement("div", {
     style: styles.errorMessage
-  }, error)), /*#__PURE__*/React.createElement("div", {
-    style: styles.buttonGroup
-  }, /*#__PURE__*/React.createElement("button", {
+  }, error)), /*#__PURE__*/React.createElement("button", {
     onClick: handleInsert,
     disabled: isLoading || !svgPath,
     style: isLoading || !svgPath ? styles.insertButtonDisabled : styles.insertButton,
@@ -228,6 +223,6 @@ const CustomTextPage = ({
         e.target.style.boxShadow = '0 4px 15px rgba(17, 120, 255, 0.3)';
       }
     }
-  }, isLoading ? 'Inserting...' : 'Add to Design')));
+  }, isLoading ? 'Inserting...' : 'Add to Design'));
 };
 export default CustomTextPage;

@@ -206,7 +206,7 @@ export default function Smudge({
   return /*#__PURE__*/React.createElement("div", {
     style: {
       width: '100%',
-      marginBottom: '20px'
+      marginBottom: '5px'
     }
   }, /*#__PURE__*/React.createElement("svg", {
     ref: svgRef,

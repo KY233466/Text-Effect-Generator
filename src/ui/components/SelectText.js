@@ -10,6 +10,116 @@ const fonts = [{
   name: "Helvetica",
   url: "./fonts/Helvetica.ttf"
 }];
+const styles = {
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    width: '100%',
+    height: 'calc(100% - 55px)'
+  },
+  content: {
+    flex: 1,
+    overflowY: 'auto'
+  },
+  preview: {
+    width: '100%',
+    height: '240px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: "sticky",
+    top: 56,
+    zIndex: 1,
+    paddingBottom: "5px"
+  },
+  label: {
+    color: "#06001A",
+    fontSize: "14px",
+    fontFamily: "Avenir Next",
+    fontWeight: "600",
+    marginBottom: "8px",
+    display: "block"
+  },
+  alignment: {
+    width: '86px',
+    height: '37px',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    padding: '8px'
+  },
+  insertButton: {
+    marginTop: '10px',
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '14px',
+    fontFamily: 'Avenir Next',
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    width: '100%',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    padding: '12px 24px',
+    background: '#1178FF',
+    color: 'white'
+  },
+  insertButtonDisabled: {
+    marginTop: '10px',
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '14px',
+    width: '100%',
+    fontFamily: 'Avenir Next',
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    minWidth: '120px',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    padding: '12px 24px',
+    backgroundColor: '#ccc',
+    color: '#666',
+    cursor: 'not-allowed',
+    transform: 'none',
+    boxShadow: 'none'
+  },
+  errorMessage: {
+    color: '#dc3545',
+    backgroundColor: '#f8d7da',
+    border: '1px solid #f5c6cb',
+    padding: '8px 12px',
+    borderRadius: '4px',
+    textAlign: 'center',
+    marginTop: '12px'
+  },
+  textInput: {
+    border: '1px solid #CBE2FF',
+    borderRadius: '10px',
+    width: '280px',
+    height: '72px',
+    padding: '12px',
+    fontSize: '14px',
+    fontFamily: 'Avenir Next',
+    resize: 'none',
+    outline: 'none',
+    transition: 'border-color 0.2s ease',
+    boxSizing: 'border-box'
+  },
+  selectFont: {
+    border: '1px solid #CBE2FF',
+    borderRadius: '10px',
+    width: '100%',
+    height: '40px',
+    fontSize: '14px',
+    fontFamily: 'Avenir Next',
+    marginBottom: '12px',
+    outline: 'none',
+    cursor: 'pointer',
+    boxSizing: 'border-box'
+  }
+};
 export default function SelectText({
   sandboxProxy,
   text,
@@ -171,33 +281,11 @@ export default function SelectText({
     }
   };
   return /*#__PURE__*/React.createElement("div", {
-    style: {
-      backgroundColor: '#FFFFFF',
-      width: '280px',
-      padding: '0',
-      margin: '0 auto'
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      marginBottom: "0"
-    }
+    style: styles.container
   }, /*#__PURE__*/React.createElement("label", {
-    style: {
-      color: "#06001A",
-      fontSize: "14px",
-      fontFamily: "Avenir Next",
-      fontWeight: "600",
-      marginBottom: "8px",
-      display: "block"
-    }
+    style: styles.label
   }, "Preview"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      width: '280px',
-      height: '240px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center'
-    }
+    style: styles.preview
   }, error ? /*#__PURE__*/React.createElement("div", {
     style: {
       color: '#ff4444',
@@ -218,34 +306,17 @@ export default function SelectText({
     d: svgPath,
     fill: "black",
     stroke: "none"
-  })))), /*#__PURE__*/React.createElement("div", {
+  }))), /*#__PURE__*/React.createElement("div", {
+    style: styles.content
+  }, /*#__PURE__*/React.createElement("div", {
     style: {
-      marginTop: '32px',
+      marginTop: '22px',
       marginBottom: "0"
     }
   }, /*#__PURE__*/React.createElement("label", {
-    style: {
-      color: "#06001A",
-      fontSize: "14px",
-      fontFamily: "Avenir Next",
-      fontWeight: "600",
-      marginBottom: "8px",
-      display: "block"
-    }
+    style: styles.label
   }, "Text"), /*#__PURE__*/React.createElement("textarea", {
-    style: {
-      border: '1px solid #CBE2FF',
-      borderRadius: '10px',
-      width: '280px',
-      height: '72px',
-      padding: '12px',
-      fontSize: '14px',
-      fontFamily: 'Avenir Next',
-      resize: 'none',
-      outline: 'none',
-      transition: 'border-color 0.2s ease',
-      boxSizing: 'border-box'
-    },
+    style: styles.textInput,
     value: text,
     onChange: e => setText(e.target.value),
     placeholder: "Enter text to render\\nMulti-line supported\\nEach line renders separately",
@@ -260,29 +331,11 @@ export default function SelectText({
       marginBottom: "0"
     }
   }, /*#__PURE__*/React.createElement("label", {
-    style: {
-      color: "#06001A",
-      fontSize: "14px",
-      fontFamily: "Avenir Next",
-      fontWeight: "600",
-      marginBottom: "8px",
-      display: "block"
-    }
+    style: styles.label
   }, "Typography"), /*#__PURE__*/React.createElement("select", {
     value: fontUrl,
     onChange: e => setFontUrl(e.target.value),
-    style: {
-      border: '1px solid #CBE2FF',
-      borderRadius: '10px',
-      width: '100%',
-      height: '40px',
-      fontSize: '14px',
-      fontFamily: 'Avenir Next',
-      marginBottom: '12px',
-      outline: 'none',
-      cursor: 'pointer',
-      boxSizing: 'border-box'
-    }
+    style: styles.selectFont
   }, fonts.map(f => /*#__PURE__*/React.createElement("option", {
     key: f.url,
     value: f.url
@@ -385,17 +438,9 @@ export default function SelectText({
   }, /*#__PURE__*/React.createElement("button", {
     onClick: () => setAlignment('left'),
     style: {
-      width: '86px',
-      height: '37px',
+      ...styles.alignment,
       backgroundColor: alignment === 'left' ? 'white' : '#EBF3FE',
-      border: alignment === 'left' ? '2px solid #CBE2FF' : 'none',
-      borderRadius: '8px',
-      cursor: 'pointer',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'flex-start',
-      justifyContent: 'center',
-      padding: '8px'
+      border: alignment === 'left' ? '2px solid #CBE2FF' : 'none'
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -420,17 +465,9 @@ export default function SelectText({
   })), /*#__PURE__*/React.createElement("button", {
     onClick: () => setAlignment('center'),
     style: {
-      width: '86px',
-      height: '37px',
+      ...styles.alignment,
       backgroundColor: alignment === 'center' ? 'white' : '#EBF3FE',
-      border: alignment === 'center' ? '2px solid #CBE2FF' : 'none',
-      borderRadius: '8px',
-      cursor: 'pointer',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '8px'
+      border: alignment === 'center' ? '2px solid #CBE2FF' : 'none'
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -455,17 +492,9 @@ export default function SelectText({
   })), /*#__PURE__*/React.createElement("button", {
     onClick: () => setAlignment('right'),
     style: {
-      width: '86px',
-      height: '37px',
+      ...styles.alignment,
       backgroundColor: alignment === 'right' ? 'white' : '#EBF3FE',
-      border: alignment === 'right' ? '2px solid #CBE2FF' : 'none',
-      borderRadius: '8px',
-      cursor: 'pointer',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'flex-end',
-      justifyContent: 'center',
-      padding: '8px'
+      border: alignment === 'right' ? '2px solid #CBE2FF' : 'none'
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -487,34 +516,22 @@ export default function SelectText({
       height: '2px',
       backgroundColor: '#666'
     }
-  })))), /*#__PURE__*/React.createElement("div", {
-    style: {
-      marginTop: '40px'
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'flex',
-      flexWrap: 'wrap',
-      justifyContent: 'center'
-    }
-  }, /*#__PURE__*/React.createElement("button", {
+  }))))), /*#__PURE__*/React.createElement("button", {
     onClick: handleInsert,
     disabled: isLoading || !svgPath,
-    style: {
-      width: '280px',
-      height: '37px',
-      fontSize: '14px',
-      fontFamily: 'Avenir Next',
-      fontWeight: '600',
-      padding: '0',
-      backgroundColor: isLoading || !svgPath ? '#CCCCCC' : '#1178FF',
-      color: 'white',
-      border: 'none',
-      borderRadius: '8px',
-      cursor: isLoading || !svgPath ? 'not-allowed' : 'pointer',
-      transition: 'background-color 0.2s ease',
-      boxSizing: 'border-box'
+    style: isLoading || !svgPath ? styles.insertButtonDisabled : styles.insertButton,
+    onMouseEnter: e => {
+      if (!isLoading && svgPath) {
+        e.target.style.transform = 'translateY(-2px)';
+        e.target.style.boxShadow = '0 6px 20px rgba(17, 120, 255, 0.4)';
+      }
+    },
+    onMouseLeave: e => {
+      if (!isLoading && svgPath) {
+        e.target.style.transform = 'translateY(0)';
+        e.target.style.boxShadow = '0 4px 15px rgba(17, 120, 255, 0.3)';
+      }
     }
-  }, isLoading ? '插入中...' : 'Add to design'))));
+  }, isLoading ? 'Inserting...' : 'Add to Design'));
 }
 ;

@@ -2,13 +2,17 @@ import React, { useEffect, useState } from "react";
 import { effectsList, getWarpFunction } from "../shapes/index.js";
 import opentype from "opentype.js";
 
-// 样式对象
 const styles = {
   container: {
     display: "flex",
     flexDirection: "column",
     width: "100%",
-    height: "calc(100% - 65px)",
+    height: "calc(100% - 55px)",
+  },
+  content: {
+    flex: 1,
+    overflowY: 'auto',
+    paddingTop: '22px'
   },
   label: {
     color: "#06001A",
@@ -21,12 +25,13 @@ const styles = {
   previewContainer: {
     border: "1px solid #EBF3FE",
     height: "240px",
+    width: "100%",
     borderRadius: "10px",
-    marginBottom: "24px",
+    marginBottom: '5px',
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FFFFFF",
+    position: "sticky",
   },
   svg: {
     width: "100%",
@@ -147,23 +152,38 @@ const styles = {
     color: "white",
   },
   insertButton: {
-    width: "100%",
-    height: "37px",
-    fontSize: "14px",
-    fontFamily: "Avenir Next",
-    fontWeight: "600",
-    padding: "0",
-    backgroundColor: "#1178FF",
-    color: "white",
-    border: "none",
-    borderRadius: "8px",
-    cursor: "pointer",
-    transition: "background-color 0.2s ease",
-    boxSizing: "border-box",
+    marginTop: '10px',
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '14px',
+    fontFamily: 'Avenir Next',
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    width: '100%',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    padding: '12px 24px',
+    background: '#1178FF',
+    color: 'white'
   },
   insertButtonDisabled: {
-    backgroundColor: "#CCCCCC",
-    cursor: "not-allowed",
+    marginTop: '10px',
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '14px',
+    width: '100%',
+    fontFamily: 'Avenir Next',
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    minWidth: '120px',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    padding: '12px 24px',
+    backgroundColor: '#ccc',
+    color: '#666',
+    cursor: 'not-allowed',
+    transform: 'none',
+    boxShadow: 'none'
   },
   errorMessage: {
     color: "#dc3545",
@@ -370,9 +390,8 @@ const TextWarpPage = ({
         <svg
           viewBox={
             pathBounds
-              ? `${pathBounds.minX - 20} ${pathBounds.minY - 20} ${
-                  pathBounds.width + 40
-                } ${pathBounds.height + 40}`
+              ? `${pathBounds.minX - 20} ${pathBounds.minY - 20} ${pathBounds.width + 40
+              } ${pathBounds.height + 40}`
               : "0 0 1000 300"
           }
           style={styles.svg}
@@ -381,103 +400,117 @@ const TextWarpPage = ({
         </svg>
       </div>
 
-      <div style={styles.controlSection}>
-        <label style={styles.label}>Shape</label>
-        <div style={styles.paginationWrapper}>
-          <button
-            onClick={() => setPageIndex((p) => Math.max(p - 1, 0))}
-            disabled={pageIndex === 0}
-            style={{
-              ...styles.paginationButton,
-              ...(pageIndex === 0 ? styles.paginationButtonDisabled : {}),
-            }}
-          >
-            &lt;
-          </button>
-          <span style={styles.pageIndexText}>{pageIndex + 1}</span>
-          <button
-            onClick={() => setPageIndex((p) => Math.min(p + 1, totalPages - 1))}
-            disabled={pageIndex === totalPages - 1}
-            style={{
-              ...styles.paginationButton,
-              ...(pageIndex === totalPages - 1
-                ? styles.paginationButtonDisabled
-                : {}),
-            }}
-          >
-            &gt;
-          </button>
-        </div>
-      </div>
-
-      <div style={styles.gridContainer}>
-        {currentGroups.map((group) => (
-          <button
-            key={group.label}
-            onClick={() => {
-              setWarpType(group.types[0]);
-            }}
-            style={{
-              ...styles.effectButton,
-              ...(warpType === group.types[0]
-                ? styles.effectButtonSelected
-                : {}),
-            }}
-          >
-            <div style={styles.effectIcon}>
-              <img src={`./icon/${group.types[0]}.png`} alt={group.label} />
-            </div>
-            <div style={styles.effectLabel}>{group.label}</div>
-          </button>
-        ))}
-      </div>
-
-      <label style={styles.label}>Type</label>
-      <div style={styles.typeButtonsContainer}>
-        {relatedTypes.map((typeKey) => {
-          const type = effectsList.find((e) => e.key === typeKey);
-          return (
+      <div style={styles.content}>
+        <div style={styles.controlSection}>
+          <label style={styles.label}>Shape</label>
+          <div style={styles.paginationWrapper}>
             <button
-              key={typeKey}
-              onClick={() => setWarpType(typeKey)}
+              onClick={() => setPageIndex((p) => Math.max(p - 1, 0))}
+              disabled={pageIndex === 0}
+              style={{
+                ...styles.paginationButton,
+                ...(pageIndex === 0 ? styles.paginationButtonDisabled : {}),
+              }}
+            >
+              &lt;
+            </button>
+            <span style={styles.pageIndexText}>{pageIndex + 1}</span>
+            <button
+              onClick={() => setPageIndex((p) => Math.min(p + 1, totalPages - 1))}
+              disabled={pageIndex === totalPages - 1}
+              style={{
+                ...styles.paginationButton,
+                ...(pageIndex === totalPages - 1
+                  ? styles.paginationButtonDisabled
+                  : {}),
+              }}
+            >
+              &gt;
+            </button>
+          </div>
+        </div>
+
+        <div style={styles.gridContainer}>
+          {currentGroups.map((group) => (
+            <button
+              key={group.label}
+              onClick={() => {
+                setWarpType(group.types[0]);
+              }}
               style={{
                 ...styles.effectButton,
-                ...(warpType === typeKey ? styles.effectButtonSelected : {}),
+                ...(warpType === group.types[0]
+                  ? styles.effectButtonSelected
+                  : {}),
               }}
             >
               <div style={styles.effectIcon}>
-                <img
-                  src={`./icon/${typeKey}.png`}
-                  alt={type?.label || typeKey}
-                />
+                <img src={`./icon/${group.types[0]}.png`} alt={group.label} />
               </div>
+              <div style={styles.effectLabel}>{group.label}</div>
             </button>
-          );
-        })}
-      </div>
+          ))}
+        </div>
 
-      <div style={styles.sliderContainer}>
-        <span style={styles.sliderIcon}>Bend</span>
-        <span style={styles.sliderValue}>{intensity}</span>
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={intensity}
-          onChange={(e) => setIntensity(Number(e.target.value))}
-          style={{
-            ...styles.slider,
-            background: getSliderBackground(intensity),
-          }}
-        />
+        <label style={styles.label}>Type</label>
+        <div style={styles.typeButtonsContainer}>
+          {relatedTypes.map((typeKey) => {
+            const type = effectsList.find((e) => e.key === typeKey);
+            return (
+              <button
+                key={typeKey}
+                onClick={() => setWarpType(typeKey)}
+                style={{
+                  ...styles.effectButton,
+                  ...(warpType === typeKey ? styles.effectButtonSelected : {}),
+                }}
+              >
+                <div style={styles.effectIcon}>
+                  <img
+                    src={`./icon/${typeKey}.png`}
+                    alt={type?.label || typeKey}
+                  />
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        <div style={styles.sliderContainer}>
+          <span style={styles.sliderIcon}>Bend</span>
+          <span style={styles.sliderValue}>{intensity}</span>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value={intensity}
+            onChange={(e) => setIntensity(Number(e.target.value))}
+            style={{
+              ...styles.slider,
+              background: getSliderBackground(intensity),
+            }}
+          />
+        </div>
       </div>
 
       <button
         onClick={handleInsert}
         disabled={isLoading || !svgPath}
-        style={styles.insertButton}
+        style={isLoading || !svgPath ? styles.insertButtonDisabled : styles.insertButton}
+        onMouseEnter={(e) => {
+          if (!isLoading && svgPath) {
+            e.target.style.transform = 'translateY(-2px)';
+            e.target.style.boxShadow = '0 6px 20px rgba(17, 120, 255, 0.4)';
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!isLoading && svgPath) {
+            e.target.style.transform = 'translateY(0)';
+            e.target.style.boxShadow = '0 4px 15px rgba(17, 120, 255, 0.3)';
+          }
+        }}
       >
-        {isLoading ? "插入中..." : "Add to design"}
+        {isLoading ? 'Inserting...' : 'Add to Design'}
       </button>
 
       {error && <div style={styles.errorMessage}>{error}</div>}

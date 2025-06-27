@@ -26,15 +26,19 @@ const TextWarpApp = ({
   return /*#__PURE__*/React.createElement("div", {
     className: "app",
     style: {
-      width: "320px",
-      margin: "0 auto",
-      padding: "15px 20px"
+      width: "100%",
+      height: "100%",
+      padding: "5px 20px"
     }
   }, /*#__PURE__*/React.createElement("div", {
     className: "tab-container",
     style: {
+      backgroundColor: 'white',
       display: "flex",
-      marginBottom: "16px"
+      paddingBottom: "16px",
+      position: "sticky",
+      top: 0,
+      zIndex: 2
     }
   }, /*#__PURE__*/React.createElement("button", {
     className: `tab ${activeTab === "text" ? "active" : ""}`,
