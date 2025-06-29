@@ -30,8 +30,8 @@ export function envelopeWaveWarp(
   }
   
   export const envelopeWaveConfig = {
-    label: "包络波形",
-    description: "基于字形中心的垂直包络波形变形",
+    label: "envelope wave",
+    description: "Vertical envelope wave deformation based on glyph center",
     defaultIntensity: 50,
     intensityRange: { min: 0, max: 100 },
   };

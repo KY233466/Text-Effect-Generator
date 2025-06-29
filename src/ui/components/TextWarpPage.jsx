@@ -269,7 +269,7 @@ const TextWarpPage = ({
     if (!text || !opentype) return;
     opentype.load(fontUrl, (err, font) => {
       if (err || !font) {
-        setError("字体加载失败");
+        setError("Font loading failed");
         return;
       }
       const fontSize = 120;

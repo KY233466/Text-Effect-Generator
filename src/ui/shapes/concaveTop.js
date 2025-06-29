@@ -27,7 +27,7 @@ export function concaveTopWarp(
 
 export const concaveTopConfig = {
   label: "pit",
-  description: "文字顶部中间凹陷",
+  description: "Text top center concave",
   defaultIntensity: 50,
   intensityRange: { min: 0, max: 100 },
 };

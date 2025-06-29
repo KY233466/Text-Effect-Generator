@@ -31,7 +31,7 @@ export function concaveBottomWarp(
 
 export const concaveBottomConfig = {
   label: "pit2",
-  description: "文字底部向内凹陷（反向膨胀）",
+  description: "Text bottom concaves inward (reverse bulge)",
   defaultIntensity: 50,
   intensityRange: { min: 0, max: 100 },
 };

@@ -35,7 +35,7 @@ export function triangleUpperWarp(
 
 export const triangleUpperConfig = {
   label: "hill1",
-  description: "文字顶部形成对称三角形，底部保持对齐",
+  description: "Text forms symmetrical triangle at top, bottom remains aligned",
   defaultIntensity: 50,
   intensityRange: { min: 0, max: 100 },
 };

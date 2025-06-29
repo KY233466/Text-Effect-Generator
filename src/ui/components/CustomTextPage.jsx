@@ -113,7 +113,7 @@ const CustomTextPage = ({
 
 	const handleInsert = async () => {
 		if (!sandboxProxy || !svgPath || !pathBounds) {
-			console.error('缺少必要数据');
+			      console.error('Missing required data');
 			return;
 		}
 		setIsLoading(true);
@@ -129,7 +129,7 @@ const CustomTextPage = ({
 				setError(result.error);
 			}
 		} catch (e) {
-			setError(`插入异常: ${e.message}`);
+			setError(`Insertion error: ${e.message}`);
 		} finally {
 			setIsLoading(false);
 		}

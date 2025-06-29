@@ -4,6 +4,10 @@ const SMUDGE_RADIUS = 100;
 const SMUDGE_STRENGTH = 0.33;
 const Warp = window.Warp;
 const styles = {
+  container: {
+    width: '100%',
+    marginBottom: '5px'
+  },
   svg: {
     border: '1px solid #CBE2FF',
     borderRadius: '10px',
@@ -204,10 +208,7 @@ export default function Smudge({
     });
   };
   return /*#__PURE__*/React.createElement("div", {
-    style: {
-      width: '100%',
-      marginBottom: '5px'
-    }
+    style: styles.container
   }, /*#__PURE__*/React.createElement("svg", {
     ref: svgRef,
     width: "100%",

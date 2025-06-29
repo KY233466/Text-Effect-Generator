@@ -21,7 +21,7 @@ export function bulgeDownWarp(
 
 export const bulgeDownConfig = {
   label: "arc3",
-  description: "文字底部向外膨胀",
+  description: "Text bottom bulges outward",
   defaultIntensity: 50,
   intensityRange: { min: 0, max: 100 },
 };

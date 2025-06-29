@@ -11,7 +11,7 @@ export function bulgeUpWarp(x, y, totalWidth, centerX, intensity, textMetrics) {
 
 export const bulgeUpConfig = {
   label: "arc",
-  description: "文字中部向上膨胀",
+  description: "Text bulges upward in the middle",
   defaultIntensity: 50,
   intensityRange: { min: 0, max: 100 },
 };

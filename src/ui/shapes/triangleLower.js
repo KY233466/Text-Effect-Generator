@@ -1,4 +1,4 @@
-// 三角形下变形效果 - 统一版本
+// Triangle lower deformation effect - unified version
 export function triangleLowerWarp(
   x,
   y,
@@ -7,26 +7,26 @@ export function triangleLowerWarp(
   intensity,
   textMetrics
 ) {
-  const fixedLine = textMetrics.ascender; // 顶部作为固定线（顶部对齐）
-  const variableLine = textMetrics.descender; // 底部作为变形边界
+  const fixedLine = textMetrics.ascender; // Top as fixed line (top alignment)
+  const variableLine = textMetrics.descender; // Bottom as deformation boundary
 
-  // 只有在固定线以下的部分才变形
+  // Only deform parts below the fixed line
   if (y <= fixedLine) {
-    return { x, y }; // 顶部区域完全不变形
+    return { x, y }; // Top area remains completely unchanged
   }
 
-  // 计算水平位置的归一化值 (-1 到 1)
+  // Calculate normalized horizontal position value (-1 to 1)
   const normX = (x - centerX) / (totalWidth / 2);
 
-  // 三角形线性变形：中心最强，向两边线性下降
+  // Triangle linear deformation: strongest at center, linear decrease towards edges
   const triangleFactor = 1 - Math.abs(normX);
 
-  // 垂直影响因子：距离固定线越远，变形越强
+  // Vertical influence factor: farther from fixed line, stronger deformation
   const textHeight = Math.abs(variableLine - fixedLine);
   const normY = Math.abs(y - fixedLine) / textHeight;
   const verticalFactor = Math.min(normY, 1);
 
-  // 标准化强度计算
+  // Normalized intensity calculation
   const standardIntensity = (intensity / 50) * (textHeight / 4);
   const triangleY = standardIntensity * triangleFactor * verticalFactor;
 
@@ -35,7 +35,7 @@ export function triangleLowerWarp(
 
 export const triangleLowerConfig = {
   label: "hill2",
-  description: "文字底部形成倒三角形，顶部保持对齐",
+  description: "Text forms inverted triangle at bottom, top remains aligned",
   defaultIntensity: 50,
   intensityRange: { min: 0, max: 100 },
 };

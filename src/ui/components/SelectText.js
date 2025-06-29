@@ -179,12 +179,12 @@ export default function SelectText({
       return;
     }
     if (!opentype) {
-      setError("OpenType.js 未加载完成，请刷新页面重试");
+      setError("OpenType.js not loaded yet, please refresh the page and try again");
       return;
     }
     opentype.load(fontUrl, (err, font) => {
       if (err || !font) {
-        const errorMessage = `字体加载失败: ${fontUrl}. 请确保字体文件存在于 'src/ui/fonts' 目录下。`;
+        const errorMessage = `Font loading failed: ${fontUrl}. Please ensure the font file exists in the 'src/ui/fonts' directory.`;
         console.error(errorMessage, err);
         setError(errorMessage);
         setSvgPath("");
@@ -224,7 +224,7 @@ export default function SelectText({
           } = lineInfo;
           let x;
 
-          // 根据对齐方式计算起始x位置
+          // Calculate starting x position based on alignment
           if (alignment === 'left') {
             x = 0;
           } else if (alignment === 'right') {
@@ -250,14 +250,14 @@ export default function SelectText({
         setPathBounds(bounds);
         setSvgPath(d);
       } catch (error) {
-        console.error('生成文本路径时出错:', error);
-        setError('生成文本路径时出现错误，请检查输入内容');
+        console.error('Error generating text path:', error);
+        setError('Error generating text path, please check your input');
       }
     });
   }, [text, fontUrl, lineHeight, letterSpacing, alignment]);
   const handleInsert = async () => {
     if (!svgPath || !sandboxProxy) {
-      console.error('SVG路径或沙盒代理不可用');
+      console.error('SVG path or sandbox proxy not available');
       return;
     }
     setIsLoading(true);
@@ -270,12 +270,12 @@ export default function SelectText({
         intensity: 0
       });
       if (!result.success) {
-        console.error('沙盒端插入失败:', result.error);
-        setError(`插入失败: ${result.error}`);
+        console.error('Sandbox insertion failed:', result.error);
+        setError(`Insertion failed: ${result.error}`);
       }
     } catch (e) {
-      console.error('调用沙盒API失败:', e);
-      setError(`插入异常: ${e.message}`);
+      console.error('Sandbox API call failed:', e);
+      setError(`Insertion error: ${e.message}`);
     } finally {
       setIsLoading(false);
     }
