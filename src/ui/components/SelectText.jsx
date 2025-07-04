@@ -114,7 +114,11 @@ const styles = {
     marginBottom: '12px',
     outline: 'none',
     cursor: 'pointer',
-    boxSizing: 'border-box'
+    padding: '10px',
+    boxSizing: 'border-box',
+    appearance: 'none',
+    WebkitAppearance: 'none',
+    MozAppearance: 'none',
   }
 };
 
