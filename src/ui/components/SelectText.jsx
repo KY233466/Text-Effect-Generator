@@ -114,7 +114,7 @@ const styles = {
     marginBottom: '12px',
     outline: 'none',
     cursor: 'pointer',
-    padding: '10px',
+    padding: '0 15px',
     boxSizing: 'border-box',
     appearance: 'none',
     WebkitAppearance: 'none',
