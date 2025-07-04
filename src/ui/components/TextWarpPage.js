@@ -76,8 +76,8 @@ const styles = {
     marginBottom: "12px"
   },
   effectButton: {
-    width: "86px",
-    height: "86px",
+    aspectRatio: "1 / 1",
+    width: "100%",
     borderRadius: "8px",
     border: "1px solid #EBF3FE",
     backgroundColor: "white",
@@ -127,28 +127,6 @@ const styles = {
   },
   pageIndexText: {
     fontSize: 10
-  },
-  typeButtonsContainer: {
-    display: "flex",
-    gap: "8px",
-    marginBottom: "24px",
-    flexWrap: "wrap"
-  },
-  typeButton: {
-    padding: "8px 12px",
-    borderRadius: "6px",
-    border: "1px solid #CBE2FF",
-    backgroundColor: "white",
-    cursor: "pointer",
-    fontSize: "12px",
-    fontFamily: "Avenir Next",
-    color: "#666",
-    transition: "all 0.2s ease"
-  },
-  typeButtonSelected: {
-    backgroundColor: "#1178FF",
-    borderColor: "#1178FF",
-    color: "white"
   },
   insertButton: {
     marginTop: '10px',
@@ -422,14 +400,14 @@ const TextWarpPage = ({
   }, /*#__PURE__*/React.createElement("div", {
     style: styles.effectIcon
   }, /*#__PURE__*/React.createElement("img", {
-    src: `./icon/${group.types[0]}.png`,
+    src: `./icon/${group.types[0]}.svg`,
     alt: group.label
   })), /*#__PURE__*/React.createElement("div", {
     style: styles.effectLabel
   }, group.label)))), /*#__PURE__*/React.createElement("label", {
     style: styles.label
   }, "Type"), /*#__PURE__*/React.createElement("div", {
-    style: styles.typeButtonsContainer
+    style: styles.gridContainer
   }, relatedTypes.map(typeKey => {
     const type = effectsList.find(e => e.key === typeKey);
     return /*#__PURE__*/React.createElement("button", {
@@ -442,7 +420,7 @@ const TextWarpPage = ({
     }, /*#__PURE__*/React.createElement("div", {
       style: styles.effectIcon
     }, /*#__PURE__*/React.createElement("img", {
-      src: `./icon/${typeKey}.png`,
+      src: `./icon/${typeKey}.svg`,
       alt: type?.label || typeKey
     })));
   })), /*#__PURE__*/React.createElement("div", {

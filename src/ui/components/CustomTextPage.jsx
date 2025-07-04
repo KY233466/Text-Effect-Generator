@@ -84,6 +84,12 @@ const styles = {
 		transform: 'none',
 		boxShadow: 'none'
 	},
+	effectLabel: {
+		fontSize: "10px",
+		color: "#666",
+		textAlign: "center",
+		fontFamily: "Avenir Next",
+	},
 	errorMessage: {
 		color: '#dc3545',
 		backgroundColor: '#f8d7da',
@@ -113,7 +119,7 @@ const CustomTextPage = ({
 
 	const handleInsert = async () => {
 		if (!sandboxProxy || !svgPath || !pathBounds) {
-			      console.error('Missing required data');
+			console.error('Missing required data');
 			return;
 		}
 		setIsLoading(true);
@@ -198,7 +204,7 @@ const CustomTextPage = ({
 							onClick={() => setSelected(s)}
 						>
 							<img src={`./icon/${s}.svg`} alt={`${s} icon`} style={styles.icon} />
-							{s}
+							<div style={styles.effectLabel}>{s}</div>
 						</button>
 					))}
 				</div>

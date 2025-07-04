@@ -83,6 +83,12 @@ const styles = {
     transform: 'none',
     boxShadow: 'none'
   },
+  effectLabel: {
+    fontSize: "10px",
+    color: "#666",
+    textAlign: "center",
+    fontFamily: "Avenir Next"
+  },
   errorMessage: {
     color: '#dc3545',
     backgroundColor: '#f8d7da',
@@ -205,7 +211,9 @@ const CustomTextPage = ({
     src: `./icon/${s}.svg`,
     alt: `${s} icon`,
     style: styles.icon
-  }), s))), error && /*#__PURE__*/React.createElement("div", {
+  }), /*#__PURE__*/React.createElement("div", {
+    style: styles.effectLabel
+  }, s)))), error && /*#__PURE__*/React.createElement("div", {
     style: styles.errorMessage
   }, error)), /*#__PURE__*/React.createElement("button", {
     onClick: handleInsert,
