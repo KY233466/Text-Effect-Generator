@@ -349,7 +349,7 @@ export default function SelectText({
       borderRadius: '5px'
     }
   }, /*#__PURE__*/React.createElement("img", {
-    src: "./icon/line_height.png",
+    src: "./icon/line_height.svg",
     alt: "icon",
     style: {
       width: '12px',
@@ -395,7 +395,7 @@ export default function SelectText({
       borderRadius: '5px'
     }
   }, /*#__PURE__*/React.createElement("img", {
-    src: "./icon/letter_spacing.png",
+    src: "./icon/letter_spacing.svg",
     alt: "icon",
     style: {
       width: '12px',

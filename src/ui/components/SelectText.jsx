@@ -339,7 +339,7 @@ export default function SelectText({ sandboxProxy,
           </select>
 
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px', backgroundColor: '#EBF3FE', padding: '10px', borderRadius: '5px' }}>
-            <img src="./icon/line_height.png" alt="icon" style={{ width: '12px', height: '12px', marginTop: '2px' }} />
+            <img src="./icon/line_height.svg" alt="icon" style={{ width: '12px', height: '12px', marginTop: '2px' }} />
             <span style={{ width: '30px', marginLeft: '12px', fontSize: '12px' }}>{lineHeight}</span>
             <input
               type="range"
@@ -364,7 +364,7 @@ export default function SelectText({ sandboxProxy,
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px', backgroundColor: '#EBF3FE', padding: '10px', borderRadius: '5px' }}>
-            <img src="./icon/letter_spacing.png" alt="icon" style={{ width: '12px', height: '12px', marginTop: '2px' }} />
+            <img src="./icon/letter_spacing.svg" alt="icon" style={{ width: '12px', height: '12px', marginTop: '2px' }} />
             <span style={{ width: '30px', marginLeft: '12px', fontSize: '12px' }}>{letterSpacing}</span>
             <input
               type="range"
