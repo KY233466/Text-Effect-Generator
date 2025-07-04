@@ -118,7 +118,6 @@ const styles = {
     outline: 'none',
     cursor: 'pointer',
     padding: '10px',
-    // margin: '10px',
     boxSizing: 'border-box',
     appearance: 'none',
     WebkitAppearance: 'none',
@@ -476,7 +475,15 @@ export default function SelectText({
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      width: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      // <— center horizontally
+      width: '100%'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: '75%',
       height: '2px',
       backgroundColor: '#666',
       marginBottom: '3px'
@@ -490,16 +497,23 @@ export default function SelectText({
     }
   }), /*#__PURE__*/React.createElement("div", {
     style: {
-      width: '90%',
+      width: '75%',
       height: '2px',
       backgroundColor: '#666'
     }
-  })), /*#__PURE__*/React.createElement("button", {
+  }))), /*#__PURE__*/React.createElement("button", {
     onClick: () => setAlignment('right'),
     style: {
       ...styles.alignment,
       backgroundColor: alignment === 'right' ? 'white' : '#EBF3FE',
       border: alignment === 'right' ? '2px solid #CBE2FF' : 'none'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'flex-end',
+      width: '100%'
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -521,7 +535,7 @@ export default function SelectText({
       height: '2px',
       backgroundColor: '#666'
     }
-  }))))), /*#__PURE__*/React.createElement("button", {
+  })))))), /*#__PURE__*/React.createElement("button", {
     onClick: handleInsert,
     disabled: isLoading || !svgPath,
     style: isLoading || !svgPath ? styles.insertButtonDisabled : styles.insertButton,

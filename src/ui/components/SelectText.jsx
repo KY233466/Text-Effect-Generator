@@ -413,9 +413,16 @@ export default function SelectText({ sandboxProxy,
                 border: alignment === 'center' ? '2px solid #CBE2FF' : 'none'
               }}
             >
-              <div style={{ width: '100%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
-              <div style={{ width: '75%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
-              <div style={{ width: '90%', height: '2px', backgroundColor: '#666' }}></div>
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',   // <— center horizontally
+                width: '100%'
+              }}>
+                <div style={{ width: '75%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
+                <div style={{ width: '75%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
+                <div style={{ width: '75%', height: '2px', backgroundColor: '#666' }}></div>
+              </div>
             </button>
 
             <button
@@ -426,9 +433,16 @@ export default function SelectText({ sandboxProxy,
                 border: alignment === 'right' ? '2px solid #CBE2FF' : 'none'
               }}
             >
-              <div style={{ width: '100%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
-              <div style={{ width: '75%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
-              <div style={{ width: '90%', height: '2px', backgroundColor: '#666' }}></div>
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-end',
+                width: '100%'
+              }}>
+                <div style={{ width: '100%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
+                <div style={{ width: '75%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
+                <div style={{ width: '90%', height: '2px', backgroundColor: '#666' }}></div>
+              </div>
             </button>
           </div>
         </div>
