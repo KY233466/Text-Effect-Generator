@@ -28,11 +28,12 @@ const TextWarpApp = ({
   const [alignment, setAlignment] = useState("center");
   const tabStyle = tabName => ({
     marginRight: tabName !== "custom" ? "10px" : "0",
-    padding: "5px 10px",
+    padding: "4px 16px",
     borderRadius: "30px",
     border: "none",
-    backgroundColor: activeTab === tabName ? "#1178FF" : "#EBF3FE",
-    color: activeTab === tabName ? "white" : "#06001A",
+    border: activeTab === tabName ? "1px solid #1178FF" : "1px solid #CBE2FF",
+    backgroundColor: activeTab === tabName ? "#1178FF" : "white",
+    color: activeTab === tabName ? "white" : "#808080",
     fontSize: "14px",
     fontFamily: "Avenir Next",
     fontWeight: activeTab === tabName ? "600" : "500",
