@@ -712,25 +712,35 @@ export default function SelectText({
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      width: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'flex-start',
+      marginTop: '12px',
+      marginBottom: '12px',
+      marginLeft: '28px',
+      marginRight: '33px'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: '20px',
       height: '2px',
       backgroundColor: '#666',
-      marginBottom: '3px'
+      marginBottom: '4px'
     }
   }), /*#__PURE__*/React.createElement("div", {
     style: {
-      width: '75%',
+      width: '13.85px',
       height: '2px',
       backgroundColor: '#666',
-      marginBottom: '3px'
+      marginBottom: '4px'
     }
   }), /*#__PURE__*/React.createElement("div", {
     style: {
-      width: '90%',
+      width: '13.85px',
       height: '2px',
       backgroundColor: '#666'
     }
-  })), /*#__PURE__*/React.createElement("button", {
+  }))), /*#__PURE__*/React.createElement("button", {
     onClick: () => setAlignment('center'),
     style: {
       ...styles.alignment,
@@ -747,25 +757,35 @@ export default function SelectText({
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      width: '75%',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      marginTop: '12px',
+      marginBottom: '12px',
+      marginLeft: '28px',
+      marginRight: '33px'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: '20px',
       height: '2px',
       backgroundColor: '#666',
-      marginBottom: '3px'
+      marginBottom: '4px'
     }
   }), /*#__PURE__*/React.createElement("div", {
     style: {
-      width: '75%',
+      width: '13.85px',
       height: '2px',
       backgroundColor: '#666',
-      marginBottom: '3px'
+      marginBottom: '4px'
     }
   }), /*#__PURE__*/React.createElement("div", {
     style: {
-      width: '75%',
+      width: '13.85px',
       height: '2px',
       backgroundColor: '#666'
     }
-  }))), /*#__PURE__*/React.createElement("button", {
+  })))), /*#__PURE__*/React.createElement("button", {
     onClick: () => setAlignment('right'),
     style: {
       ...styles.alignment,
@@ -781,25 +801,35 @@ export default function SelectText({
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      width: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'flex-end',
+      marginTop: '12px',
+      marginBottom: '12px',
+      marginLeft: '33px',
+      marginRight: '28px'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: '20px',
       height: '2px',
       backgroundColor: '#666',
-      marginBottom: '3px'
+      marginBottom: '4px'
     }
   }), /*#__PURE__*/React.createElement("div", {
     style: {
-      width: '75%',
+      width: '13.85px',
       height: '2px',
       backgroundColor: '#666',
-      marginBottom: '3px'
+      marginBottom: '4px'
     }
   }), /*#__PURE__*/React.createElement("div", {
     style: {
-      width: '90%',
+      width: '13.85px',
       height: '2px',
       backgroundColor: '#666'
     }
-  })))))), /*#__PURE__*/React.createElement("button", {
+  }))))))), /*#__PURE__*/React.createElement("button", {
     onClick: handleInsert,
     disabled: isLoading || !svgPath,
     style: isLoading || !svgPath ? styles.insertButtonDisabled : styles.insertButton,

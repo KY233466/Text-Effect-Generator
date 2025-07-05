@@ -619,9 +619,11 @@ export default function SelectText({ sandboxProxy,
                 border: alignment === 'left' ? '2px solid #CBE2FF' : 'none'
               }}
             >
-              <div style={{ width: '100%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
-              <div style={{ width: '75%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
-              <div style={{ width: '90%', height: '2px', backgroundColor: '#666' }}></div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop:'12px', marginBottom:'12px', marginLeft:'28px', marginRight:'33px'  }}>
+                <div style={{ width: '20px', height: '2px', backgroundColor: '#666', marginBottom: '4px' }}></div>
+                <div style={{ width: '13.85px', height: '2px', backgroundColor: '#666', marginBottom: '4px' }}></div>
+                <div style={{ width: '13.85px', height: '2px', backgroundColor: '#666' }}></div>
+              </div>
             </button>
 
             <button
@@ -638,9 +640,11 @@ export default function SelectText({ sandboxProxy,
                 alignItems: 'center',   // <— center horizontally
                 width: '100%'
               }}>
-                <div style={{ width: '75%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
-                <div style={{ width: '75%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
-                <div style={{ width: '75%', height: '2px', backgroundColor: '#666' }}></div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop:'12px', marginBottom:'12px', marginLeft:'28px', marginRight:'33px'  }}>
+                <div style={{ width: '20px', height: '2px', backgroundColor: '#666', marginBottom: '4px' }}></div>
+                <div style={{ width: '13.85px', height: '2px', backgroundColor: '#666', marginBottom: '4px' }}></div>
+                <div style={{ width: '13.85px', height: '2px', backgroundColor: '#666' }}></div>
+                </div>
               </div>
             </button>
 
@@ -658,9 +662,11 @@ export default function SelectText({ sandboxProxy,
                 alignItems: 'flex-end',
                 width: '100%'
               }}>
-                <div style={{ width: '100%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
-                <div style={{ width: '75%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
-                <div style={{ width: '90%', height: '2px', backgroundColor: '#666' }}></div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginTop:'12px', marginBottom:'12px', marginLeft:'33px', marginRight:'28px'  }}>
+                <div style={{ width: '20px', height: '2px', backgroundColor: '#666', marginBottom: '4px' }}></div>
+                <div style={{ width: '13.85px', height: '2px', backgroundColor: '#666', marginBottom: '4px' }}></div>
+                <div style={{ width: '13.85px', height: '2px', backgroundColor: '#666' }}></div>
+              </div>
               </div>
             </button>
           </div>
