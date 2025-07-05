@@ -1,5 +1,106 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import opentype from 'opentype.js';
+
+const FontSelector = ({ fonts, onSelect }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedFont, setSelectedFont] = useState(null);
+  const dropdownRef = useRef(null);
+
+  const toggleDropdown = () => setIsOpen(!isOpen);
+  const handleSelect = (font) => {
+    setSelectedFont(font);
+    setIsOpen(false);
+    onSelect(font);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const displayFont = selectedFont || fonts[0];
+
+  return (
+    <div style={{ position: 'relative', width: '100%' }} ref={dropdownRef}>
+      <div
+        onClick={toggleDropdown}
+        style={{
+          width: '100%',
+          height: '40px',
+          border: '2px solid #CBE2FF',
+          backgroundColor: selectedFont ? '#EBF3FE' : '#fff',
+          borderRadius: '8px',
+          padding: '10px',
+          fontFamily: 'Avenir Next',
+          fontSize: '14px',
+          cursor: 'pointer',
+          userSelect: 'none',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}
+      >
+        <span>{displayFont.name}</span>
+        <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M1 1L6 6L11 1" stroke="#333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </div>
+      {isOpen && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '45px',
+            left: 0,
+            right: 0,
+            border: '2px solid #CBE2FF',
+            borderRadius: '8px',
+            backgroundColor: '#fff',
+            maxHeight: '200px',
+            overflowY: 'auto',
+            zIndex: 10
+          }}
+        >
+          {fonts.map((font) => (
+            <div
+              key={font.name}
+              onClick={() => handleSelect(font)}
+              style={{
+                padding: '10px',
+                borderBottom: '1px solid #f0f0f0',
+                cursor: 'pointer',
+                backgroundColor: selectedFont?.name === font.name ? '#EBF3FE' : '#fff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                fontSize: '14px'
+              }}
+            >
+              <div style={{
+                fontFamily: 'Avenir Next',
+                fontSize: '14px',
+                color: '#333'
+              }}>{font.name}</div>
+              <div style={{
+                fontFamily: font.name,
+                fontSize: '14px',
+                fontWeight: '600'
+              }}>
+                HAVE FUN
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const fonts = [
   { name: "Old Standard", url: "./fonts/OldStandardTT-Regular.ttf" },
@@ -330,17 +431,11 @@ export default function SelectText({ sandboxProxy,
           />
         </div>
 
-        <div style={{ width: '280px', height: '227px', marginTop: '24px', marginBottom: "0" }}>
+        <div style={{ width: '280px', height: '227px', marginTop: '24px' }}>
           <label style={styles.label}>Typography</label>
-          <select
-            value={fontUrl}
-            onChange={e => setFontUrl(e.target.value)}
-            style={styles.selectFont}
-          >
-            {fonts.map(f => (
-              <option key={f.url} value={f.url}>{f.name}</option>
-            ))}
-          </select>
+          <div style={{ marginBottom: '12px' }}>
+            <FontSelector fonts={fonts} onSelect={(font) => setFontUrl(font.url)} />
+          </div>
 
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px', backgroundColor: '#EBF3FE', padding: '10px', borderRadius: '5px' }}>
             <img src="./icon/line_height.svg" alt="icon" style={{ width: '12px', height: '12px', marginTop: '2px' }} />

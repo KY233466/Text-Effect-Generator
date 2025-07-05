@@ -36,7 +36,8 @@ function start() {
             return [
                 { postscriptName: "ArialMT", familyName: "Arial", styleName: "Regular" },
                 { postscriptName: "Helvetica", familyName: "Helvetica", styleName: "Regular" },
-                { postscriptName: "TimesNewRomanPSMT", familyName: "Times New Roman", styleName: "Regular" }
+                { postscriptName: "TimesNewRomanPSMT", familyName: "Times New Roman", styleName: "Regular" },
+                { postscriptName: "Eckmannpsych", familyName: "Eckmannpsych", styleName: "Regular" }
             ];
         },
         // Insert SVG path
@@ -114,7 +115,7 @@ function start() {
                 console.log('Path object type:', typeof pathObj);
                 console.log('Path object properties:', Object.getOwnPropertyNames(pathObj));
                 
-                // 🔥 Primary task: immediately remove default stroke
+                //  immediately remove default stroke
                 console.log('🔥 PathNode has default stroke, removing immediately...');
                 console.log('Default stroke at creation:', pathObj.stroke);
                 

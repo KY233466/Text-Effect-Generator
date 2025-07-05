@@ -1,5 +1,105 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import opentype from 'opentype.js';
+const FontSelector = ({
+  fonts,
+  onSelect
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedFont, setSelectedFont] = useState(null);
+  const dropdownRef = useRef(null);
+  const toggleDropdown = () => setIsOpen(!isOpen);
+  const handleSelect = font => {
+    setSelectedFont(font);
+    setIsOpen(false);
+    onSelect(font);
+  };
+  useEffect(() => {
+    const handleClickOutside = event => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+  const displayFont = selectedFont || fonts[0];
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: 'relative',
+      width: '100%'
+    },
+    ref: dropdownRef
+  }, /*#__PURE__*/React.createElement("div", {
+    onClick: toggleDropdown,
+    style: {
+      width: '100%',
+      height: '40px',
+      border: '2px solid #CBE2FF',
+      backgroundColor: selectedFont ? '#EBF3FE' : '#fff',
+      borderRadius: '8px',
+      padding: '10px',
+      fontFamily: 'Avenir Next',
+      fontSize: '14px',
+      cursor: 'pointer',
+      userSelect: 'none',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between'
+    }
+  }, /*#__PURE__*/React.createElement("span", null, displayFont.name), /*#__PURE__*/React.createElement("svg", {
+    width: "12",
+    height: "8",
+    viewBox: "0 0 12 8",
+    fill: "none",
+    xmlns: "http://www.w3.org/2000/svg"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M1 1L6 6L11 1",
+    stroke: "#333",
+    strokeWidth: "1.5",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }))), isOpen && /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: 'absolute',
+      top: '45px',
+      left: 0,
+      right: 0,
+      border: '2px solid #CBE2FF',
+      borderRadius: '8px',
+      backgroundColor: '#fff',
+      maxHeight: '200px',
+      overflowY: 'auto',
+      zIndex: 10
+    }
+  }, fonts.map(font => /*#__PURE__*/React.createElement("div", {
+    key: font.name,
+    onClick: () => handleSelect(font),
+    style: {
+      padding: '10px',
+      borderBottom: '1px solid #f0f0f0',
+      cursor: 'pointer',
+      backgroundColor: selectedFont?.name === font.name ? '#EBF3FE' : '#fff',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      fontSize: '14px'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: 'Avenir Next',
+      fontSize: '14px',
+      color: '#333'
+    }
+  }, font.name), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: font.name,
+      fontSize: '14px',
+      fontWeight: '600'
+    }
+  }, "HAVE FUN")))));
+};
 const fonts = [{
   name: "Old Standard",
   url: "./fonts/OldStandardTT-Regular.ttf"
@@ -331,19 +431,18 @@ export default function SelectText({
     style: {
       width: '280px',
       height: '227px',
-      marginTop: '24px',
-      marginBottom: "0"
+      marginTop: '24px'
     }
   }, /*#__PURE__*/React.createElement("label", {
     style: styles.label
-  }, "Typography"), /*#__PURE__*/React.createElement("select", {
-    value: fontUrl,
-    onChange: e => setFontUrl(e.target.value),
-    style: styles.selectFont
-  }, fonts.map(f => /*#__PURE__*/React.createElement("option", {
-    key: f.url,
-    value: f.url
-  }, f.name))), /*#__PURE__*/React.createElement("div", {
+  }, "Typography"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: '12px'
+    }
+  }, /*#__PURE__*/React.createElement(FontSelector, {
+    fonts: fonts,
+    onSelect: font => setFontUrl(font.url)
+  })), /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
       alignItems: 'center',
