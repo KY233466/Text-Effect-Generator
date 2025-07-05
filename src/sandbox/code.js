@@ -31,11 +31,50 @@ function start() {
     // APIs to be exposed to the UI runtime
     // i.e., to the `index.html` file of this add-on.
     const sandboxApi = {
-        // Get available fonts list
+        // Get available fonts list - should match the fonts in SelectText.jsx
         getAvailableFonts: async () => {
             return [
+                // Custom fonts ordered alphabetically
+                { postscriptName: "8Heavy", familyName: "8 Heavy", styleName: "Regular" },
                 { postscriptName: "ArialMT", familyName: "Arial", styleName: "Regular" },
+                
+                // Degular family (ordered alphabetically)
+                { postscriptName: "DegularDisplayBlack", familyName: "Degular Display", styleName: "Black" },
+                { postscriptName: "DegularDisplayBlackItalic", familyName: "Degular Display", styleName: "Black Italic" },
+                { postscriptName: "DegularDisplayBold", familyName: "Degular Display", styleName: "Bold" },
+                { postscriptName: "DegularDisplayBoldItalic", familyName: "Degular Display", styleName: "Bold Italic" },
+                { postscriptName: "DegularDisplayLight", familyName: "Degular Display", styleName: "Light" },
+                { postscriptName: "DegularDisplayLightItalic", familyName: "Degular Display", styleName: "Light Italic" },
+                { postscriptName: "DegularDisplayMedium", familyName: "Degular Display", styleName: "Medium" },
+                { postscriptName: "DegularDisplayMediumItalic", familyName: "Degular Display", styleName: "Medium Italic" },
+                { postscriptName: "DegularDisplayRegular", familyName: "Degular Display", styleName: "Regular" },
+                { postscriptName: "DegularDisplayRegularItalic", familyName: "Degular Display", styleName: "Regular Italic" },
+                { postscriptName: "DegularDisplaySemibold", familyName: "Degular Display", styleName: "Semibold" },
+                { postscriptName: "DegularDisplaySemiboldItalic", familyName: "Degular Display", styleName: "Semibold Italic" },
+                { postscriptName: "DegularDisplayThin", familyName: "Degular Display", styleName: "Thin" },
+                { postscriptName: "DegularDisplayThinItalic", familyName: "Degular Display", styleName: "Thin Italic" },
+                
+                // Eckmannpsych family (ordered alphabetically)
+                { postscriptName: "EckmannpsychLarge", familyName: "Eckmannpsych Large", styleName: "Regular" },
+                { postscriptName: "EckmannpsychMedium", familyName: "Eckmannpsych Medium", styleName: "Regular" },
+                { postscriptName: "EckmannpsychSmall", familyName: "Eckmannpsych Small", styleName: "Regular" },
+                { postscriptName: "EckmannpsychVariable", familyName: "Eckmannpsych Variable", styleName: "Regular" },
+                
+                // Gyst font family (ordered alphabetically)
+                { postscriptName: "Gyst", familyName: "Gyst", styleName: "Regular" },
+                { postscriptName: "Gyst-Bold", familyName: "Gyst", styleName: "Bold" },
+                { postscriptName: "Gyst-BoldItalic", familyName: "Gyst", styleName: "Bold Italic" },
+                { postscriptName: "Gyst-Italic", familyName: "Gyst", styleName: "Italic" },
+                { postscriptName: "Gyst-Light", familyName: "Gyst", styleName: "Light" },
+                { postscriptName: "Gyst-LightItalic", familyName: "Gyst", styleName: "Light Italic" },
+                { postscriptName: "Gyst-Medium", familyName: "Gyst", styleName: "Medium" },
+                { postscriptName: "Gyst-MediumItalic", familyName: "Gyst", styleName: "Medium Italic" },
+                
+                // Remaining fonts (ordered alphabetically)
                 { postscriptName: "Helvetica", familyName: "Helvetica", styleName: "Regular" },
+                { postscriptName: "OldStandardTT", familyName: "Old Standard", styleName: "Regular" },
+                { postscriptName: "PikaUltraScript", familyName: "Pika Ultra Script", styleName: "Regular" },
+                { postscriptName: "SwungNote", familyName: "Swung Note", styleName: "Regular" },
                 { postscriptName: "TimesNewRomanPSMT", familyName: "Times New Roman", styleName: "Regular" }
             ];
         },

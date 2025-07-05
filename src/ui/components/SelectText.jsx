@@ -1,10 +1,227 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import opentype from 'opentype.js';
 
+const FontSelector = ({ fonts, onSelect, currentFontUrl }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedFont, setSelectedFont] = useState(null);
+  const [openGroups, setOpenGroups] = useState({});
+  const dropdownRef = useRef(null);
+
+  const findFontByUrl = (url) => {
+    const flatFonts = fonts.reduce((acc, item) => {
+      if (item.group) {
+        return [...acc, ...item.fonts];
+      } else {
+        return [...acc, item];
+      }
+    }, []);
+    return flatFonts.find(font => font.url === url);
+  };
+
+
+  useEffect(() => {
+    if (currentFontUrl) {
+      const font = findFontByUrl(currentFontUrl);
+      if (font) {
+        setSelectedFont(font);
+      }
+    }
+  }, [currentFontUrl, fonts]);
+
+  useEffect(() => {
+    if (!selectedFont && currentFontUrl) {
+      const font = findFontByUrl(currentFontUrl);
+      if (font) {
+        setSelectedFont(font);
+      }
+    }
+  }, [selectedFont, currentFontUrl]);
+
+  const toggleDropdown = () => setIsOpen(!isOpen);
+  const handleSelect = (font) => {
+    setSelectedFont(font);
+    setIsOpen(false);
+    onSelect(font);
+  };
+
+  const toggleGroup = (groupName) => {
+    setOpenGroups((prev) => ({
+      ...prev,
+      [groupName]: !prev[groupName],
+    }));
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const displayFont = selectedFont || fonts[0];
+
+  const renderFontOption = (font) => (
+    <div
+      key={font.name}
+      onClick={() => handleSelect(font)}
+      style={{
+        padding: '10px',
+        borderBottom: '1px solid #f0f0f0',
+        cursor: 'pointer',
+        backgroundColor: selectedFont?.name === font.name ? '#EBF3FE' : '#fff',
+        display: 'flex',
+        alignItems: 'center',
+        fontSize: '14px'
+      }}
+    >
+      <div style={{
+        fontSize: '14px',
+        color: '#000'
+      }}>{font.name}</div>
+    </div>
+  );
+
+  return (
+    <div style={{ position: 'relative', width: '100%' }} ref={dropdownRef}>
+      <div
+        onClick={toggleDropdown}
+        style={{
+          width: '100%',
+          height: '40px',
+          border: '2px solid #CBE2FF',
+          backgroundColor: selectedFont ? '#EBF3FE' : '#fff',
+          borderRadius: '8px',
+          padding: '10px',
+          fontFamily: displayFont.name,
+          fontSize: '14px',
+          cursor: 'pointer',
+          userSelect: 'none',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}
+      >
+        <span>{displayFont.name}</span>
+        <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M1 1L6 6L11 1" stroke="#333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </div>
+      {isOpen && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '45px',
+            left: 0,
+            right: 0,
+            border: '2px solid #CBE2FF',
+            borderRadius: '8px',
+            backgroundColor: '#fff',
+            maxHeight: '200px',
+            overflowY: 'auto',
+            zIndex: 10
+          }}
+        >
+          {fonts.map((item) => (
+            item.group ? (
+              <div key={item.group}>
+                <div
+                  onClick={() => toggleGroup(item.group)}
+                  style={{
+                    padding: '10px',
+                    borderBottom: '1px solid #f0f0f0',
+                    cursor: 'pointer',
+                    backgroundColor: openGroups[item.group] ? '#EBF3FE' : '#fff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    fontSize: '14px',
+                    fontWeight: 'normal',
+                    color: '#000'
+                  }}
+                >
+                  <span style={{ display: 'flex', alignItems: 'center', color: '#000' }}>
+                    <svg
+                      width="10"
+                      height="10"
+                      viewBox="0 0 10 10"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      style={{ marginRight: '6px' }}
+                    >
+                      <path
+                        d={openGroups[item.group] ? "M1 3L5 7L9 3" : "M3 1L7 5L3 9"}
+                        stroke="#000"
+                        strokeWidth="1.2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    {item.group}
+                  </span>
+                </div>
+                {openGroups[item.group] && item.fonts.map(renderFontOption)}
+              </div>
+            ) : renderFontOption(item)
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const fonts = [
-  { name: "Old Standard", url: "./fonts/OldStandardTT-Regular.ttf" },
-  { name: "Arial", url: "./fonts/Arial.ttf" },
-  { name: "Helvetica", url: "./fonts/Helvetica.ttf" }
+  { name: '8 Heavy', url: './fonts/8 Heavy.ttf' },
+  { name: 'Arial', url: './fonts/Arial.ttf' },
+  {
+    group: 'Degular',
+    fonts: [
+      { name: 'Degular Display Black', url: './fonts/Degular/DegularDisplay-Black.otf' },
+      { name: 'Degular Display Black Italic', url: './fonts/Degular/DegularDisplay-BlackItalic.otf' },
+      { name: 'Degular Display Bold', url: './fonts/Degular/DegularDisplay-Bold.otf' },
+      { name: 'Degular Display Bold Italic', url: './fonts/Degular/DegularDisplay-BoldItalic.otf' },
+      { name: 'Degular Display Light', url: './fonts/Degular/DegularDisplay-Light.otf' },
+      { name: 'Degular Display Light Italic', url: './fonts/Degular/DegularDisplay-LightItalic.otf' },
+      { name: 'Degular Display Medium', url: './fonts/Degular/DegularDisplay-Medium.otf' },
+      { name: 'Degular Display Medium Italic', url: './fonts/Degular/DegularDisplay-MediumItalic.otf' },
+      { name: 'Degular Display Regular', url: './fonts/Degular/DegularDisplay-Regular.otf' },
+      { name: 'Degular Display Regular Italic', url: './fonts/Degular/DegularDisplay-RegularItalic.otf' },
+      { name: 'Degular Display Semibold', url: './fonts/Degular/DegularDisplay-Semibold.otf' },
+      { name: 'Degular Display Semibold Italic', url: './fonts/Degular/DegularDisplay-SemiboldItalic.otf' },
+      { name: 'Degular Display Thin', url: './fonts/Degular/DegularDisplay-Thin.otf' },
+      { name: 'Degular Display Thin Italic', url: './fonts/Degular/DegularDisplay-ThinItalic.otf' }
+    ]
+  },
+  {
+    group: 'Eckmannpsych-font',
+    fonts: [
+      { name: 'Eckmannpsych Large', url: './fonts/eckmannpsych-font/Eckmannpsych-Large.ttf' },
+      { name: 'Eckmannpsych Medium', url: './fonts/eckmannpsych-font/Eckmannpsych-Medium.ttf' },
+      { name: 'Eckmannpsych Small', url: './fonts/eckmannpsych-font/Eckmannpsych-Small.ttf' },
+      { name: 'Eckmannpsych Variable', url: './fonts/eckmannpsych-font/Eckmannpsych-Variable.ttf' }
+    ]
+  },
+  {
+    group: 'Gyst',
+    fonts: [
+      { name: 'Gyst', url: './fonts/Gyst/Gyst.otf' },
+      { name: 'Gyst Bold', url: './fonts/Gyst/Gyst-Bold.ttf' },
+      { name: 'Gyst Bold Italic', url: './fonts/Gyst/Gyst-BoldItalic.ttf' },
+      { name: 'Gyst Italic', url: './fonts/Gyst/Gyst-Italic.ttf' },
+      { name: 'Gyst Light', url: './fonts/Gyst/Gyst-Light.ttf' },
+      { name: 'Gyst Light Italic', url: './fonts/Gyst/Gyst-LightItalic.ttf' },
+      { name: 'Gyst Medium', url: './fonts/Gyst/Gyst-Medium.ttf' },
+      { name: 'Gyst Medium Italic', url: './fonts/Gyst/Gyst-MediumItalic.ttf' }
+    ]
+  },
+  { name: 'Helvetica', url: './fonts/Helvetica.ttf' },
+  { name: 'Old Standard', url: './fonts/OldStandardTT-Regular.ttf' },
+  { name: 'Pika Ultra Script', url: './fonts/PikaUltraScript-Regular-iF667ecb67317fc.otf' },
+  { name: 'Swung Note', url: './fonts/SwungNote.ttf' }
 ];
 
 const styles = {
@@ -196,7 +413,7 @@ export default function SelectText({ sandboxProxy,
           return;
         }
 
-        const fontSize = 20;
+        const fontSize = 100;
         const scale = fontSize / font.unitsPerEm;
         const baselineY = fontSize * 0.8;
         const actualLineHeight = fontSize * lineHeight;
@@ -277,6 +494,10 @@ export default function SelectText({ sandboxProxy,
       if (!result.success) {
         console.error('Sandbox insertion failed:', result.error);
         setError(`Insertion failed: ${result.error}`);
+      } else if (result.message) {
+        // Show informational message about SDK limitations
+        console.warn('SDK Limitation:', result.message);
+        setError(`⚠️ ${result.message}`);
       }
     } catch (e) {
       console.error('Sandbox API call failed:', e);
@@ -330,17 +551,15 @@ export default function SelectText({ sandboxProxy,
           />
         </div>
 
-        <div style={{ width: '280px', height: '227px', marginTop: '24px', marginBottom: "0" }}>
+        <div style={{ width: '280px', height: '227px', marginTop: '24px' }}>
           <label style={styles.label}>Typography</label>
-          <select
-            value={fontUrl}
-            onChange={e => setFontUrl(e.target.value)}
-            style={styles.selectFont}
-          >
-            {fonts.map(f => (
-              <option key={f.url} value={f.url}>{f.name}</option>
-            ))}
-          </select>
+          <div style={{ marginBottom: '12px' }}>
+            <FontSelector 
+              fonts={fonts} 
+              onSelect={(font) => setFontUrl(font.url)} 
+              currentFontUrl={fontUrl}
+            />
+          </div>
 
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px', backgroundColor: '#EBF3FE', padding: '10px', borderRadius: '5px' }}>
             <img src="./icon/line_height.svg" alt="icon" style={{ width: '12px', height: '12px', marginTop: '2px' }} />
@@ -400,9 +619,11 @@ export default function SelectText({ sandboxProxy,
                 border: alignment === 'left' ? '2px solid #CBE2FF' : 'none'
               }}
             >
-              <div style={{ width: '100%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
-              <div style={{ width: '75%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
-              <div style={{ width: '90%', height: '2px', backgroundColor: '#666' }}></div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop:'12px', marginBottom:'12px', marginLeft:'28px', marginRight:'33px'  }}>
+                <div style={{ width: '20px', height: '2px', backgroundColor: '#666', marginBottom: '4px' }}></div>
+                <div style={{ width: '13.85px', height: '2px', backgroundColor: '#666', marginBottom: '4px' }}></div>
+                <div style={{ width: '13.85px', height: '2px', backgroundColor: '#666' }}></div>
+              </div>
             </button>
 
             <button
@@ -419,9 +640,11 @@ export default function SelectText({ sandboxProxy,
                 alignItems: 'center',   // <— center horizontally
                 width: '100%'
               }}>
-                <div style={{ width: '75%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
-                <div style={{ width: '75%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
-                <div style={{ width: '75%', height: '2px', backgroundColor: '#666' }}></div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop:'12px', marginBottom:'12px', marginLeft:'28px', marginRight:'33px'  }}>
+                <div style={{ width: '20px', height: '2px', backgroundColor: '#666', marginBottom: '4px' }}></div>
+                <div style={{ width: '13.85px', height: '2px', backgroundColor: '#666', marginBottom: '4px' }}></div>
+                <div style={{ width: '13.85px', height: '2px', backgroundColor: '#666' }}></div>
+                </div>
               </div>
             </button>
 
@@ -439,9 +662,11 @@ export default function SelectText({ sandboxProxy,
                 alignItems: 'flex-end',
                 width: '100%'
               }}>
-                <div style={{ width: '100%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
-                <div style={{ width: '75%', height: '2px', backgroundColor: '#666', marginBottom: '3px' }}></div>
-                <div style={{ width: '90%', height: '2px', backgroundColor: '#666' }}></div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginTop:'12px', marginBottom:'12px', marginLeft:'33px', marginRight:'28px'  }}>
+                <div style={{ width: '20px', height: '2px', backgroundColor: '#666', marginBottom: '4px' }}></div>
+                <div style={{ width: '13.85px', height: '2px', backgroundColor: '#666', marginBottom: '4px' }}></div>
+                <div style={{ width: '13.85px', height: '2px', backgroundColor: '#666' }}></div>
+              </div>
               </div>
             </button>
           </div>
