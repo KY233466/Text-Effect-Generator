@@ -2,16 +2,50 @@ import React, { useEffect, useRef, useState } from 'react';
 import opentype from 'opentype.js';
 const FontSelector = ({
   fonts,
-  onSelect
+  onSelect,
+  currentFontUrl
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedFont, setSelectedFont] = useState(null);
+  const [openGroups, setOpenGroups] = useState({});
   const dropdownRef = useRef(null);
+  const findFontByUrl = url => {
+    const flatFonts = fonts.reduce((acc, item) => {
+      if (item.group) {
+        return [...acc, ...item.fonts];
+      } else {
+        return [...acc, item];
+      }
+    }, []);
+    return flatFonts.find(font => font.url === url);
+  };
+  useEffect(() => {
+    if (currentFontUrl) {
+      const font = findFontByUrl(currentFontUrl);
+      if (font) {
+        setSelectedFont(font);
+      }
+    }
+  }, [currentFontUrl, fonts]);
+  useEffect(() => {
+    if (!selectedFont && currentFontUrl) {
+      const font = findFontByUrl(currentFontUrl);
+      if (font) {
+        setSelectedFont(font);
+      }
+    }
+  }, [selectedFont, currentFontUrl]);
   const toggleDropdown = () => setIsOpen(!isOpen);
   const handleSelect = font => {
     setSelectedFont(font);
     setIsOpen(false);
     onSelect(font);
+  };
+  const toggleGroup = groupName => {
+    setOpenGroups(prev => ({
+      ...prev,
+      [groupName]: !prev[groupName]
+    }));
   };
   useEffect(() => {
     const handleClickOutside = event => {
@@ -25,6 +59,24 @@ const FontSelector = ({
     };
   }, []);
   const displayFont = selectedFont || fonts[0];
+  const renderFontOption = font => /*#__PURE__*/React.createElement("div", {
+    key: font.name,
+    onClick: () => handleSelect(font),
+    style: {
+      padding: '10px',
+      borderBottom: '1px solid #f0f0f0',
+      cursor: 'pointer',
+      backgroundColor: selectedFont?.name === font.name ? '#EBF3FE' : '#fff',
+      display: 'flex',
+      alignItems: 'center',
+      fontSize: '14px'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: '14px',
+      color: '#000'
+    }
+  }, font.name));
   return /*#__PURE__*/React.createElement("div", {
     style: {
       position: 'relative',
@@ -40,7 +92,7 @@ const FontSelector = ({
       backgroundColor: selectedFont ? '#EBF3FE' : '#fff',
       borderRadius: '8px',
       padding: '10px',
-      fontFamily: 'Avenir Next',
+      fontFamily: displayFont.name,
       fontSize: '14px',
       cursor: 'pointer',
       userSelect: 'none',
@@ -73,42 +125,150 @@ const FontSelector = ({
       overflowY: 'auto',
       zIndex: 10
     }
-  }, fonts.map(font => /*#__PURE__*/React.createElement("div", {
-    key: font.name,
-    onClick: () => handleSelect(font),
+  }, fonts.map(item => item.group ? /*#__PURE__*/React.createElement("div", {
+    key: item.group
+  }, /*#__PURE__*/React.createElement("div", {
+    onClick: () => toggleGroup(item.group),
     style: {
       padding: '10px',
       borderBottom: '1px solid #f0f0f0',
       cursor: 'pointer',
-      backgroundColor: selectedFont?.name === font.name ? '#EBF3FE' : '#fff',
+      backgroundColor: openGroups[item.group] ? '#EBF3FE' : '#fff',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      fontSize: '14px'
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontFamily: 'Avenir Next',
       fontSize: '14px',
-      color: '#333'
+      fontWeight: 'normal',
+      color: '#000'
     }
-  }, font.name), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("span", {
     style: {
-      fontFamily: font.name,
-      fontSize: '14px',
-      fontWeight: '600'
+      display: 'flex',
+      alignItems: 'center',
+      color: '#000'
     }
-  }, "HAVE FUN")))));
+  }, /*#__PURE__*/React.createElement("svg", {
+    width: "10",
+    height: "10",
+    viewBox: "0 0 10 10",
+    fill: "none",
+    xmlns: "http://www.w3.org/2000/svg",
+    style: {
+      marginRight: '6px'
+    }
+  }, /*#__PURE__*/React.createElement("path", {
+    d: openGroups[item.group] ? "M1 3L5 7L9 3" : "M3 1L7 5L3 9",
+    stroke: "#000",
+    strokeWidth: "1.2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  })), item.group)), openGroups[item.group] && item.fonts.map(renderFontOption)) : renderFontOption(item))));
 };
 const fonts = [{
-  name: "Old Standard",
-  url: "./fonts/OldStandardTT-Regular.ttf"
+  name: '8 Heavy',
+  url: './fonts/8 Heavy.ttf'
 }, {
-  name: "Arial",
-  url: "./fonts/Arial.ttf"
+  name: 'Arial',
+  url: './fonts/Arial.ttf'
 }, {
-  name: "Helvetica",
-  url: "./fonts/Helvetica.ttf"
+  group: 'Degular',
+  fonts: [{
+    name: 'Degular Display Black',
+    url: './fonts/Degular/DegularDisplay-Black.otf'
+  }, {
+    name: 'Degular Display Black Italic',
+    url: './fonts/Degular/DegularDisplay-BlackItalic.otf'
+  }, {
+    name: 'Degular Display Bold',
+    url: './fonts/Degular/DegularDisplay-Bold.otf'
+  }, {
+    name: 'Degular Display Bold Italic',
+    url: './fonts/Degular/DegularDisplay-BoldItalic.otf'
+  }, {
+    name: 'Degular Display Light',
+    url: './fonts/Degular/DegularDisplay-Light.otf'
+  }, {
+    name: 'Degular Display Light Italic',
+    url: './fonts/Degular/DegularDisplay-LightItalic.otf'
+  }, {
+    name: 'Degular Display Medium',
+    url: './fonts/Degular/DegularDisplay-Medium.otf'
+  }, {
+    name: 'Degular Display Medium Italic',
+    url: './fonts/Degular/DegularDisplay-MediumItalic.otf'
+  }, {
+    name: 'Degular Display Regular',
+    url: './fonts/Degular/DegularDisplay-Regular.otf'
+  }, {
+    name: 'Degular Display Regular Italic',
+    url: './fonts/Degular/DegularDisplay-RegularItalic.otf'
+  }, {
+    name: 'Degular Display Semibold',
+    url: './fonts/Degular/DegularDisplay-Semibold.otf'
+  }, {
+    name: 'Degular Display Semibold Italic',
+    url: './fonts/Degular/DegularDisplay-SemiboldItalic.otf'
+  }, {
+    name: 'Degular Display Thin',
+    url: './fonts/Degular/DegularDisplay-Thin.otf'
+  }, {
+    name: 'Degular Display Thin Italic',
+    url: './fonts/Degular/DegularDisplay-ThinItalic.otf'
+  }]
+}, {
+  group: 'Eckmannpsych-font',
+  fonts: [{
+    name: 'Eckmannpsych Large',
+    url: './fonts/eckmannpsych-font/Eckmannpsych-Large.ttf'
+  }, {
+    name: 'Eckmannpsych Medium',
+    url: './fonts/eckmannpsych-font/Eckmannpsych-Medium.ttf'
+  }, {
+    name: 'Eckmannpsych Small',
+    url: './fonts/eckmannpsych-font/Eckmannpsych-Small.ttf'
+  }, {
+    name: 'Eckmannpsych Variable',
+    url: './fonts/eckmannpsych-font/Eckmannpsych-Variable.ttf'
+  }]
+}, {
+  group: 'Gyst',
+  fonts: [{
+    name: 'Gyst',
+    url: './fonts/Gyst/Gyst.otf'
+  }, {
+    name: 'Gyst Bold',
+    url: './fonts/Gyst/Gyst-Bold.ttf'
+  }, {
+    name: 'Gyst Bold Italic',
+    url: './fonts/Gyst/Gyst-BoldItalic.ttf'
+  }, {
+    name: 'Gyst Italic',
+    url: './fonts/Gyst/Gyst-Italic.ttf'
+  }, {
+    name: 'Gyst Light',
+    url: './fonts/Gyst/Gyst-Light.ttf'
+  }, {
+    name: 'Gyst Light Italic',
+    url: './fonts/Gyst/Gyst-LightItalic.ttf'
+  }, {
+    name: 'Gyst Medium',
+    url: './fonts/Gyst/Gyst-Medium.ttf'
+  }, {
+    name: 'Gyst Medium Italic',
+    url: './fonts/Gyst/Gyst-MediumItalic.ttf'
+  }]
+}, {
+  name: 'Helvetica',
+  url: './fonts/Helvetica.ttf'
+}, {
+  name: 'Old Standard',
+  url: './fonts/OldStandardTT-Regular.ttf'
+}, {
+  name: 'Pika Ultra Script',
+  url: './fonts/PikaUltraScript-Regular-iF667ecb67317fc.otf'
+}, {
+  name: 'Swung Note',
+  url: './fonts/SwungNote.ttf'
 }];
 const styles = {
   container: {
@@ -301,7 +461,7 @@ export default function SelectText({
           setSvgPath("");
           return;
         }
-        const fontSize = 20;
+        const fontSize = 100;
         const scale = fontSize / font.unitsPerEm;
         const baselineY = fontSize * 0.8;
         const actualLineHeight = fontSize * lineHeight;
@@ -376,6 +536,10 @@ export default function SelectText({
       if (!result.success) {
         console.error('Sandbox insertion failed:', result.error);
         setError(`Insertion failed: ${result.error}`);
+      } else if (result.message) {
+        // Show informational message about SDK limitations
+        console.warn('SDK Limitation:', result.message);
+        setError(`⚠️ ${result.message}`);
       }
     } catch (e) {
       console.error('Sandbox API call failed:', e);
@@ -441,7 +605,8 @@ export default function SelectText({
     }
   }, /*#__PURE__*/React.createElement(FontSelector, {
     fonts: fonts,
-    onSelect: font => setFontUrl(font.url)
+    onSelect: font => setFontUrl(font.url),
+    currentFontUrl: fontUrl
   })), /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
