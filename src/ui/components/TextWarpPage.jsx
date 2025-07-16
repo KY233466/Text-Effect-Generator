@@ -23,7 +23,7 @@ const styles = {
     display: "block",
   },
   previewContainer: {
-    border: "1px solid #EBF3FE",
+    border: "1px solid #CBE2FF",
     height: "240px",
     width: "100%",
     borderRadius: "10px",
