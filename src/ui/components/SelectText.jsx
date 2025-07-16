@@ -233,7 +233,8 @@ const styles = {
   },
   content: {
     flex: 1,
-    overflowY: 'auto'
+    overflowY: 'hidden',
+    overflowX: 'hidden',
   },
   preview: {
     width: '100%',
@@ -241,7 +242,7 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    position: "sticky",
+    position: "relative",
     top: 56,
     zIndex: 1,
     paddingBottom: "5px",
