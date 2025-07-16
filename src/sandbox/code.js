@@ -83,7 +83,30 @@ function start() {
                     throw new Error('SVG path data is empty');
                 }
 
-
+                // Scale the SVG path data directly
+                const scale = 2;
+                let scaledPathData = d;
+                
+                // Apply scaling by modifying the path data coordinates
+                if (bounds) {
+                    // Create a simple transform matrix for scaling
+                    const matrix = [scale, 0, 0, scale, 0, 0];
+                    
+                    // Apply transform to path data
+                    scaledPathData = d.replace(/(-?\d+\.?\d*)/g, (match, num) => {
+                        const index = d.indexOf(match);
+                        const beforeMatch = d.substring(0, index);
+                        const commandCount = (beforeMatch.match(/[MLHVCSQTAZmlhvcsqtaz]/g) || []).length;
+                        
+                        // Only scale coordinates, not command letters
+                        if (/^[MLHVCSQTAZmlhvcsqtaz]$/.test(match)) {
+                            return match; // Keep command letters unchanged
+                        }
+                        
+                        // Scale the coordinate
+                        return (parseFloat(num) * scale).toString();
+                    });
+                }
                 
                 // Check if editor object is available
                 if (!editor) {
@@ -102,21 +125,21 @@ function start() {
                 try {
                     // Method 1: Check various possible path creation methods
                     if (typeof editor.createPath === 'function') {
-                        pathObj = editor.createPath(d);
+                        pathObj = editor.createPath(scaledPathData);
                         creationMethod = 'createPath';
                     } else if (typeof editor.createPathNode === 'function') {
-                        pathObj = editor.createPathNode(d);
+                        pathObj = editor.createPathNode(scaledPathData);
                         creationMethod = 'createPathNode';
                     } else if (typeof editor.addPath === 'function') {
-                        pathObj = editor.addPath(d);
+                        pathObj = editor.addPath(scaledPathData);
                         creationMethod = 'addPath';
                     } else if (typeof editor.createShape === 'function') {
                         pathObj = editor.createShape();
                         if (pathObj && typeof pathObj.setPath === 'function') {
-                            pathObj.setPath(d);
+                            pathObj.setPath(scaledPathData);
                             creationMethod = 'createShape + setPath';
                         } else if (pathObj && 'path' in pathObj) {
-                            pathObj.path = d;
+                            pathObj.path = scaledPathData;
                             creationMethod = 'createShape + path property';
                         }
                     } else if (typeof editor.createPolygon === 'function') {
@@ -134,8 +157,6 @@ function start() {
                 if (!pathObj) {
                     throw new Error('Path object creation failed - return value is null');
                 }
-                
-                // 🔥 Primary task: immediately remove default stroke
                 
                 // Try all possible stroke removal methods
                 const strokeRemovalResults = [];
@@ -183,51 +204,66 @@ function start() {
                     }
                 }
                 
-                // Now set fill color (hot pink)
-                const fillColor = { red: 0.0, green: 0.0, blue: 0.0, alpha: 1 }; // 黑色
-
-
+                // Now set fill color (black)
+                const fillColor = { red: 0.0, green: 0.0, blue: 0.0, alpha: 1 }; 
                 
-                // Check if editor.makeColorFill exists
-                if (typeof editor.makeColorFill === 'function') {
-                    try {
-                        const colorFill = editor.makeColorFill(fillColor);
-                        if (safeSetProperty(pathObj, 'fill', colorFill, '(set fill color)')) {
-                            // Fill color set successfully
-                        } else {
-                            // If fill property setting fails, try other possible property names
-                            safeSetProperty(pathObj, 'fillColor', colorFill, '(try fillColor property)') ||
-                            safeSetProperty(pathObj, 'color', colorFill, '(try color property)');
-                        }
-                    } catch (colorError) {
-                        // Failed to create color fill
+                // Apply fill color
+                try {
+                    const colorFill = editor.makeColorFill(fillColor);
+                    if (safeSetProperty(pathObj, 'fill', colorFill, '(set fill color)')) {
+                        // Fill color set successfully
+                    } else {
+                        // If fill property setting fails, try other possible property names
+                        safeSetProperty(pathObj, 'fillColor', colorFill, '(try fillColor property)') ||
+                        safeSetProperty(pathObj, 'color', colorFill, '(try color property)');
                     }
-                } else {
-                    safeSetProperty(pathObj, 'fill', fillColor, '(set fill color directly)') ||
-                    safeSetProperty(pathObj, 'fillColor', fillColor, '(set fillColor directly)') ||
-                    safeSetProperty(pathObj, 'color', fillColor, '(set color directly)');
+                } catch (colorError) {
+                    console.error('Failed to create color fill:', colorError);
                 }
                 
-                // Final verification: ensure no stroke and has fill
-                
-                // Calculate more suitable position based on bounds information
-                let offsetX = 100;
-                let offsetY = 100;
-                
+                // Apply scaling using transform matrix (fallback)
+                try {
+                    // Method 1: Try using transform matrix
+                    if (pathObj && 'transform' in pathObj) {
+                        pathObj.transform = { 
+                            scaleX: scale, 
+                            scaleY: scale,
+                            translateX: 0,
+                            translateY: 0
+                        };
+                    } else if (pathObj && typeof pathObj.setTransform === 'function') {
+                        pathObj.setTransform({ scaleX: scale, scaleY: scale });
+                    } else if (pathObj && 'matrix' in pathObj) {
+                        // Create a scale matrix
+                        pathObj.matrix = [scale, 0, 0, scale, 0, 0];
+                    }
+                } catch (transformError) {
+                    console.error('Failed to apply transform:', transformError);
+                }
+                let canvasWidth = 1000, canvasHeight = 1000;
+                try {
+                  const page = editor.documentRoot.pages.first;
+                  if (page && page.width && page.height) {
+                    canvasWidth = page.width;
+                    canvasHeight = page.height;
+                  }
+                } catch (e) {}
+                // 计算SVG缩放后宽高和居中位置
+                let offsetX = 100, offsetY = 100;
                 if (bounds) {
-                    // Ensure inserted content is in visible area of canvas
-                    offsetX = Math.max(50, -bounds.minX + 50);
-                    offsetY = Math.max(50, -bounds.minY + 50);
+                  const svgWidth = bounds.width * scale;
+                  const svgHeight = bounds.height * scale;
+                  offsetX = (canvasWidth - svgWidth) / 2 - bounds.minX * scale;
+                  offsetY = (canvasHeight - svgHeight) / 2 - bounds.minY * scale;
                 }
                 
                 // Set position - using safe property setting
                 const translation = { x: offsetX, y: offsetY };
-                if (!safeSetProperty(pathObj, 'translation', translation, '(set position)')) {
-                    // If translation fails, try other possible property names
-                    safeSetProperty(pathObj, 'position', translation, '(try position property)') ||
-                    safeSetProperty(pathObj, 'transform', translation, '(try transform property)') ||
-                    (safeSetProperty(pathObj, 'x', offsetX, '(try x property)') && 
-                     safeSetProperty(pathObj, 'y', offsetY, '(try y property)'));
+                if (!safeSetProperty(pathObj, 'translation', translation, '(centered position)')) {
+                  safeSetProperty(pathObj, 'position', translation, '(try position property)') ||
+                  safeSetProperty(pathObj, 'transform', translation, '(try transform property)') ||
+                  (safeSetProperty(pathObj, 'x', offsetX, '(try x property)') && 
+                   safeSetProperty(pathObj, 'y', offsetY, '(try y property)'));
                 }
                 
                 // Check insertion parent node

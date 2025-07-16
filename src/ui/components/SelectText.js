@@ -279,8 +279,8 @@ const styles = {
   },
   content: {
     flex: 1,
-    overflowY: 'auto'
-    // overflowX: 'hidden',
+    overflowY: 'auto',
+    overflowX: 'hidden'
   },
   preview: {
     width: '100%',

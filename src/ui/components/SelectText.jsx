@@ -234,7 +234,7 @@ const styles = {
   content: {
     flex: 1,
     overflowY: 'auto',
-    // overflowX: 'hidden',
+    overflowX: 'hidden',
   },
   preview: {
     width: '100%',
