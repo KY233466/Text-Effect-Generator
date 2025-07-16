@@ -8,21 +8,17 @@ const { runtime } = addOnSandboxSdk.instance;
 function safeSetProperty(obj, property, value, description = '') {
     try {
         if (obj === null || obj === undefined) {
-            console.warn(`⚠️ Attempting to set property ${property} on null/undefined object ${description}`);
             return false;
         }
         
         if (!(property in obj) && typeof obj[property] === 'undefined') {
-            console.warn(`⚠️ Object does not support property ${property} ${description}, object type:`, typeof obj);
-            console.log('Available properties:', Object.getOwnPropertyNames(obj));
             return false;
         }
         
         obj[property] = value;
-        console.log(`✅ Successfully set property ${property} = ${value} ${description}`);
         return true;
     } catch (error) {
-        console.error(`❌ Failed to set property ${property} ${description}:`, error);
+        console.error(`Failed to set property ${property} ${description}:`, error);
         return false;
     }
 }
@@ -87,9 +83,7 @@ function start() {
                     throw new Error('SVG path data is empty');
                 }
 
-                console.log('Received SVG path data:', d.substring(0, 100) + '...');
-                console.log('Path bounds info:', bounds);
-                console.log('Original text:', originalText, 'Warp type:', warpType, 'Intensity:', intensity);
+
                 
                 // Check if editor object is available
                 if (!editor) {
@@ -101,9 +95,6 @@ function start() {
                 const methods = allProps.filter(name => typeof editor[name] === 'function');
                 const properties = allProps.filter(name => typeof editor[name] !== 'function');
                 
-                console.log('Editor available methods:', methods);
-                console.log('Editor available properties:', properties);
-                
                 // Try different path creation methods
                 let pathObj;
                 let creationMethod = '';
@@ -111,19 +102,15 @@ function start() {
                 try {
                     // Method 1: Check various possible path creation methods
                     if (typeof editor.createPath === 'function') {
-                        console.log('Trying to use editor.createPath method');
                         pathObj = editor.createPath(d);
                         creationMethod = 'createPath';
                     } else if (typeof editor.createPathNode === 'function') {
-                        console.log('Trying to use editor.createPathNode method');
                         pathObj = editor.createPathNode(d);
                         creationMethod = 'createPathNode';
                     } else if (typeof editor.addPath === 'function') {
-                        console.log('Trying to use editor.addPath method');
                         pathObj = editor.addPath(d);
                         creationMethod = 'addPath';
                     } else if (typeof editor.createShape === 'function') {
-                        console.log('Trying to use editor.createShape method');
                         pathObj = editor.createShape();
                         if (pathObj && typeof pathObj.setPath === 'function') {
                             pathObj.setPath(d);
@@ -133,7 +120,6 @@ function start() {
                             creationMethod = 'createShape + path property';
                         }
                     } else if (typeof editor.createPolygon === 'function') {
-                        console.log('Trying to use editor.createPolygon as fallback');
                         // As a last attempt, use polygon
                         pathObj = editor.createPolygon();
                         creationMethod = 'createPolygon (fallback)';
@@ -149,13 +135,7 @@ function start() {
                     throw new Error('Path object creation failed - return value is null');
                 }
                 
-                console.log(`Path object created successfully, using method: ${creationMethod}`, pathObj);
-                console.log('Path object type:', typeof pathObj);
-                console.log('Path object properties:', Object.getOwnPropertyNames(pathObj));
-                
                 // 🔥 Primary task: immediately remove default stroke
-                console.log('🔥 PathNode has default stroke, removing immediately...');
-                console.log('Default stroke at creation:', pathObj.stroke);
                 
                 // Try all possible stroke removal methods
                 const strokeRemovalResults = [];
@@ -199,49 +179,36 @@ function start() {
                             strokeRemovalResults.push('transparent stroke set successfully');
                         }
                     } catch (strokeError) {
-                        console.warn('Failed to create transparent stroke:', strokeError);
+                        // Failed to create transparent stroke
                     }
                 }
                 
-                console.log('✅ Stroke removal results:', strokeRemovalResults);
-                console.log('✅ Stroke value after removal:', pathObj.stroke);
-                
                 // Now set fill color (hot pink)
-                console.log('🎨 Starting to set fill color...');
-                const fillColor = { red: 1.0, green: 0.412, blue: 0.706, alpha: 1 };
+                const fillColor = { red: 0.0, green: 0.0, blue: 0.0, alpha: 1 }; // 黑色
+
+
                 
                 // Check if editor.makeColorFill exists
                 if (typeof editor.makeColorFill === 'function') {
                     try {
                         const colorFill = editor.makeColorFill(fillColor);
-                        console.log('Color fill object created successfully:', colorFill);
                         if (safeSetProperty(pathObj, 'fill', colorFill, '(set fill color)')) {
-                            console.log('✅ Fill color set successfully');
+                            // Fill color set successfully
                         } else {
-                            console.warn('Unable to set fill color, trying other methods');
                             // If fill property setting fails, try other possible property names
                             safeSetProperty(pathObj, 'fillColor', colorFill, '(try fillColor property)') ||
                             safeSetProperty(pathObj, 'color', colorFill, '(try color property)');
                         }
                     } catch (colorError) {
-                        console.error('Failed to create color fill:', colorError);
+                        // Failed to create color fill
                     }
                 } else {
-                    console.warn('editor.makeColorFill method does not exist, trying to set color directly');
                     safeSetProperty(pathObj, 'fill', fillColor, '(set fill color directly)') ||
                     safeSetProperty(pathObj, 'fillColor', fillColor, '(set fillColor directly)') ||
                     safeSetProperty(pathObj, 'color', fillColor, '(set color directly)');
                 }
                 
                 // Final verification: ensure no stroke and has fill
-                console.log('🔍 Final style verification:', {
-                    stroke: pathObj.stroke,
-                    fill: pathObj.fill,
-                    strokeColor: pathObj.strokeColor,
-                    fillColor: pathObj.fillColor,
-                    strokeWidth: pathObj.strokeWidth,
-                    borderWidth: pathObj.borderWidth
-                });
                 
                 // Calculate more suitable position based on bounds information
                 let offsetX = 100;
@@ -269,13 +236,8 @@ function start() {
                     throw new Error('Insertion parent node not available');
                 }
                 
-                console.log('Insertion parent node:', insertionParent);
-                console.log('Insertion parent node type:', typeof insertionParent);
-                console.log('Insertion parent node properties:', Object.getOwnPropertyNames(insertionParent));
-                
                 try {
                     insertionParent.children.append(pathObj);
-                    console.log(`SVG path inserted successfully, using method: ${creationMethod}, position: (${offsetX}, ${offsetY})`);
                 } catch (appendError) {
                     console.error('Failed to append to parent node:', appendError);
                     throw new Error(`Failed to append to parent node: ${appendError.message}`);
@@ -284,8 +246,6 @@ function start() {
                 return { success: true, position: { x: offsetX, y: offsetY }, method: creationMethod };
                 
             } catch (error) {
-                console.error('Failed to insert SVG path:', error);
-                console.error('Error stack:', error.stack);
                 return { success: false, error: error.message };
             }
         },
@@ -302,10 +262,8 @@ function start() {
                 rectangle.fill = rectangleFill;
                 const insertionParent = editor.context.insertionParent;
                 insertionParent.children.append(rectangle);
-                console.log('Rectangle created successfully');
                 return { success: true };
             } catch (error) {
-                console.error('Failed to create rectangle:', error);
                 return { success: false, error: error.message };
             }
         }
