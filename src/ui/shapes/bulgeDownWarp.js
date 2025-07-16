@@ -11,7 +11,7 @@ export function bulgeDownWarp(
   const scaleY = 1 + strength * (1 - normX * normX);
   const baseline = 10;
 
-  // 上半部分保持原样，下半部分向下膨胀
+  // Keep upper half unchanged, lower half bulges downward
   if (y < baseline * 0.85) {
     return { x, y };
   } else {

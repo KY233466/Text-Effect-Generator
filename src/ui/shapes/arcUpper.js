@@ -7,11 +7,11 @@ export function arcUpperWarp(
   textMetrics = {}
 ) {
   const normX = (x - centerX) / (totalWidth / 2); // -1 ~ 1
-  const arcHeight = (intensity / 100) * (textMetrics.baseline || 100); // 控制弧形高度
+  const arcHeight = (intensity / 100) * (textMetrics.baseline || 100); // Control arc height
 
   return {
     x,
-    y: y - arcHeight * (1 - normX * normX), // 越靠中间越高
+    y: y - arcHeight * (1 - normX * normX), // Higher in the middle
   };
 }
 

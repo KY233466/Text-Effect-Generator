@@ -1,97 +1,111 @@
-# Adobe Express Text Warp Add-on
+# Text Generator Add-on for Adobe Express
 
-This is an Adobe Express add-on based on opentype.js that enables advanced text warping effects.
+This project is an Adobe Express add-on that provides advanced text warping and creative typography effects. It is built with React and opentype.js, supporting real-time preview, custom fonts, and a variety of shape-based text warps.
 
 ## Features
 
-- **Multiple Warp Types**: Arc lower, wave, bulge up, bulge down
-- **Real-time Preview**: Preview warp effects in real-time within the add-on interface
-- **Intensity Control**: 0-100 intensity slider to control warp strength
-- **Font Support**: Support for custom font files (place font files in `public/fonts/` directory)
-- **System Fonts**: Support for system default fonts as fallback
+- **Multiple Warp Types**: Arc, wave, bulge, triangle, flag, curtain, bouquet, envelope, and more.
+- **Real-time Preview**: Instantly see the effect of text warping in the UI.
+- **Custom & System Fonts**: Supports both bundled and system fonts.
+- **Intensity & Typography Controls**: Adjust warp intensity, line height, letter spacing, and alignment.
+- **Insert to Canvas**: One-click to insert warped text into Adobe Express canvas.
+- **Modular Design**: Easy to add new warp effects.
 
 ## Project Structure
 
 ```
-my-addon/
-├── src/
-│   ├── ui/
-│   │   └── index.jsx          # UI interface (React + opentype.js)
-│   └── sandbox/
-│       └── code.js            # Adobe Express sandbox logic
-├── public/
-│   └── fonts/                 # Font files directory
-├── dist/                      # Build output directory
-└── package.json
+text-generator/
+└── my-addon/
+    ├── package.json
+    ├── README.md
+    ├── src/
+    │   ├── index.html                # Add-on entry (sandbox)
+    │   ├── manifest.json             # Add-on manifest
+    │   ├── lib/
+    │   │   └── warp.js               # Warp.js library
+    │   ├── sandbox/
+    │   │   └── code.js               # Adobe Express sandbox logic
+    │   └── ui/
+    │       ├── index.html            # UI entry
+    │       ├── index.js(x)           # UI bootstrap (React)
+    │       ├── TextWarpApp.js(x)     # Main React App
+    │       ├── components/           # UI components (TextWarpPage, CustomTextPage, SelectText, etc.)
+    │       ├── shapes/               # All shape warp algorithms (see below)
+    │       └── fonts/                # Custom font files
+    └── dist/                        # Build output
 ```
 
-## Installation and Usage
+### Shape Warp Algorithms
 
-1. **Install Dependencies**
+All text warp effects are implemented in `src/ui/shapes/`. Each file exports a warp function and config. You can easily add new effects by following the pattern in this folder.
+
+Supported effects include:
+- Arc Lower, Arc Upper
+- Wave
+- Bulge Up, Bulge Down, Bulge Both
+- Triangle Upper, Triangle Lower
+- Flag
+- Concave Top, Concave Bottom
+- Slant Down Left/Right
+- Bouquet, Envelope Wave
+
+## Installation
+
+1. **Install dependencies**
    ```bash
+   cd my-addon
    npm install
    ```
 
-2. **Add Font Files** (Optional)
-   - Place font files (.ttf format) in the `public/fonts/` directory
-   - Supported font files:
-     - `OldStandardTT-Regular.ttf`
-     - `Arial.ttf`
-     - `Helvetica.ttf`
+2. **(Optional) Add custom fonts**
+   - Place `.ttf` or `.otf` files in `src/ui/fonts/`.
 
-3. **Build Project**
+3. **Build the project**
    ```bash
    npm run build
    ```
 
-4. **Load Add-on in Adobe Express**
-   - Load the built `dist/` directory as an add-on in Adobe Express
+4. **Start development server**
+   ```bash
+   npm run dev
+   ```
+   - Open the add-on in Adobe Express or in your browser for local debugging.
 
-## How to Use
+## Usage
 
-1. **Input Text**: Enter the text you want to warp in the text input field
-2. **Select Font**: Choose a font from the dropdown menu (including system default fonts)
-3. **Select Warp Type**: Choose from arc lower, wave, bulge up, or bulge down
-4. **Adjust Intensity**: Use the slider to adjust warp intensity (0-100)
-5. **Preview Effect**: View the warp effect in the preview area
-6. **Insert to Canvas**: Click "Insert to Canvas" button to insert the warped text into Adobe Express canvas
+1. **Input Text**: Enter your text in the input field.
+2. **Select Font**: Choose a font from the dropdown (custom or system).
+3. **Choose Warp Type**: Select a shape effect (arc, wave, bulge, etc.).
+4. **Adjust Controls**: Use sliders for intensity, line height, letter spacing, and alignment.
+5. **Preview**: See the real-time effect in the preview area.
+6. **Insert**: Click "Insert to Canvas" to add the warped text to Adobe Express.
 
-## Technical Implementation
+## Development
 
-### UI Side (React)
-- Uses `opentype.js` to load font files
-- Generates SVG path data
-- Real-time preview of warp effects
-- Communicates with sandbox via Adobe Express SDK
+- Main UI is built with React (`src/ui/`).
+- Text warping is powered by `opentype.js` and custom SVG path manipulation.
+- Communication with Adobe Express is via the Add-on SDK and sandbox API.
+- To add new warp effects, create a new file in `src/ui/shapes/` and export your function/config.
 
-### Sandbox Side
-- Receives SVG path data
-- Uses `editor.createPath()` to create path objects
-- Sets fill color and position
-- Inserts into Adobe Express canvas
+## Main Dependencies
 
-## Warp Algorithms
+- [React](https://react.dev/)
+- [opentype.js](https://github.com/opentypejs/opentype.js)
+- [@adobe/ccweb-add-on-scripts](https://www.npmjs.com/package/@adobe/ccweb-add-on-scripts)
 
-- **Arc Lower**: Uses quadratic functions to create downward curving arc effects
-- **Wave**: Uses sine functions to create wave effects
-- **Bulge Up**: Creates upward bulging effects
-- **Bulge Down**: Creates downward bulging effects
+## Extending
+
+To add a new warp effect:
+1. Create a new `.js` file in `src/ui/shapes/`.
+2. Export a function: `(x, y, totalWidth, centerX, intensity, textMetrics) => {x, y}`.
+3. Add your config and register it in `shapes/index.js`.
 
 ## Notes
 
-1. **Font Files**: If font files don't exist, the add-on will automatically use system default fonts
-2. **Performance**: Complex warp effects may impact performance, adjust intensity appropriately
-3. **Compatibility**: Ensure Adobe Express version supports Path object creation
+- If no custom font is found, system fonts are used as fallback.
+- Some complex effects may impact performance.
+- Make sure your Adobe Express version supports the required APIs.
 
-## Development and Debugging
+## License
 
-- Use `npm run dev` to start development server
-- Open add-on in browser for local debugging
-
-## Future Enhancements
-
-- Support for more warp types
-- Color selection feature
-- Gradient fill support
-- Stroke effects
-- Image export functionality
+MIT

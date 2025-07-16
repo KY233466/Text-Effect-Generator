@@ -20,11 +20,11 @@ export function concaveBottomWarp(
   const offsetY = (intensity / 50) * 50 * horizontalFactor * verticalFactor;
 
   if (y <= baseline * 0.85) {
-    return { x, y }; // baseline 以上不变
+    return { x, y }; // No change above baseline
   } else {
     return {
       x,
-      y: y - offsetY, // baseline 以下缩放
+      y: y - offsetY, // Compress below baseline
     };
   }
 }

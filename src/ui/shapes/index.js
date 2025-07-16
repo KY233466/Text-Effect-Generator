@@ -1,4 +1,4 @@
-// 形状变形效果模块索引
+// Shape warp effect module index
 
 import { arcLowerWarp, arcLowerConfig } from "./arcLower.js";
 import { arcUpperWarp, arcUpperConfig } from "./arcUpper.js";
@@ -16,7 +16,7 @@ import { slantDownLeftWarp, slantDownLeftConfig } from "./slantDownLeft.js";
 import { bouquetWarp, bouquetConfig } from "./bouquet.js";
 import { envelopeWaveWarp, envelopeWaveConfig } from "./envelopeWave.js";
 
-// 导出所有变形函数
+// Export all warp functions
 export const warpFunctions = {
   arcLower: arcLowerWarp,
   arcUpper: arcUpperWarp,
@@ -35,7 +35,7 @@ export const warpFunctions = {
   envelopeWave: envelopeWaveWarp,
 };
 
-// 导出所有配置
+// Export all configs
 export const warpConfigs = {
   arcLower: arcLowerConfig,
   arcUpper: arcUpperConfig,
@@ -54,7 +54,7 @@ export const warpConfigs = {
   envelopeWave: envelopeWaveConfig,
 };
 
-// 导出效果列表（用于UI渲染）
+// Export effect list (for UI rendering)
 export const effectsList = [
   { key: "arcLower", ...arcLowerConfig },
   { key: "arcUpper", ...arcUpperConfig },
@@ -73,12 +73,12 @@ export const effectsList = [
   { key: "envelopeWave", ...envelopeWaveConfig },
 ];
 
-// 辅助函数：获取变形函数
+// Helper: get warp function by effect type
 export function getWarpFunction(effectType) {
   return warpFunctions[effectType];
 }
 
-// 辅助函数：获取配置
+// Helper: get config by effect type
 export function getWarpConfig(effectType) {
   return warpConfigs[effectType];
 }

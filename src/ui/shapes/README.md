@@ -1,59 +1,59 @@
-# 形状变形模块
+# Shape Warp Module
 
-这个目录包含了各种文本变形效果的独立实现。
+This directory contains independent implementations of various text warp effects.
 
-## 文件结构
+## File Structure
 
 ```
 shapes/
-├── index.js          # 模块索引，统一导出所有效果
-├── arcLower.js       # 下弧形变形效果
-├── arcUpper.js       # 上弧形变形效果
-├── wave.js           # 波浪变形效果
-├── bulgeUpWarp.js    # 上凸变形效果
-├── bulgeDownWarp.js  # 下凸变形效果
-├── bulgeBothWarp.js  # 双向凸起变形效果
-├── triangleUpper.js  # 上三角变形效果
-├── triangleLower.js  # 下三角变形效果
-├── flag.js           # 旗帜飘动变形效果
-└── README.md         # 本说明文件
+├── index.js          # Module index, exports all effects
+├── arcLower.js       # Arc lower warp effect
+├── arcUpper.js       # Arc upper warp effect
+├── wave.js           # Wave warp effect
+├── bulgeUpWarp.js    # Bulge up warp effect
+├── bulgeDownWarp.js  # Bulge down warp effect
+├── bulgeBothWarp.js  # Bulge both sides warp effect
+├── triangleUpper.js  # Triangle upper warp effect
+├── triangleLower.js  # Triangle lower warp effect
+├── flag.js           # Flag waving warp effect
+└── README.md         # This documentation file
 ```
 
-## 可用效果
+## Available Effects
 
-- **Arc Lower**: 下弧形变形效果
-- **Arc Upper**: 上弧形变形效果  
-- **Wave**: 波浪变形效果
-- **Bulge Up**: 上凸变形效果
-- **Bulge Down**: 下凸变形效果
-- **Bulge Both**: 双向凸起变形效果
-- **Triangle Upper**: 上三角变形效果
-- **Triangle Lower**: 下三角变形效果
-- **Flag**: 旗帜飘动变形效果
+- **Arc Lower**: Arc lower warp effect
+- **Arc Upper**: Arc upper warp effect
+- **Wave**: Wave warp effect
+- **Bulge Up**: Bulge up warp effect
+- **Bulge Down**: Bulge down warp effect
+- **Bulge Both**: Bulge both sides warp effect
+- **Triangle Upper**: Triangle upper warp effect
+- **Triangle Lower**: Triangle lower warp effect
+- **Flag**: Flag waving warp effect
 
-## 使用方法
+## Usage
 
 ```javascript
 import { getWarpFunction, effectsList } from './shapes/index.js';
 
-// 获取特定的变形函数
+// Get a specific warp function
 const warpFn = getWarpFunction('wave');
 
-// 应用变形
+// Apply warp
 const result = warpFn(x, y, totalWidth, centerX, intensity, textMetrics);
 ```
 
-## 添加新效果
+## Add New Effects
 
-1. 在 `shapes/` 目录下创建新的 `.js` 文件
-2. 导出变形函数和配置对象
-3. 在 `index.js` 中添加导入和导出
-4. 变形函数签名：`(x, y, totalWidth, centerX, intensity, textMetrics) => {x, y}`
+1. Create a new `.js` file in the `shapes/` directory
+2. Export the warp function and config object
+3. Add imports and exports in `index.js`
+4. Warp function signature: `(x, y, totalWidth, centerX, intensity, textMetrics) => {x, y}`
 
-## 参数说明
+## Parameter Description
 
-- `x, y`: 当前点的坐标
-- `totalWidth`: 文本总宽度
-- `centerX`: 文本中心X坐标
-- `intensity`: 变形强度 (0-100)
-- `textMetrics`: 文本度量信息（基线、上下界等） 
+- `x, y`: Current point coordinates
+- `totalWidth`: Total text width
+- `centerX`: Center X coordinate of the text
+- `intensity`: Warp intensity (0-100)
+- `textMetrics`: Text metrics (baseline, bounds, etc.) 
