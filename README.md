@@ -5,6 +5,9 @@ This project is an Adobe Express add-on that provides advanced text warping and 
 ## Features
 
 - **Multiple Warp Types**: Arc, wave, bulge, triangle, flag, curtain, bouquet, envelope, and more.
+- **Interactive Custom Effects**: 
+  - **Mesh Warp**: Drag control points to create custom mesh-based text distortions
+  - **Smudge Effect**: Interactive brush-like distortion by dragging mouse/touch
 - **Real-time Preview**: Instantly see the effect of text warping in the UI.
 - **Custom & System Fonts**: Supports both bundled and system fonts.
 - **Intensity & Typography Controls**: Adjust warp intensity, line height, letter spacing, and alignment.
@@ -40,14 +43,8 @@ text-generator/
 All text warp effects are implemented in `src/ui/shapes/`. Each file exports a warp function and config. You can easily add new effects by following the pattern in this folder.
 
 Supported effects include:
-- Arc Lower, Arc Upper
-- Wave
-- Bulge Up, Bulge Down, Bulge Both
-- Triangle Upper, Triangle Lower
-- Flag
-- Concave Top, Concave Bottom
-- Slant Down Left/Right
-- Bouquet, Envelope Wave
+- **Preset Shapes**: Arc Lower, Arc Upper, Wave, Bulge Up, Bulge Down, Bulge Both, Triangle Upper, Triangle Lower, Flag, Concave Top, Concave Bottom, Slant Down Left/Right, Bouquet, Envelope Wave
+- **Interactive Effects**: Mesh Warp (drag control points), Smudge Effect (brush-like distortion)
 
 ## Installation
 
@@ -75,7 +72,10 @@ Supported effects include:
 
 1. **Input Text**: Enter your text in the input field.
 2. **Select Font**: Choose a font from the dropdown (custom or system).
-3. **Choose Warp Type**: Select a shape effect (arc, wave, bulge, etc.).
+3. **Choose Warp Type**: 
+   - **Preset Effects**: Select a shape effect (arc, wave, bulge, etc.) and adjust intensity
+   - **Mesh Warp**: Drag the control points to create custom distortions
+   - **Smudge Effect**: Click and drag to create brush-like distortions
 4. **Adjust Controls**: Use sliders for intensity, line height, letter spacing, and alignment.
 5. **Preview**: See the real-time effect in the preview area.
 6. **Insert**: Click "Insert to Canvas" to add the warped text to Adobe Express.
