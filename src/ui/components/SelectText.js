@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import opentype from 'opentype.js';
+import { getWarpFunction } from '../shapes/index.js';
 const FontSelector = ({
   fonts,
   onSelect,
@@ -395,7 +396,9 @@ export default function SelectText({
   letterSpacing,
   setLetterSpacing,
   alignment,
-  setAlignment
+  setAlignment,
+  warpType,
+  intensity
 }) {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -461,7 +464,7 @@ export default function SelectText({
           setSvgPath("");
           return;
         }
-        const fontSize = 100;
+        const fontSize = 120;
         const scale = fontSize / font.unitsPerEm;
         const baselineY = fontSize * 0.8;
         const actualLineHeight = fontSize * lineHeight;
@@ -480,6 +483,27 @@ export default function SelectText({
             y: baselineY + lineIndex * actualLineHeight
           };
         });
+
+        // Add warp logic
+        let warpFn = getWarpFunction(warpType);
+
+        // Add fallback for invalid warpType
+        if (!warpFn) {
+          console.warn("Invalid warpType:", warpType, "falling back to 'none'");
+          warpFn = getWarpFunction('none');
+        }
+        const totalHeight = (lines.length - 1) * actualLineHeight + fontSize;
+        const centerY = baselineY + (lines.length - 1) * actualLineHeight / 2;
+        const centerX = maxLineWidth / 2;
+        const overallTopY = baselineY - fontSize * 0.7;
+        const overallBottomY = baselineY + (lines.length - 1) * actualLineHeight + fontSize * 0.2;
+        const textMetrics = {
+          baseline: centerY,
+          ascender: centerY - totalHeight / 2,
+          descender: centerY + totalHeight / 2,
+          yMax: overallTopY,
+          yMin: overallBottomY
+        };
         lineInfos.forEach((lineInfo, lineIndex) => {
           const {
             glyphs,
@@ -498,7 +522,29 @@ export default function SelectText({
           }
           glyphs.forEach(g => {
             const path = g.getPath(x, y, fontSize);
-            allCommands.push(...path.commands);
+            // Always apply warp effect (consistent with TextWarpPage)
+            path.commands.forEach(cmd => {
+              const copy = {
+                ...cmd
+              };
+              ["", "1", "2"].forEach(suffix => {
+                const xKey = "x" + suffix;
+                const yKey = "y" + suffix;
+                if (xKey in copy && yKey in copy) {
+                  const originalX = copy[xKey];
+                  const originalY = copy[yKey];
+                  const warped = warpFn(originalX, originalY, maxLineWidth, centerX, intensity, textMetrics);
+                  copy[xKey] = warped.x;
+                  copy[yKey] = warped.y;
+
+                  // Debug first few points
+                  if (allCommands.length < 5) {
+                    console.log(`Point ${suffix || 'main'}: (${originalX}, ${originalY}) -> (${warped.x}, ${warped.y})`);
+                  }
+                }
+              });
+              allCommands.push(copy);
+            });
             x += g.advanceWidth * scale + letterSpacing;
           });
         });
@@ -515,10 +561,20 @@ export default function SelectText({
         setSvgPath(d);
       } catch (error) {
         console.error('Error generating text path:', error);
-        setError('Error generating text path, please check your input');
+        console.error('Error stack:', error.stack);
+        console.error('Error details:', {
+          text,
+          fontUrl,
+          lineHeight,
+          letterSpacing,
+          alignment,
+          warpType,
+          intensity
+        });
+        setError(`Error generating text path: ${error.message}`);
       }
     });
-  }, [text, fontUrl, lineHeight, letterSpacing, alignment]);
+  }, [text, fontUrl, lineHeight, letterSpacing, alignment, warpType, intensity]);
   const handleInsert = async () => {
     if (!svgPath || !sandboxProxy) {
       console.error('SVG path or sandbox proxy not available');
@@ -530,8 +586,8 @@ export default function SelectText({
         d: svgPath,
         bounds: pathBounds,
         originalText: text,
-        warpType: "none",
-        intensity: 0
+        warpType: warpType || "none",
+        intensity: intensity || 0
       });
       if (!result.success) {
         console.error('Sandbox insertion failed:', result.error);

@@ -18,6 +18,7 @@ import { envelopeWaveWarp, envelopeWaveConfig } from "./envelopeWave.js";
 
 // Export all warp functions
 export const warpFunctions = {
+  none: (x, y) => ({ x, y }), // No warp effect
   arcLower: arcLowerWarp,
   arcUpper: arcUpperWarp,
   wave: waveWarp,

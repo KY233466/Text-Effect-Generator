@@ -182,9 +182,11 @@ const TextWarpPage = ({
   lineHeight,
   letterSpacing,
   alignment,
+  warpType,
+  setWarpType,
+  intensity,
+  setIntensity,
 }) => {
-  const [warpType, setWarpType] = useState("wave");
-  const [intensity, setIntensity] = useState(50);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [svgPath, setSvgPath] = useState("");

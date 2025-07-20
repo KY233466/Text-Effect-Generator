@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import TextWarpPage from "./components/TextWarpPage.js";
 import CustomTextPage from "./components/CustomTextPage.js";
 import SelectText from "./components/SelectText.js";
+import { useWarpSettings } from "./hooks/useWarpSettings.js";
 const styles = {
   app: {
     width: "100%",
@@ -26,6 +27,12 @@ const TextWarpApp = ({
   const [lineHeight, setLineHeight] = useState(1.2);
   const [letterSpacing, setLetterSpacing] = useState(0);
   const [alignment, setAlignment] = useState("center");
+  const {
+    warpType,
+    setWarpType,
+    intensity,
+    setIntensity
+  } = useWarpSettings("wave", 50);
   const tabStyle = tabName => ({
     marginRight: tabName !== "custom" ? "10px" : "0",
     padding: "4px 16px",
@@ -68,6 +75,8 @@ const TextWarpApp = ({
     setLetterSpacing: setLetterSpacing,
     alignment: alignment,
     setAlignment: setAlignment,
+    warpType: warpType,
+    intensity: intensity,
     sandboxProxy: sandboxProxy
   }), activeTab === "warp" && /*#__PURE__*/React.createElement(TextWarpPage, {
     text: text,
@@ -75,6 +84,10 @@ const TextWarpApp = ({
     lineHeight: lineHeight,
     letterSpacing: letterSpacing,
     alignment: alignment,
+    warpType: warpType,
+    setWarpType: setWarpType,
+    intensity: intensity,
+    setIntensity: setIntensity,
     sandboxProxy: sandboxProxy
   }), activeTab === "custom" && /*#__PURE__*/React.createElement(CustomTextPage, {
     text: text,
