@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { effectsList, getWarpFunction } from "../shapes/index.js";
 import opentype from "opentype.js";
+import PreviewExpandButton from "./PreviewExpandButton.js";
 const styles = {
   container: {
     display: "flex",
     flexDirection: "column",
     width: "100%",
-    height: "calc(100% - 55px)"
+    height: "auto"
   },
   content: {
-    flex: 1,
-    overflowY: 'auto',
+    overflowY: 'visible',
     paddingTop: '22px'
   },
   label: {
@@ -30,7 +30,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    position: "sticky"
+    position: "relative"
   },
   svg: {
     width: "100%",
@@ -174,7 +174,7 @@ const styles = {
   }
 };
 const TextWarpPage = ({
-  sandboxProxy,
+  insertWarpedSvg,
   text,
   fontUrl,
   lineHeight,
@@ -183,13 +183,18 @@ const TextWarpPage = ({
   warpType,
   setWarpType,
   intensity,
-  setIntensity
+  setIntensity,
+  expanded = false,
+  showInsert = true,
+  onExpand,
+  isExpanding = false
 }) => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [svgPath, setSvgPath] = useState("");
   const [pathBounds, setPathBounds] = useState(null);
   const [pageIndex, setPageIndex] = useState(0);
+  const [previewHovered, setPreviewHovered] = useState(false);
   const shapeGroups = [{
     label: "Arc",
     types: ["bulgeUp", "bulgeDown", "bulgeBoth"]
@@ -216,7 +221,8 @@ const TextWarpPage = ({
     types: ["envelopeWave", "bouquet"]
   }];
   const getSliderBackground = intensity => `linear-gradient(to right, #1178FF 0%, #1178FF ${intensity}%, #ffffff ${intensity}%, #ffffff 100%)`;
-  const pageSize = 3;
+  const gridColumnCount = expanded ? 6 : 3;
+  const pageSize = gridColumnCount;
   const totalPages = Math.ceil(shapeGroups.length / pageSize);
   const currentGroups = shapeGroups.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
   const selectedGroup = shapeGroups.find(group => group.types.includes(warpType)) || shapeGroups[0];
@@ -334,10 +340,10 @@ const TextWarpPage = ({
     });
   }, [text, fontUrl, warpType, intensity, lineHeight, letterSpacing, alignment]);
   const handleInsert = async () => {
-    if (!svgPath || !sandboxProxy) return;
+    if (!svgPath || !insertWarpedSvg) return;
     setIsLoading(true);
     try {
-      const result = await sandboxProxy.insertWarpedSVG({
+      const result = await insertWarpedSvg({
         d: svgPath,
         bounds: pathBounds,
         originalText: text,
@@ -356,7 +362,12 @@ const TextWarpPage = ({
   }, /*#__PURE__*/React.createElement("label", {
     style: styles.label
   }, "Preview"), /*#__PURE__*/React.createElement("div", {
-    style: styles.previewContainer
+    style: {
+      ...styles.previewContainer,
+      height: expanded ? "360px" : styles.previewContainer.height
+    },
+    onMouseEnter: () => setPreviewHovered(true),
+    onMouseLeave: () => setPreviewHovered(false)
   }, /*#__PURE__*/React.createElement("svg", {
     viewBox: pathBounds ? `${pathBounds.minX - 20} ${pathBounds.minY - 20} ${pathBounds.width + 40} ${pathBounds.height + 40}` : "0 0 1000 300",
     style: styles.svg
@@ -364,7 +375,11 @@ const TextWarpPage = ({
     d: svgPath,
     fill: "#06001A",
     stroke: "none"
-  }))), /*#__PURE__*/React.createElement("div", {
+  })), /*#__PURE__*/React.createElement(PreviewExpandButton, {
+    onClick: onExpand,
+    isLoading: isExpanding,
+    previewHovered: previewHovered
+  })), /*#__PURE__*/React.createElement("div", {
     style: styles.content
   }, /*#__PURE__*/React.createElement("div", {
     style: styles.controlSection
@@ -389,7 +404,10 @@ const TextWarpPage = ({
       ...(pageIndex === totalPages - 1 ? styles.paginationButtonDisabled : {})
     }
   }, ">"))), /*#__PURE__*/React.createElement("div", {
-    style: styles.gridContainer
+    style: {
+      ...styles.gridContainer,
+      gridTemplateColumns: `repeat(${gridColumnCount}, minmax(0, 1fr))`
+    }
   }, currentGroups.map(group => /*#__PURE__*/React.createElement("button", {
     key: group.label,
     onClick: () => {
@@ -409,7 +427,10 @@ const TextWarpPage = ({
   }, group.label)))), /*#__PURE__*/React.createElement("label", {
     style: styles.label
   }, "Type"), /*#__PURE__*/React.createElement("div", {
-    style: styles.gridContainer
+    style: {
+      ...styles.gridContainer,
+      gridTemplateColumns: `repeat(${gridColumnCount}, minmax(0, 1fr))`
+    }
   }, relatedTypes.map(typeKey => {
     const type = effectsList.find(e => e.key === typeKey);
     return /*#__PURE__*/React.createElement("button", {
@@ -441,7 +462,7 @@ const TextWarpPage = ({
       ...styles.slider,
       background: getSliderBackground(intensity)
     }
-  }))), /*#__PURE__*/React.createElement("button", {
+  }))), showInsert && /*#__PURE__*/React.createElement("button", {
     onClick: handleInsert,
     disabled: isLoading || !svgPath,
     style: isLoading || !svgPath ? styles.insertButtonDisabled : styles.insertButton,

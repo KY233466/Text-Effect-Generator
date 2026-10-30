@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Mesh from "./Mesh/mesh.js";
 import Smudge from "./Smudge/smudge.js";
+import PreviewExpandButton from './PreviewExpandButton.js';
 const styles = {
   container: {
     display: 'flex',
     flexDirection: 'column',
     width: '100%',
-    height: 'calc(100% - 55px)'
+    height: 'auto'
   },
   content: {
-    flex: 1,
-    overflowY: 'auto',
+    overflowY: 'visible',
     paddingTop: '22px'
   },
   label: {
@@ -100,27 +100,46 @@ const styles = {
   }
 };
 const CustomTextPage = ({
-  sandboxProxy,
+  insertWarpedSvg,
   text,
   fontUrl,
   lineHeight,
   letterSpacing,
-  alignment
+  alignment,
+  expanded = false,
+  showInsert = true,
+  initialCustomEffect,
+  onPreviewChange,
+  onExpand,
+  isExpanding = false
 }) => {
   const Shape = ["mesh", "smudge"];
-  const [selected, setSelected] = useState("mesh");
+  const [selected, setSelected] = useState(initialCustomEffect?.type || "mesh");
+  const [savedEffect, setSavedEffect] = useState(initialCustomEffect || null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [svgPath, setSvgPath] = useState("");
-  const [pathBounds, setPathBounds] = useState(null);
+  const [previewHovered, setPreviewHovered] = useState(false);
+  const [svgPath, setSvgPath] = useState(initialCustomEffect?.d || "");
+  const [pathBounds, setPathBounds] = useState(initialCustomEffect?.bounds || null);
+  useEffect(() => {
+    if (!onPreviewChange) return;
+    onPreviewChange(svgPath && pathBounds ? {
+      d: svgPath,
+      bounds: pathBounds,
+      originalText: text,
+      warpType: `custom-${selected}`,
+      type: selected,
+      intensity: 1
+    } : null);
+  }, [svgPath, pathBounds, selected, text, onPreviewChange]);
   const handleInsert = async () => {
-    if (!sandboxProxy || !svgPath || !pathBounds) {
+    if (!insertWarpedSvg || !svgPath || !pathBounds) {
       console.error('Missing required data');
       return;
     }
     setIsLoading(true);
     try {
-      const result = await sandboxProxy.insertWarpedSVG({
+      const result = await insertWarpedSvg({
         d: svgPath,
         bounds: pathBounds,
         originalText: text,
@@ -174,7 +193,27 @@ const CustomTextPage = ({
     style: styles.container
   }, /*#__PURE__*/React.createElement("label", {
     style: styles.label
-  }, "Preview"), selected == "mesh" ? /*#__PURE__*/React.createElement(Mesh, {
+  }, "Preview"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: 'relative'
+    },
+    onMouseEnter: () => setPreviewHovered(true),
+    onMouseLeave: () => setPreviewHovered(false)
+  }, savedEffect ? /*#__PURE__*/React.createElement("svg", {
+    width: "100%",
+    height: expanded ? 360 : 240,
+    viewBox: `${savedEffect.bounds.minX - 20} ${savedEffect.bounds.minY - 20} ${savedEffect.bounds.width + 40} ${savedEffect.bounds.height + 40}`,
+    preserveAspectRatio: "xMidYMid meet",
+    style: {
+      border: '1px solid #CBE2FF',
+      borderRadius: '10px',
+      background: 'white'
+    }
+  }, /*#__PURE__*/React.createElement("path", {
+    d: savedEffect.d,
+    fill: "#06001A",
+    stroke: "none"
+  })) : selected === "mesh" ? /*#__PURE__*/React.createElement(Mesh, {
     setPathBounds: setPathBounds,
     text: text,
     setSvgPath: setSvgPath,
@@ -182,7 +221,8 @@ const CustomTextPage = ({
     lineHeight: lineHeight,
     letterSpacing: letterSpacing,
     alignment: alignment,
-    calculatePathBounds: calculatePathBounds
+    calculatePathBounds: calculatePathBounds,
+    previewHeight: expanded ? 360 : 240
   }) : /*#__PURE__*/React.createElement(Smudge, {
     pathBounds: pathBounds,
     setPathBounds: setPathBounds,
@@ -192,8 +232,13 @@ const CustomTextPage = ({
     lineHeight: lineHeight,
     letterSpacing: letterSpacing,
     alignment: alignment,
-    calculatePathBounds: calculatePathBounds
-  }), /*#__PURE__*/React.createElement("div", {
+    calculatePathBounds: calculatePathBounds,
+    previewHeight: expanded ? 360 : 240
+  }), /*#__PURE__*/React.createElement(PreviewExpandButton, {
+    onClick: onExpand,
+    isLoading: isExpanding,
+    previewHovered: previewHovered
+  })), /*#__PURE__*/React.createElement("div", {
     style: styles.content
   }, /*#__PURE__*/React.createElement("label", {
     style: styles.label
@@ -206,7 +251,12 @@ const CustomTextPage = ({
       ...styles.shapeButton,
       ...(selected === s ? styles.shapeButtonSelected : {})
     },
-    onClick: () => setSelected(s)
+    onClick: () => {
+      setSelected(s);
+      setSavedEffect(null);
+      setSvgPath("");
+      setPathBounds(null);
+    }
   }, /*#__PURE__*/React.createElement("img", {
     src: `./icon/${s}.svg`,
     alt: `${s} icon`,
@@ -215,7 +265,7 @@ const CustomTextPage = ({
     style: styles.effectLabel
   }, s)))), error && /*#__PURE__*/React.createElement("div", {
     style: styles.errorMessage
-  }, error)), /*#__PURE__*/React.createElement("button", {
+  }, error)), showInsert && /*#__PURE__*/React.createElement("button", {
     onClick: handleInsert,
     disabled: isLoading || !svgPath,
     style: isLoading || !svgPath ? styles.insertButtonDisabled : styles.insertButton,

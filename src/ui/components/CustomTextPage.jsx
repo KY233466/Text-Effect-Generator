@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Mesh from "./Mesh/mesh.js";
 import Smudge from "./Smudge/smudge.js";
+import PreviewExpandButton from './PreviewExpandButton.js';
 
 const styles = {
 	container: {
 		display: 'flex',
 		flexDirection: 'column',
 		width: '100%',
-		height: 'calc(100% - 55px)',
+		height: 'auto',
 	},
 	content: {
-		flex: 1,
-		overflowY: 'auto',
+		overflowY: 'visible',
 		paddingTop: '22px'
 	},
 	label: {
@@ -102,29 +102,50 @@ const styles = {
 };
 
 const CustomTextPage = ({
-	sandboxProxy,
+	insertWarpedSvg,
 	text,
 	fontUrl,
 	lineHeight,
 	letterSpacing,
-	alignment }) => {
+	alignment,
+	expanded = false,
+	showInsert = true,
+	initialCustomEffect,
+	onPreviewChange,
+	onExpand,
+	isExpanding = false }) => {
 
 	const Shape = ["mesh", "smudge"];
-	const [selected, setSelected] = useState("mesh");
+	const [selected, setSelected] = useState(initialCustomEffect?.type || "mesh");
+	const [savedEffect, setSavedEffect] = useState(initialCustomEffect || null);
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState(null);
+	const [previewHovered, setPreviewHovered] = useState(false);
 
-	const [svgPath, setSvgPath] = useState("");
-	const [pathBounds, setPathBounds] = useState(null);
+	const [svgPath, setSvgPath] = useState(initialCustomEffect?.d || "");
+	const [pathBounds, setPathBounds] = useState(initialCustomEffect?.bounds || null);
+
+	useEffect(() => {
+		if (!onPreviewChange) return;
+
+		onPreviewChange(svgPath && pathBounds ? {
+			d: svgPath,
+			bounds: pathBounds,
+			originalText: text,
+			warpType: `custom-${selected}`,
+				type: selected,
+			intensity: 1,
+		} : null);
+	}, [svgPath, pathBounds, selected, text, onPreviewChange]);
 
 	const handleInsert = async () => {
-		if (!sandboxProxy || !svgPath || !pathBounds) {
+		if (!insertWarpedSvg || !svgPath || !pathBounds) {
 			console.error('Missing required data');
 			return;
 		}
 		setIsLoading(true);
 		try {
-			const result = await sandboxProxy.insertWarpedSVG({
+			const result = await insertWarpedSvg({
 				d: svgPath,
 				bounds: pathBounds,
 				originalText: text,
@@ -169,26 +190,53 @@ const CustomTextPage = ({
 	return (
 		<div style={styles.container}>
 			<label style={styles.label}>Preview</label>
-			{selected == "mesh" ? <Mesh
-				setPathBounds={setPathBounds}
-				text={text}
-				setSvgPath={setSvgPath}
-				fontUrl={fontUrl}
-				lineHeight={lineHeight}
-				letterSpacing={letterSpacing}
-				alignment={alignment}
-				calculatePathBounds={calculatePathBounds}
-			/> : <Smudge
-				pathBounds={pathBounds}
-				setPathBounds={setPathBounds}
-				text={text}
-				setSvgPath={setSvgPath}
-				fontUrl={fontUrl}
-				lineHeight={lineHeight}
-				letterSpacing={letterSpacing}
-				alignment={alignment}
-				calculatePathBounds={calculatePathBounds}
-			/>}
+			<div
+				style={{ position: 'relative' }}
+				onMouseEnter={() => setPreviewHovered(true)}
+				onMouseLeave={() => setPreviewHovered(false)}
+			>
+				{savedEffect ? (
+					<svg
+						width="100%"
+						height={expanded ? 360 : 240}
+						viewBox={`${savedEffect.bounds.minX - 20} ${savedEffect.bounds.minY - 20} ${savedEffect.bounds.width + 40} ${savedEffect.bounds.height + 40}`}
+						preserveAspectRatio="xMidYMid meet"
+						style={{
+							border: '1px solid #CBE2FF',
+							borderRadius: '10px',
+							background: 'white',
+						}}
+					>
+						<path d={savedEffect.d} fill="#06001A" stroke="none" />
+					</svg>
+				) : selected === "mesh" ? <Mesh
+					setPathBounds={setPathBounds}
+					text={text}
+					setSvgPath={setSvgPath}
+					fontUrl={fontUrl}
+					lineHeight={lineHeight}
+					letterSpacing={letterSpacing}
+					alignment={alignment}
+					calculatePathBounds={calculatePathBounds}
+					previewHeight={expanded ? 360 : 240}
+				/> : <Smudge
+					pathBounds={pathBounds}
+					setPathBounds={setPathBounds}
+					text={text}
+					setSvgPath={setSvgPath}
+					fontUrl={fontUrl}
+					lineHeight={lineHeight}
+					letterSpacing={letterSpacing}
+					alignment={alignment}
+					calculatePathBounds={calculatePathBounds}
+					previewHeight={expanded ? 360 : 240}
+				/>}
+				<PreviewExpandButton
+					onClick={onExpand}
+					isLoading={isExpanding}
+					previewHovered={previewHovered}
+				/>
+			</div>
 
 			<div style={styles.content}>
 				<label style={styles.label}>Type</label>
@@ -201,7 +249,12 @@ const CustomTextPage = ({
 								...styles.shapeButton,
 								...(selected === s ? styles.shapeButtonSelected : {}),
 							}}
-							onClick={() => setSelected(s)}
+							onClick={() => {
+								setSelected(s);
+								setSavedEffect(null);
+								setSvgPath("");
+								setPathBounds(null);
+							}}
 						>
 							<img src={`./icon/${s}.svg`} alt={`${s} icon`} style={styles.icon} />
 							<div style={styles.effectLabel}>{s}</div>
@@ -212,27 +265,29 @@ const CustomTextPage = ({
 				{error && <div style={styles.errorMessage}>{error}</div>}
 			</div>
 
-			<button
-				onClick={handleInsert}
-				disabled={isLoading || !svgPath}
-				style={isLoading || !svgPath ? styles.insertButtonDisabled : styles.insertButton}
-				onMouseEnter={(e) => {
-					if (!isLoading && svgPath) {
-						e.target.style.transform = 'translateY(-2px)';
-						e.target.style.boxShadow = '0 6px 20px rgba(17, 120, 255, 0.4)';
-					}
-				}}
-				onMouseLeave={(e) => {
-					if (!isLoading && svgPath) {
-						e.target.style.transform = 'translateY(0)';
-						e.target.style.boxShadow = '0 4px 15px rgba(17, 120, 255, 0.3)';
-					}
-				}}
-			>
-				{isLoading ? 'Inserting...' : 'Add to Design'}
-			</button>
+			{showInsert && (
+				<button
+					onClick={handleInsert}
+					disabled={isLoading || !svgPath}
+					style={isLoading || !svgPath ? styles.insertButtonDisabled : styles.insertButton}
+					onMouseEnter={(e) => {
+						if (!isLoading && svgPath) {
+							e.target.style.transform = 'translateY(-2px)';
+							e.target.style.boxShadow = '0 6px 20px rgba(17, 120, 255, 0.4)';
+						}
+					}}
+					onMouseLeave={(e) => {
+						if (!isLoading && svgPath) {
+							e.target.style.transform = 'translateY(0)';
+							e.target.style.boxShadow = '0 4px 15px rgba(17, 120, 255, 0.3)';
+						}
+					}}
+				>
+					{isLoading ? 'Inserting...' : 'Add to Design'}
+				</button>
+			)}
 		</div>
 	);
 };
 
-export default CustomTextPage; 
+export default CustomTextPage;

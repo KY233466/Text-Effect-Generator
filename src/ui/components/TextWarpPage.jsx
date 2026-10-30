@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { effectsList, getWarpFunction } from "../shapes/index.js";
 import opentype from "opentype.js";
+import PreviewExpandButton from "./PreviewExpandButton.js";
 
 const styles = {
   container: {
     display: "flex",
     flexDirection: "column",
     width: "100%",
-    height: "calc(100% - 55px)",
+    height: "auto",
   },
   content: {
-    flex: 1,
-    overflowY: 'auto',
+    overflowY: 'visible',
     paddingTop: '22px'
   },
   label: {
@@ -31,7 +31,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    position: "sticky",
+    position: "relative",
   },
   svg: {
     width: "100%",
@@ -176,7 +176,7 @@ const styles = {
 };
 
 const TextWarpPage = ({
-  sandboxProxy,
+  insertWarpedSvg,
   text,
   fontUrl,
   lineHeight,
@@ -186,12 +186,17 @@ const TextWarpPage = ({
   setWarpType,
   intensity,
   setIntensity,
+  expanded = false,
+  showInsert = true,
+  onExpand,
+  isExpanding = false,
 }) => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [svgPath, setSvgPath] = useState("");
   const [pathBounds, setPathBounds] = useState(null);
   const [pageIndex, setPageIndex] = useState(0);
+  const [previewHovered, setPreviewHovered] = useState(false);
 
   const shapeGroups = [
     { label: "Arc", types: ["bulgeUp", "bulgeDown", "bulgeBoth"] },
@@ -207,7 +212,8 @@ const TextWarpPage = ({
   const getSliderBackground = (intensity) =>
     `linear-gradient(to right, #1178FF 0%, #1178FF ${intensity}%, #ffffff ${intensity}%, #ffffff 100%)`;
 
-  const pageSize = 3;
+  const gridColumnCount = expanded ? 6 : 3;
+  const pageSize = gridColumnCount;
   const totalPages = Math.ceil(shapeGroups.length / pageSize);
   const currentGroups = shapeGroups.slice(
     pageIndex * pageSize,
@@ -345,10 +351,10 @@ const TextWarpPage = ({
   ]);
 
   const handleInsert = async () => {
-    if (!svgPath || !sandboxProxy) return;
+    if (!svgPath || !insertWarpedSvg) return;
     setIsLoading(true);
     try {
-      const result = await sandboxProxy.insertWarpedSVG({
+      const result = await insertWarpedSvg({
         d: svgPath,
         bounds: pathBounds,
         originalText: text,
@@ -366,7 +372,13 @@ const TextWarpPage = ({
   return (
     <div style={styles.container}>
       <label style={styles.label}>Preview</label>
-      <div style={styles.previewContainer}>
+      <div style={{
+        ...styles.previewContainer,
+        height: expanded ? "360px" : styles.previewContainer.height,
+      }}
+        onMouseEnter={() => setPreviewHovered(true)}
+        onMouseLeave={() => setPreviewHovered(false)}
+      >
         <svg
           viewBox={
             pathBounds
@@ -378,6 +390,11 @@ const TextWarpPage = ({
         >
           <path d={svgPath} fill="#06001A" stroke="none" />
         </svg>
+        <PreviewExpandButton
+          onClick={onExpand}
+          isLoading={isExpanding}
+          previewHovered={previewHovered}
+        />
       </div>
 
       <div style={styles.content}>
@@ -410,7 +427,10 @@ const TextWarpPage = ({
           </div>
         </div>
 
-        <div style={styles.gridContainer}>
+        <div style={{
+          ...styles.gridContainer,
+          gridTemplateColumns: `repeat(${gridColumnCount}, minmax(0, 1fr))`,
+        }}>
           {currentGroups.map((group) => (
             <button
               key={group.label}
@@ -433,7 +453,10 @@ const TextWarpPage = ({
         </div>
 
         <label style={styles.label}>Type</label>
-        <div style={styles.gridContainer}>
+        <div style={{
+          ...styles.gridContainer,
+          gridTemplateColumns: `repeat(${gridColumnCount}, minmax(0, 1fr))`,
+        }}>
           {relatedTypes.map((typeKey) => {
             const type = effectsList.find((e) => e.key === typeKey);
             return (
@@ -473,25 +496,27 @@ const TextWarpPage = ({
         </div>
       </div>
 
-      <button
-        onClick={handleInsert}
-        disabled={isLoading || !svgPath}
-        style={isLoading || !svgPath ? styles.insertButtonDisabled : styles.insertButton}
-        onMouseEnter={(e) => {
-          if (!isLoading && svgPath) {
-            e.target.style.transform = 'translateY(-2px)';
-            e.target.style.boxShadow = '0 6px 20px rgba(17, 120, 255, 0.4)';
-          }
-        }}
-        onMouseLeave={(e) => {
-          if (!isLoading && svgPath) {
-            e.target.style.transform = 'translateY(0)';
-            e.target.style.boxShadow = '0 4px 15px rgba(17, 120, 255, 0.3)';
-          }
-        }}
-      >
-        {isLoading ? 'Inserting...' : 'Add to Design'}
-      </button>
+      {showInsert && (
+        <button
+          onClick={handleInsert}
+          disabled={isLoading || !svgPath}
+          style={isLoading || !svgPath ? styles.insertButtonDisabled : styles.insertButton}
+          onMouseEnter={(e) => {
+            if (!isLoading && svgPath) {
+              e.target.style.transform = 'translateY(-2px)';
+              e.target.style.boxShadow = '0 6px 20px rgba(17, 120, 255, 0.4)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isLoading && svgPath) {
+              e.target.style.transform = 'translateY(0)';
+              e.target.style.boxShadow = '0 4px 15px rgba(17, 120, 255, 0.3)';
+            }
+          }}
+        >
+          {isLoading ? 'Inserting...' : 'Add to Design'}
+        </button>
+      )}
 
       {error && <div style={styles.errorMessage}>{error}</div>}
     </div>

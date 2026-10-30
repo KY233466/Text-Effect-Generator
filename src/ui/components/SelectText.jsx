@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import opentype from 'opentype.js';
 import { getWarpFunction } from '../shapes/index.js';
+import { countTextCharacters, MAX_TEXT_CHARACTERS } from '../utils/textLimit.js';
+import PreviewExpandButton from './PreviewExpandButton.js';
 
 const FontSelector = ({ fonts, onSelect, currentFontUrl }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -230,11 +232,10 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     width: '100%',
-    height: 'calc(100% - 55px)',
+    height: 'auto',
   },
   content: {
-    flex: 1,
-    overflowY: 'auto',
+    overflowY: 'visible',
     overflowX: 'hidden',
   },
   preview: {
@@ -340,7 +341,7 @@ const styles = {
   }
 };
 
-export default function SelectText({ sandboxProxy,
+export default function SelectText({ insertWarpedSvg,
   text,
   setText,
   fontUrl,
@@ -352,12 +353,18 @@ export default function SelectText({ sandboxProxy,
   alignment,
   setAlignment,
   warpType,
-  intensity }) {
+  intensity,
+  expanded = false,
+  showInsert = true,
+  onExpand,
+  isExpanding = false }) {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [previewHovered, setPreviewHovered] = useState(false);
 
   const [svgPath, setSvgPath] = useState("");
   const [pathBounds, setPathBounds] = useState(null);
+  const characterCount = countTextCharacters(text);
 
   const calculatePathBounds = (commands) => {
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
@@ -441,14 +448,14 @@ export default function SelectText({ sandboxProxy,
 
         // Add warp logic
         let warpFn = getWarpFunction(warpType);
-        
-        
+
+
         // Add fallback for invalid warpType
         if (!warpFn) {
           console.warn("Invalid warpType:", warpType, "falling back to 'none'");
           warpFn = getWarpFunction('none');
         }
-        
+
         const totalHeight = (lines.length - 1) * actualLineHeight + fontSize;
         const centerY = baselineY + (lines.length - 1) * actualLineHeight / 2;
         const centerX = maxLineWidth / 2;
@@ -488,7 +495,7 @@ export default function SelectText({ sandboxProxy,
                   const warped = warpFn(originalX, originalY, maxLineWidth, centerX, intensity, textMetrics);
                   copy[xKey] = warped.x;
                   copy[yKey] = warped.y;
-                  
+
                   // Debug first few points
                   if (allCommands.length < 5) {
                     console.log(`Point ${suffix || 'main'}: (${originalX}, ${originalY}) -> (${warped.x}, ${warped.y})`);
@@ -533,14 +540,14 @@ export default function SelectText({ sandboxProxy,
   }, [text, fontUrl, lineHeight, letterSpacing, alignment, warpType, intensity]);
 
   const handleInsert = async () => {
-    if (!svgPath || !sandboxProxy) {
-      console.error('SVG path or sandbox proxy not available');
+    if (!svgPath || !insertWarpedSvg) {
+      console.error('SVG path or image import API not available');
       return;
     }
 
     setIsLoading(true);
     try {
-      const result = await sandboxProxy.insertWarpedSVG({
+      const result = await insertWarpedSvg({
         d: svgPath,
         bounds: pathBounds,
         originalText: text,
@@ -566,7 +573,11 @@ export default function SelectText({ sandboxProxy,
   return (
     <div style={styles.container}>
       <label style={styles.label}>Preview</label>
-      <div style={styles.preview}>
+      <div
+        style={{ ...styles.preview, height: expanded ? '360px' : styles.preview.height }}
+        onMouseEnter={() => setPreviewHovered(true)}
+        onMouseLeave={() => setPreviewHovered(false)}
+      >
         {error ? (
           <div style={{
             color: '#ff4444',
@@ -591,13 +602,18 @@ export default function SelectText({ sandboxProxy,
             <path d={svgPath} fill="black" stroke="none" />
           </svg>
         )}
+        <PreviewExpandButton
+          onClick={onExpand}
+          isLoading={isExpanding}
+          previewHovered={previewHovered}
+        />
       </div>
 
       <div style={styles.content}>
         <div style={{ marginTop: '22px', marginBottom: "0" }}>
           <label style={styles.label}>Text</label>
           <textarea
-            style={styles.textInput}
+            style={{ ...styles.textInput, width: expanded ? '100%' : styles.textInput.width }}
             value={text}
             onChange={e => setText(e.target.value)}
             placeholder="Enter text to render\nMulti-line supported\nEach line renders separately"
@@ -605,14 +621,20 @@ export default function SelectText({ sandboxProxy,
             onFocus={e => e.target.style.borderColor = '#1178FF'}
             onBlur={e => e.target.style.borderColor = '#CBE2FF'}
           />
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px' }}>
+            <span style={{ fontSize: '12px', color: '#666' }}>Max {MAX_TEXT_CHARACTERS} characters</span>
+            <span style={{ fontSize: '12px', color: characterCount >= MAX_TEXT_CHARACTERS ? '#d9534f' : '#666' }}>
+              {characterCount}/{MAX_TEXT_CHARACTERS}
+            </span>
+          </div>
         </div>
 
-        <div style={{ width: '280px', height: '227px', marginTop: '24px' }}>
+        <div style={{ width: expanded ? '100%' : '280px', height: '227px', marginTop: '24px' }}>
           <label style={styles.label}>Typography</label>
           <div style={{ marginBottom: '12px' }}>
-            <FontSelector 
-              fonts={fonts} 
-              onSelect={(font) => setFontUrl(font.url)} 
+            <FontSelector
+              fonts={fonts}
+              onSelect={(font) => setFontUrl(font.url)}
               currentFontUrl={fontUrl}
             />
           </div>
@@ -675,7 +697,7 @@ export default function SelectText({ sandboxProxy,
                 border: alignment === 'left' ? '2px solid #CBE2FF' : 'none'
               }}
             >
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop:'12px', marginBottom:'12px', marginLeft:'28px', marginRight:'33px'  }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: '12px', marginBottom: '12px', marginLeft: '28px', marginRight: '33px' }}>
                 <div style={{ width: '20px', height: '2px', backgroundColor: '#666', marginBottom: '4px' }}></div>
                 <div style={{ width: '13.85px', height: '2px', backgroundColor: '#666', marginBottom: '4px' }}></div>
                 <div style={{ width: '13.85px', height: '2px', backgroundColor: '#666' }}></div>
@@ -696,10 +718,10 @@ export default function SelectText({ sandboxProxy,
                 alignItems: 'center',   // <— center horizontally
                 width: '100%'
               }}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop:'12px', marginBottom:'12px', marginLeft:'28px', marginRight:'33px'  }}>
-                <div style={{ width: '20px', height: '2px', backgroundColor: '#666', marginBottom: '4px' }}></div>
-                <div style={{ width: '13.85px', height: '2px', backgroundColor: '#666', marginBottom: '4px' }}></div>
-                <div style={{ width: '13.85px', height: '2px', backgroundColor: '#666' }}></div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '12px', marginBottom: '12px', marginLeft: '28px', marginRight: '33px' }}>
+                  <div style={{ width: '20px', height: '2px', backgroundColor: '#666', marginBottom: '4px' }}></div>
+                  <div style={{ width: '13.85px', height: '2px', backgroundColor: '#666', marginBottom: '4px' }}></div>
+                  <div style={{ width: '13.85px', height: '2px', backgroundColor: '#666' }}></div>
                 </div>
               </div>
             </button>
@@ -718,36 +740,38 @@ export default function SelectText({ sandboxProxy,
                 alignItems: 'flex-end',
                 width: '100%'
               }}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginTop:'12px', marginBottom:'12px', marginLeft:'33px', marginRight:'28px'  }}>
-                <div style={{ width: '20px', height: '2px', backgroundColor: '#666', marginBottom: '4px' }}></div>
-                <div style={{ width: '13.85px', height: '2px', backgroundColor: '#666', marginBottom: '4px' }}></div>
-                <div style={{ width: '13.85px', height: '2px', backgroundColor: '#666' }}></div>
-              </div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginTop: '12px', marginBottom: '12px', marginLeft: '33px', marginRight: '28px' }}>
+                  <div style={{ width: '20px', height: '2px', backgroundColor: '#666', marginBottom: '4px' }}></div>
+                  <div style={{ width: '13.85px', height: '2px', backgroundColor: '#666', marginBottom: '4px' }}></div>
+                  <div style={{ width: '13.85px', height: '2px', backgroundColor: '#666' }}></div>
+                </div>
               </div>
             </button>
           </div>
         </div>
       </div>
 
-      <button
-        onClick={handleInsert}
-        disabled={isLoading || !svgPath}
-        style={isLoading || !svgPath ? styles.insertButtonDisabled : styles.insertButton}
-        onMouseEnter={(e) => {
-          if (!isLoading && svgPath) {
-            e.target.style.transform = 'translateY(-2px)';
-            e.target.style.boxShadow = '0 6px 20px rgba(17, 120, 255, 0.4)';
-          }
-        }}
-        onMouseLeave={(e) => {
-          if (!isLoading && svgPath) {
-            e.target.style.transform = 'translateY(0)';
-            e.target.style.boxShadow = '0 4px 15px rgba(17, 120, 255, 0.3)';
-          }
-        }}
-      >
-        {isLoading ? 'Inserting...' : 'Add to Design'}
-      </button>
+      {showInsert && (
+        <button
+          onClick={handleInsert}
+          disabled={isLoading || !svgPath}
+          style={isLoading || !svgPath ? styles.insertButtonDisabled : styles.insertButton}
+          onMouseEnter={(e) => {
+            if (!isLoading && svgPath) {
+              e.target.style.transform = 'translateY(-2px)';
+              e.target.style.boxShadow = '0 6px 20px rgba(17, 120, 255, 0.4)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isLoading && svgPath) {
+              e.target.style.transform = 'translateY(0)';
+              e.target.style.boxShadow = '0 4px 15px rgba(17, 120, 255, 0.3)';
+            }
+          }}
+        >
+          {isLoading ? 'Inserting...' : 'Add to Design'}
+        </button>
+      )}
     </div>
   );
 };

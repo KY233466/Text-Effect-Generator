@@ -29,7 +29,8 @@ export default function Mesh({
   lineHeight,
   letterSpacing,
   alignment,
-  calculatePathBounds
+  calculatePathBounds,
+  previewHeight = 240
 }) {
   const svgRef = useRef();
   const pathRef = useRef();
@@ -157,7 +158,18 @@ export default function Mesh({
       });
       warp.transform(reposition);
       const newD = pathRef.current?.getAttribute('d');
-      if (newD) setSvgPath(newD);
+      if (newD) {
+        setSvgPath(newD);
+        const warpedBox = pathRef.current.getBBox();
+        setPathBounds({
+          minX: warpedBox.x,
+          minY: warpedBox.y,
+          maxX: warpedBox.x + warpedBox.width,
+          maxY: warpedBox.y + warpedBox.height,
+          width: warpedBox.width,
+          height: warpedBox.height
+        });
+      }
       drawControlShape();
     });
   };
@@ -202,6 +214,15 @@ export default function Mesh({
       const updatedD = svgRef.current.querySelector('path')?.getAttribute('d');
       if (updatedD) {
         setSvgPath(updatedD);
+        const warpedBox = pathRef.current.getBBox();
+        setPathBounds({
+          minX: warpedBox.x,
+          minY: warpedBox.y,
+          maxX: warpedBox.x + warpedBox.width,
+          maxY: warpedBox.y + warpedBox.height,
+          width: warpedBox.width,
+          height: warpedBox.height
+        });
       }
     }
     setDragIndex(null);
@@ -214,7 +235,7 @@ export default function Mesh({
     ref: svgControlRef,
     id: "svg-control",
     width: "100%",
-    height: "240",
+    height: previewHeight,
     style: styles.svgControl
   }, /*#__PURE__*/React.createElement("path", {
     ref: controlPathRef,
@@ -240,7 +261,7 @@ export default function Mesh({
     ref: svgRef,
     id: "svg-element",
     width: "100%",
-    height: "240",
+    height: previewHeight,
     style: styles.svg
   }));
 }

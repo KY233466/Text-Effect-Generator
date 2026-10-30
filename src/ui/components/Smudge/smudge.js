@@ -23,7 +23,8 @@ export default function Smudge({
   lineHeight,
   letterSpacing,
   alignment,
-  calculatePathBounds
+  calculatePathBounds,
+  previewHeight = 240
 }) {
   const svgRef = useRef();
   const pathRef = useRef();
@@ -150,7 +151,10 @@ export default function Smudge({
     setIsMouseDown(false);
     if (pathRef.current) {
       const updatedD = pathRef.current.getAttribute('d');
-      if (updatedD) setSvgPath(updatedD);
+      if (updatedD) {
+        setSvgPath(updatedD);
+        updateWarpedBounds();
+      }
     }
   };
   const handleTouchStart = e => {
@@ -184,8 +188,23 @@ export default function Smudge({
     });
     if (pathRef.current) {
       const updatedD = pathRef.current.getAttribute('d');
-      if (updatedD) setSvgPath(updatedD);
+      if (updatedD) {
+        setSvgPath(updatedD);
+        updateWarpedBounds();
+      }
     }
+  };
+  const updateWarpedBounds = () => {
+    if (!pathRef.current) return;
+    const warpedBox = pathRef.current.getBBox();
+    setPathBounds({
+      minX: warpedBox.x,
+      minY: warpedBox.y,
+      maxX: warpedBox.x + warpedBox.width,
+      maxY: warpedBox.y + warpedBox.height,
+      width: warpedBox.width,
+      height: warpedBox.height
+    });
   };
   const getSVGCoordinates = (clientX, clientY) => {
     const pt = svgRef.current.createSVGPoint();
@@ -212,7 +231,7 @@ export default function Smudge({
   }, /*#__PURE__*/React.createElement("svg", {
     ref: svgRef,
     width: "100%",
-    height: "240",
+    height: previewHeight,
     viewBox: pathBounds ? `${pathBounds.minX - 20} ${pathBounds.minY - 20} ${pathBounds.width + 40} ${pathBounds.height + 40}` : '0 0 600 200',
     preserveAspectRatio: "xMidYMid meet",
     style: {

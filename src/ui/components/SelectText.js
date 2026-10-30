@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import opentype from 'opentype.js';
 import { getWarpFunction } from '../shapes/index.js';
+import { countTextCharacters, MAX_TEXT_CHARACTERS } from '../utils/textLimit.js';
+import PreviewExpandButton from './PreviewExpandButton.js';
 const FontSelector = ({
   fonts,
   onSelect,
@@ -276,11 +278,10 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     width: '100%',
-    height: 'calc(100% - 55px)'
+    height: 'auto'
   },
   content: {
-    flex: 1,
-    overflowY: 'auto',
+    overflowY: 'visible',
     overflowX: 'hidden'
   },
   preview: {
@@ -386,7 +387,7 @@ const styles = {
   }
 };
 export default function SelectText({
-  sandboxProxy,
+  insertWarpedSvg,
   text,
   setText,
   fontUrl,
@@ -398,12 +399,18 @@ export default function SelectText({
   alignment,
   setAlignment,
   warpType,
-  intensity
+  intensity,
+  expanded = false,
+  showInsert = true,
+  onExpand,
+  isExpanding = false
 }) {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [previewHovered, setPreviewHovered] = useState(false);
   const [svgPath, setSvgPath] = useState("");
   const [pathBounds, setPathBounds] = useState(null);
+  const characterCount = countTextCharacters(text);
   const calculatePathBounds = commands => {
     let minX = Infinity,
       minY = Infinity,
@@ -576,13 +583,13 @@ export default function SelectText({
     });
   }, [text, fontUrl, lineHeight, letterSpacing, alignment, warpType, intensity]);
   const handleInsert = async () => {
-    if (!svgPath || !sandboxProxy) {
-      console.error('SVG path or sandbox proxy not available');
+    if (!svgPath || !insertWarpedSvg) {
+      console.error('SVG path or image import API not available');
       return;
     }
     setIsLoading(true);
     try {
-      const result = await sandboxProxy.insertWarpedSVG({
+      const result = await insertWarpedSvg({
         d: svgPath,
         bounds: pathBounds,
         originalText: text,
@@ -609,7 +616,12 @@ export default function SelectText({
   }, /*#__PURE__*/React.createElement("label", {
     style: styles.label
   }, "Preview"), /*#__PURE__*/React.createElement("div", {
-    style: styles.preview
+    style: {
+      ...styles.preview,
+      height: expanded ? '360px' : styles.preview.height
+    },
+    onMouseEnter: () => setPreviewHovered(true),
+    onMouseLeave: () => setPreviewHovered(false)
   }, error ? /*#__PURE__*/React.createElement("div", {
     style: {
       color: '#ff4444',
@@ -630,7 +642,11 @@ export default function SelectText({
     d: svgPath,
     fill: "black",
     stroke: "none"
-  }))), /*#__PURE__*/React.createElement("div", {
+  })), /*#__PURE__*/React.createElement(PreviewExpandButton, {
+    onClick: onExpand,
+    isLoading: isExpanding,
+    previewHovered: previewHovered
+  })), /*#__PURE__*/React.createElement("div", {
     style: styles.content
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -640,16 +656,35 @@ export default function SelectText({
   }, /*#__PURE__*/React.createElement("label", {
     style: styles.label
   }, "Text"), /*#__PURE__*/React.createElement("textarea", {
-    style: styles.textInput,
+    style: {
+      ...styles.textInput,
+      width: expanded ? '100%' : styles.textInput.width
+    },
     value: text,
     onChange: e => setText(e.target.value),
     placeholder: "Enter text to render\\nMulti-line supported\\nEach line renders separately",
     rows: 3,
     onFocus: e => e.target.style.borderColor = '#1178FF',
     onBlur: e => e.target.style.borderColor = '#CBE2FF'
-  })), /*#__PURE__*/React.createElement("div", {
+  }), /*#__PURE__*/React.createElement("div", {
     style: {
-      width: '280px',
+      display: 'flex',
+      justifyContent: 'space-between',
+      marginTop: '6px'
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: '12px',
+      color: '#666'
+    }
+  }, "Max ", MAX_TEXT_CHARACTERS, " characters"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: '12px',
+      color: characterCount >= MAX_TEXT_CHARACTERS ? '#d9534f' : '#666'
+    }
+  }, characterCount, "/", MAX_TEXT_CHARACTERS))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: expanded ? '100%' : '280px',
       height: '227px',
       marginTop: '24px'
     }
@@ -885,7 +920,7 @@ export default function SelectText({
       height: '2px',
       backgroundColor: '#666'
     }
-  }))))))), /*#__PURE__*/React.createElement("button", {
+  }))))))), showInsert && /*#__PURE__*/React.createElement("button", {
     onClick: handleInsert,
     disabled: isLoading || !svgPath,
     style: isLoading || !svgPath ? styles.insertButtonDisabled : styles.insertButton,
