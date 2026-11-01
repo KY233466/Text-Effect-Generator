@@ -65,6 +65,17 @@ const FontSelector = ({
   const renderFontOption = font => /*#__PURE__*/React.createElement("div", {
     key: font.name,
     onClick: () => handleSelect(font),
+    onKeyDown: event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        handleSelect(font);
+      }
+    },
+    role: "option",
+    tabIndex: 0,
+    "aria-selected": selectedFont?.name === font.name,
+    "aria-label": `Use ${font.name} font`,
+    title: `Use ${font.name} font`,
     style: {
       padding: '10px',
       borderBottom: '1px solid #f0f0f0',
@@ -88,6 +99,18 @@ const FontSelector = ({
     ref: dropdownRef
   }, /*#__PURE__*/React.createElement("div", {
     onClick: toggleDropdown,
+    onKeyDown: event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        toggleDropdown();
+      }
+    },
+    role: "button",
+    tabIndex: 0,
+    "aria-label": `Font: ${displayFont.name}`,
+    "aria-haspopup": "listbox",
+    "aria-expanded": isOpen,
+    title: `Font: ${displayFont.name}`,
     style: {
       width: '100%',
       height: '40px',
@@ -116,6 +139,8 @@ const FontSelector = ({
     strokeLinecap: "round",
     strokeLinejoin: "round"
   }))), isOpen && /*#__PURE__*/React.createElement("div", {
+    role: "listbox",
+    "aria-label": "Fonts",
     style: {
       position: 'absolute',
       top: '45px',
@@ -129,9 +154,22 @@ const FontSelector = ({
       zIndex: 10
     }
   }, fonts.map(item => item.group ? /*#__PURE__*/React.createElement("div", {
-    key: item.group
+    key: item.group,
+    role: "group",
+    "aria-label": `${item.group} fonts`
   }, /*#__PURE__*/React.createElement("div", {
     onClick: () => toggleGroup(item.group),
+    onKeyDown: event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        toggleGroup(item.group);
+      }
+    },
+    role: "button",
+    tabIndex: 0,
+    "aria-label": `${openGroups[item.group] ? 'Collapse' : 'Expand'} ${item.group} fonts`,
+    "aria-expanded": Boolean(openGroups[item.group]),
+    title: `${openGroups[item.group] ? 'Collapse' : 'Expand'} ${item.group} fonts`,
     style: {
       padding: '10px',
       borderBottom: '1px solid #f0f0f0',
@@ -685,14 +723,23 @@ export default function SelectText({
   }, characterCount, "/", MAX_TEXT_CHARACTERS))), /*#__PURE__*/React.createElement("div", {
     style: {
       width: expanded ? '100%' : '280px',
-      height: '227px',
+      height: expanded ? 'auto' : '227px',
       marginTop: '24px'
     }
   }, /*#__PURE__*/React.createElement("label", {
     style: styles.label
   }, "Typography"), /*#__PURE__*/React.createElement("div", {
+    style: expanded ? {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+      gap: '12px',
+      alignItems: 'stretch'
+    } : {
+      display: 'block'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
     style: {
-      marginBottom: '12px'
+      marginBottom: expanded ? 0 : '12px'
     }
   }, /*#__PURE__*/React.createElement(FontSelector, {
     fonts: fonts,
@@ -702,20 +749,29 @@ export default function SelectText({
     style: {
       display: 'flex',
       alignItems: 'center',
-      marginBottom: '12px',
+      marginBottom: expanded ? 0 : '12px',
       backgroundColor: '#EBF3FE',
       padding: '10px',
       borderRadius: '5px'
     }
+  }, /*#__PURE__*/React.createElement("span", {
+    role: "img",
+    "aria-label": "Line height",
+    title: "Line height",
+    style: {
+      display: 'inline-flex',
+      alignItems: 'center'
+    }
   }, /*#__PURE__*/React.createElement("img", {
     src: "./icon/line_height.svg",
-    alt: "icon",
+    alt: "",
+    "aria-hidden": "true",
     style: {
       width: '12px',
       height: '12px',
       marginTop: '2px'
     }
-  }), /*#__PURE__*/React.createElement("span", {
+  })), /*#__PURE__*/React.createElement("span", {
     style: {
       width: '30px',
       marginLeft: '12px',
@@ -727,6 +783,8 @@ export default function SelectText({
     max: "2.5",
     step: "0.1",
     value: lineHeight,
+    "aria-label": "Line height",
+    "aria-valuetext": `${lineHeight} line height`,
     onChange: e => {
       const value = Number(e.target.value);
       setLineHeight(value);
@@ -748,20 +806,29 @@ export default function SelectText({
     style: {
       display: 'flex',
       alignItems: 'center',
-      marginBottom: '12px',
+      marginBottom: expanded ? 0 : '12px',
       backgroundColor: '#EBF3FE',
       padding: '10px',
       borderRadius: '5px'
     }
+  }, /*#__PURE__*/React.createElement("span", {
+    role: "img",
+    "aria-label": "Letter spacing",
+    title: "Letter spacing",
+    style: {
+      display: 'inline-flex',
+      alignItems: 'center'
+    }
   }, /*#__PURE__*/React.createElement("img", {
     src: "./icon/letter_spacing.svg",
-    alt: "icon",
+    alt: "",
+    "aria-hidden": "true",
     style: {
       width: '12px',
       height: '12px',
       marginTop: '2px'
     }
-  }), /*#__PURE__*/React.createElement("span", {
+  })), /*#__PURE__*/React.createElement("span", {
     style: {
       width: '30px',
       marginLeft: '12px',
@@ -772,6 +839,8 @@ export default function SelectText({
     min: "0",
     max: "20",
     value: letterSpacing,
+    "aria-label": "Letter spacing",
+    "aria-valuetext": `${letterSpacing} letter spacing`,
     onChange: e => {
       const value = Number(e.target.value);
       setLetterSpacing(value);
@@ -796,6 +865,9 @@ export default function SelectText({
     }
   }, /*#__PURE__*/React.createElement("button", {
     onClick: () => setAlignment('left'),
+    "aria-label": "Align text left",
+    "aria-pressed": alignment === 'left',
+    title: "Align text left",
     style: {
       ...styles.alignment,
       backgroundColor: alignment === 'left' ? 'white' : '#EBF3FE',
@@ -833,6 +905,9 @@ export default function SelectText({
     }
   }))), /*#__PURE__*/React.createElement("button", {
     onClick: () => setAlignment('center'),
+    "aria-label": "Center text",
+    "aria-pressed": alignment === 'center',
+    title: "Center text",
     style: {
       ...styles.alignment,
       backgroundColor: alignment === 'center' ? 'white' : '#EBF3FE',
@@ -878,6 +953,9 @@ export default function SelectText({
     }
   })))), /*#__PURE__*/React.createElement("button", {
     onClick: () => setAlignment('right'),
+    "aria-label": "Align text right",
+    "aria-pressed": alignment === 'right',
+    title: "Align text right",
     style: {
       ...styles.alignment,
       backgroundColor: alignment === 'right' ? 'white' : '#EBF3FE',
@@ -920,7 +998,7 @@ export default function SelectText({
       height: '2px',
       backgroundColor: '#666'
     }
-  }))))))), showInsert && /*#__PURE__*/React.createElement("button", {
+  })))))))), showInsert && /*#__PURE__*/React.createElement("button", {
     onClick: handleInsert,
     disabled: isLoading || !svgPath,
     style: isLoading || !svgPath ? styles.insertButtonDisabled : styles.insertButton,

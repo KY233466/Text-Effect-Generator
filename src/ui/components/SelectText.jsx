@@ -72,6 +72,17 @@ const FontSelector = ({ fonts, onSelect, currentFontUrl }) => {
     <div
       key={font.name}
       onClick={() => handleSelect(font)}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          handleSelect(font);
+        }
+      }}
+      role="option"
+      tabIndex={0}
+      aria-selected={selectedFont?.name === font.name}
+      aria-label={`Use ${font.name} font`}
+      title={`Use ${font.name} font`}
       style={{
         padding: '10px',
         borderBottom: '1px solid #f0f0f0',
@@ -93,6 +104,18 @@ const FontSelector = ({ fonts, onSelect, currentFontUrl }) => {
     <div style={{ position: 'relative', width: '100%' }} ref={dropdownRef}>
       <div
         onClick={toggleDropdown}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            toggleDropdown();
+          }
+        }}
+        role="button"
+        tabIndex={0}
+        aria-label={`Font: ${displayFont.name}`}
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        title={`Font: ${displayFont.name}`}
         style={{
           width: '100%',
           height: '40px',
@@ -116,6 +139,8 @@ const FontSelector = ({ fonts, onSelect, currentFontUrl }) => {
       </div>
       {isOpen && (
         <div
+          role="listbox"
+          aria-label="Fonts"
           style={{
             position: 'absolute',
             top: '45px',
@@ -131,9 +156,20 @@ const FontSelector = ({ fonts, onSelect, currentFontUrl }) => {
         >
           {fonts.map((item) => (
             item.group ? (
-              <div key={item.group}>
+              <div key={item.group} role="group" aria-label={`${item.group} fonts`}>
                 <div
                   onClick={() => toggleGroup(item.group)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      toggleGroup(item.group);
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`${openGroups[item.group] ? 'Collapse' : 'Expand'} ${item.group} fonts`}
+                  aria-expanded={Boolean(openGroups[item.group])}
+                  title={`${openGroups[item.group] ? 'Collapse' : 'Expand'} ${item.group} fonts`}
                   style={{
                     padding: '10px',
                     borderBottom: '1px solid #f0f0f0',
@@ -629,49 +665,73 @@ export default function SelectText({ insertWarpedSvg,
           </div>
         </div>
 
-        <div style={{ width: expanded ? '100%' : '280px', height: '227px', marginTop: '24px' }}>
+        <div style={{ width: expanded ? '100%' : '280px', height: expanded ? 'auto' : '227px', marginTop: '24px' }}>
           <label style={styles.label}>Typography</label>
-          <div style={{ marginBottom: '12px' }}>
-            <FontSelector
-              fonts={fonts}
-              onSelect={(font) => setFontUrl(font.url)}
-              currentFontUrl={fontUrl}
-            />
-          </div>
+          <div style={expanded ? {
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+            gap: '12px',
+            alignItems: 'stretch',
+          } : { display: 'block' }}>
+            <div style={{ marginBottom: expanded ? 0 : '12px' }}>
+              <FontSelector
+                fonts={fonts}
+                onSelect={(font) => setFontUrl(font.url)}
+                currentFontUrl={fontUrl}
+              />
+            </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px', backgroundColor: '#EBF3FE', padding: '10px', borderRadius: '5px' }}>
-            <img src="./icon/line_height.svg" alt="icon" style={{ width: '12px', height: '12px', marginTop: '2px' }} />
-            <span style={{ width: '30px', marginLeft: '12px', fontSize: '12px' }}>{lineHeight}</span>
-            <input
-              type="range"
-              min="0.8"
-              max="2.5"
-              step="0.1"
-              value={lineHeight}
-              onChange={e => {
-                const value = Number(e.target.value);
-                setLineHeight(value);
-                const progress = ((value - 0.8) / (2.5 - 0.8)) * 100;
-                e.target.style.setProperty('--progress', `${progress}%`);
-              }}
-              onInput={e => {
-                const value = Number(e.target.value);
-                const progress = ((value - 0.8) / (2.5 - 0.8)) * 100;
-                e.target.style.setProperty('--progress', `${progress}%`);
-              }}
-              className="intensity-slider"
-              style={{ marginTop: '5px', width: '80%', '--progress': `${((lineHeight - 0.8) / (2.5 - 0.8)) * 100}%` }}
-            />
-          </div>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: expanded ? 0 : '12px', backgroundColor: '#EBF3FE', padding: '10px', borderRadius: '5px' }}>
+              <span
+                role="img"
+                aria-label="Line height"
+                title="Line height"
+                style={{ display: 'inline-flex', alignItems: 'center' }}
+              >
+                <img src="./icon/line_height.svg" alt="" aria-hidden="true" style={{ width: '12px', height: '12px', marginTop: '2px' }} />
+              </span>
+              <span style={{ width: '30px', marginLeft: '12px', fontSize: '12px' }}>{lineHeight}</span>
+              <input
+                type="range"
+                min="0.8"
+                max="2.5"
+                step="0.1"
+                value={lineHeight}
+                aria-label="Line height"
+                aria-valuetext={`${lineHeight} line height`}
+                onChange={e => {
+                  const value = Number(e.target.value);
+                  setLineHeight(value);
+                  const progress = ((value - 0.8) / (2.5 - 0.8)) * 100;
+                  e.target.style.setProperty('--progress', `${progress}%`);
+                }}
+                onInput={e => {
+                  const value = Number(e.target.value);
+                  const progress = ((value - 0.8) / (2.5 - 0.8)) * 100;
+                  e.target.style.setProperty('--progress', `${progress}%`);
+                }}
+                className="intensity-slider"
+                style={{ marginTop: '5px', width: '80%', '--progress': `${((lineHeight - 0.8) / (2.5 - 0.8)) * 100}%` }}
+              />
+            </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px', backgroundColor: '#EBF3FE', padding: '10px', borderRadius: '5px' }}>
-            <img src="./icon/letter_spacing.svg" alt="icon" style={{ width: '12px', height: '12px', marginTop: '2px' }} />
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: expanded ? 0 : '12px', backgroundColor: '#EBF3FE', padding: '10px', borderRadius: '5px' }}>
+            <span
+              role="img"
+              aria-label="Letter spacing"
+              title="Letter spacing"
+              style={{ display: 'inline-flex', alignItems: 'center' }}
+            >
+              <img src="./icon/letter_spacing.svg" alt="" aria-hidden="true" style={{ width: '12px', height: '12px', marginTop: '2px' }} />
+            </span>
             <span style={{ width: '30px', marginLeft: '12px', fontSize: '12px' }}>{letterSpacing}</span>
             <input
               type="range"
               min="0"
               max="20"
               value={letterSpacing}
+              aria-label="Letter spacing"
+              aria-valuetext={`${letterSpacing} letter spacing`}
               onChange={e => {
                 const value = Number(e.target.value);
                 setLetterSpacing(value);
@@ -691,6 +751,9 @@ export default function SelectText({ insertWarpedSvg,
           <div style={{ display: 'flex', gap: '12px' }}>
             <button
               onClick={() => setAlignment('left')}
+              aria-label="Align text left"
+              aria-pressed={alignment === 'left'}
+              title="Align text left"
               style={{
                 ...styles.alignment,
                 backgroundColor: alignment === 'left' ? 'white' : '#EBF3FE',
@@ -706,6 +769,9 @@ export default function SelectText({ insertWarpedSvg,
 
             <button
               onClick={() => setAlignment('center')}
+              aria-label="Center text"
+              aria-pressed={alignment === 'center'}
+              title="Center text"
               style={{
                 ...styles.alignment,
                 backgroundColor: alignment === 'center' ? 'white' : '#EBF3FE',
@@ -728,6 +794,9 @@ export default function SelectText({ insertWarpedSvg,
 
             <button
               onClick={() => setAlignment('right')}
+              aria-label="Align text right"
+              aria-pressed={alignment === 'right'}
+              title="Align text right"
               style={{
                 ...styles.alignment,
                 backgroundColor: alignment === 'right' ? 'white' : '#EBF3FE',
@@ -747,6 +816,7 @@ export default function SelectText({ insertWarpedSvg,
                 </div>
               </div>
             </button>
+          </div>
           </div>
         </div>
       </div>
