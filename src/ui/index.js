@@ -3,7 +3,9 @@ import { createRoot } from "react-dom/client";
 import addOnUISdk from "https://new.express.adobe.com/static/add-on-sdk/sdk.js";
 import TextWarpApp from "./TextWarpApp.js";
 import { insertWarpedSvg } from "./utils/svgImport.js";
+import { installUIInteractionGuards } from "./utils/uiInteractionGuards.js";
 import { EDITOR_DRAFT_STORAGE_KEY, normalizeEditorState } from "./utils/editorState.js";
+installUIInteractionGuards();
 addOnUISdk.ready.then(() => {
   const container = document.getElementById("root");
   const root = createRoot(container);
